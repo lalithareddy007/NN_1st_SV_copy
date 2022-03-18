@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <title>LMS</title>
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/font-awesome.min.css}"/>
+    <link th:href="@{/css/LmsStyle.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top" style="background-color: #DB2077;" th:fragment="headerfragment">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#" class="navbar-left"><img th:src="@{/icons/lms.ico}"></a>
+            <!--<a class="navbar-brand">LMS</a>  -->
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li th:classappend="${module == 'program' ? 'active' : ''}">
+                    <a href="#" th:href="@{/program}">Program</a>
+                </li>
+                <li th:classappend="${module == 'batch' ? 'active' : ''}">
+                    <a href="#" th:href="@{/programbatch}">Batch</a>
+                </li>
+                <li th:classappend="${module == 'batch' ? 'active' : ''}">
+                    <a href="#" th:href="@{/class}">Class</a>
+                </li>
+                <li th:classappend="${module == 'batch' ? 'active' : ''}">
+                    <a href="#" th:href="@{/attendance}">Attendance</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <!--             <li th:if="${#authorization.expression('!isAuthenticated()')}"> -->
+                <li th:if=true>
+                    <a href="/signin" th:href="@{/signin}">
+                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp;Sign in
+                    </a>
+                </li>
+                <!--            <li th:if="${#authorization.expression('isAuthenticated()')}"> -->
+                <li th:if=false>
+                    <a href="/logout" th:href="@{#}" onclick="$('#form').submit();">
+                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp;Logout
+                    </a>
+                    <form style="visibility: hidden" id="form" method="post" action="#" th:action="@{/logout}"></form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="message" th:fragment="messagefragment">
+    <span th:text="${message}"></span>
+</div>
+<div class="error" th:fragment="errorfragment">
+    <ul th:each="error : ${errors}">
+        <li>[[${error}]]</li>
+    </ul>
+</div>
+</body>
+</html>
