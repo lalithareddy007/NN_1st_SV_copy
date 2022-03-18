@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>LMS</title>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <link rel="icon" type="image/ico" th:href="@{/icons/favicon.ico}"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link th:href="@{/css/LmsStyle.css}" rel="stylesheet"/>
+
+    <script th:src="@{/webjars/momentjs/min/moment.min.js}" type="text/javascript"></script>
+    <link th:src="@{/webjars/Eonasdan-bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css}"
+          rel="stylesheet"/>
+    <script th:src="@{/webjars/Eonasdan-bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js}"
+            type="text/javascript"></script>
+
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap-select/css/bootstrap-select.min.css}">
+    <script th:src="@{/webjars/bootstrap-select/js/bootstrap-select.min.js}"></script>
+</head>
+
+<body>
+<div th:replace="fragments/header :: headerfragment"/>
+<div class="module">
+    <br/>
+    <h2 align="center">Add Class</h2>
+    <br/>
+</div>
+<div class="container my-5">
+    <form th:method="get" th:action="@{/class}">
+        <button type="submit" class="arrow-left">Back</button>
+        <br/>
+    </form>
+    <form method="post" th:action="@{/class/add}" th:object="${model}">
+        <br/>
+        <div th:replace="fragments/header :: messagefragment"/>
+        <table>
+            <tr>
+                <td><label for="batchId" class="col-form-label">Batch Id</label></td>
+                <td>
+                    <select class="selectpicker" data-live-search="true" id="batchId" th:field="*{batchId}">
+                        <option th:each="batchItem : ${batch}" th:value="${batchItem.batchId}"
+                                th:text="|${batchItem.batchName} - ${batchItem.batchDescription}|">
+                        </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classNo" class="col-form-label">Class No</label></td>
+                <td>
+                    <input id="classNo" placeholder="Class No" required type="text"
+                           th:field="*{classNo}"
+                           class="form-control"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classDate" class="col-form-label">Class Date</label></td>
+                <td>
+                    <div class="container">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class='input-group date' id='classDatePicker'>
+                                    <input id="classDate" th:field="*{classDate}" placeholder="Class Date" required
+                                           type='text' class="form-control"/>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classTopic" class="col-form-label">Class Topic</label></td>
+                <td>
+                    <input id="classTopic" placeholder="Class Topic" required type="text"
+                           th:field="*{classTopic}"
+                           class="form-control"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classStaffId" class="col-form-label">Staff Id</label></td>
+                <td>
+                    <input id="classStaffId" placeholder="Staff Id" type="text"
+                           th:field="*{classStaffId}"
+                           class="form-control"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classDescription" class="col-form-label">Description</label></td>
+                <td>
+                    <input id="classDescription" placeholder="Description" type="text"
+                           th:field="*{classDescription}"
+                           class="form-control"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classComments" class="col-form-label">Comments</label></td>
+                <td>
+                    <input id="classComments" placeholder="Comments" type="text"
+                           th:field="*{classComments}"
+                           class="form-control"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classNotes" class="col-form-label">Notes</label></td>
+                <td>
+                    <input id="classNotes" placeholder="Notes" type="text"
+                           th:field="*{classNotes}"
+                           class="form-control"/>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="classRecordingPath" class="col-form-label">Recording</label></td>
+                <td>
+                    <input id="classRecordingPath" placeholder="Recording" type="text"
+                           th:field="*{classRecordingPath}"
+                           class="form-control"/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center">
+                    <div th:replace="fragments/header :: errorfragment"/>
+                    <button type="submit" class="block">Add</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script type="text/javascript">
+    $('#classDatePicker').datetimepicker({
+        format: 'DD/MM/yyyy h:mm a'
+    });
+    $(document).ready(function() {
+        $('#batchId').selectpicker();
+    });
+
+</script>
+</body>
+</html>
