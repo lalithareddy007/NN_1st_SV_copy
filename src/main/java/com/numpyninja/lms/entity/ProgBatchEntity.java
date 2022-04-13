@@ -26,7 +26,10 @@ public class ProgBatchEntity {
     String batchStatus;
 
     @Positive(message = "Batch Program ID invalid")
-    Long batchProgramId;
+	@ManyToOne ( cascade = CascadeType.ALL , fetch = FetchType.LAZY)       // LMSPhase2 changes
+    @JoinColumn ( name = "batch_program_id", nullable = false )  // LMSPhase2 changes
+    //Long batchProgramId;                             
+    private ProgramEntity program;                         // LMSPhase2 changes
 
     Integer batchNoOfClasses;
 }
