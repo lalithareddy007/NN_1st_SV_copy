@@ -8,7 +8,6 @@ spring:
     username: root
     password: root
   jackson.deserialization.fail-on-unknown-properties: true
-  jackson.serialization.fail-on-empty-beans: false  # LMSPhase2 changes
   mvc.hiddenmethod.filter.enabled: true
   main.allow-bean-definition-overriding: true
   #hibernate ddl Auto for CURDOperations
