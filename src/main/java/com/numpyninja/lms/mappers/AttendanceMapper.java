@@ -9,8 +9,6 @@ import org.mapstruct.factory.Mappers;
 import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.entity.Attendance;
 
-
-
 @Mapper(componentModel = "spring", uses={ClassScheduleMapper.class, UserMapper.class})
 public interface AttendanceMapper {
 

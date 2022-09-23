@@ -9,7 +9,6 @@ import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.Class;
-
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 	//Get Attendance by Student

@@ -1,10 +1,7 @@
 package com.numpyninja.lms.services;
 
-import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.AttendanceDto;
-import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.Attendance;
-import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.exception.ResourceNotFoundException;

@@ -26,11 +26,10 @@ import com.numpyninja.lms.services.AttendanceServices;
 
 @RestController
 @RequestMapping("/attendance")
-public class AttendanceController {
+public class AttendanceController{
 
 	@Autowired
 	private AttendanceServices attendanceServices;
-
 	// get all attendances
 	@GetMapping("")
 	protected ResponseEntity<List<AttendanceDto>> getAllAssignments() {
