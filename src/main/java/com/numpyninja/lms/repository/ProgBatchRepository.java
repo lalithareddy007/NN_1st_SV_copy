@@ -11,7 +11,7 @@ import com.numpyninja.lms.entity.Batch;
 @Repository
 public interface ProgBatchRepository extends JpaRepository<Batch, Integer>  {
  
-	List<Batch> findByBatchName(String programName);
+	List<Batch> findByBatchName(String batchName);
 
     List<Batch> findByBatchNameContainingIgnoreCaseOrderByBatchIdAsc(String batchName);
 
