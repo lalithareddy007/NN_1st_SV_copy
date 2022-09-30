@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.numpyninja.lms.dto.BatchDTO;
 import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.Program;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.BatchMapper;
 import com.numpyninja.lms.repository.ProgBatchRepository;
@@ -56,6 +57,10 @@ public class ProgBatchServices {
     	Batch newBatch = batchMapper.toBatch(batchDTO );
     	Program program = programRepository.findById( programId ).orElseThrow(()-> new ResourceNotFoundException("Program", "Id", programId));
     	newBatch.setProgram(program);
+		Batch result = progBatchRepository.findByBatchNameAndProgram_ProgramId(newBatch.getBatchName(), programId);
+		if ( result != null)
+			 throw new DuplicateResourceFoundException ( "Program " +program.getProgramName() + " with Batch-" + newBatch.getBatchName() 
+			            + " already exists:" + " ; Please give a different batch Name or Choose a different Program"); 
     	newBatch.setCreationTime(new Timestamp( new Date().getTime()));
     	newBatch.setLastModTime(new Timestamp( new Date().getTime()));
     	Batch batchCreated = progBatchRepository.save(newBatch);
