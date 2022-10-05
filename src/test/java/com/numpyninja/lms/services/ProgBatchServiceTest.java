@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import com.numpyninja.lms.dto.BatchDTO;
 import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.Program;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.BatchMapper;
 import com.numpyninja.lms.repository.ProgramRepository;
@@ -118,7 +120,7 @@ public class ProgBatchServiceTest {
     }
        
     @DisplayName("JUnit test for getBatchById method")
-    //@Test
+    @Test
     @Order(3)
     public void givenBatchId_WhenGetBatchById_ThenReturnBatchDTO(){
     	// given
@@ -134,10 +136,10 @@ public class ProgBatchServiceTest {
     }
     
     
-	@DisplayName("JUnit test for findBatchByProgramId")         /* newly added */
+	@DisplayName("JUnit test for findBatchByProgramId")          
 	@Test
 	@Order(4)	
-	public void givenProgramId_WhenGetBatches_ThenReturnListOfBatches(Long programid) {
+	public void givenProgramId_WhenGetBatches_ThenReturnListOfBatches() {
 		// given
 		Long programId = (long)1; 
     	List<Batch> prog1List= new ArrayList();
@@ -161,7 +163,7 @@ public class ProgBatchServiceTest {
     
 	
     @DisplayName("JUnit test to create Batch")
-	//@Test
+	@Test
 	@Order(5)
 	public void givenBatchDTO_WhenSave_ThenReturnSavedBatchDTO() throws Exception {
 		// given
@@ -173,15 +175,32 @@ public class ProgBatchServiceTest {
 		
 		// when
 		BatchDTO savedBatchDTO = batchService.createBatch(batchDTO3);
+
 		// Then
 		assertThat(savedBatchDTO).isNotNull();  
 		assertThat(savedBatchDTO.getBatchId()).isEqualTo(3);
 	}
     
-	
+    
+    @DisplayName("JUnit test to create a duplicate Batch")                  
+	@Test                                                                       
+	@Order(6)                         
+	public void givenExistingBatch_WhenSave_ThenThrowsException() throws Exception {
+		// given
+		Long programId = (long)2; 
+		given(programRepository.findById(programId)).willReturn( Optional.of(program2) );
+		given (  batchMapper.toBatch( batchDTO3 )).willReturn(batch3);
+		given (batchRepository.findByBatchNameAndProgram_ProgramId(batch3.getBatchName(), programId)).willReturn(batch3);
+		
+		// when && then
+		Assertions.assertThrows(DuplicateResourceFoundException.class, ()->batchService.createBatch(batchDTO3));
+	}
+    
+    
+    
 	@DisplayName("JUnit test for update Batch")
-	//@Test
-	@Order(6)
+	@Test
+	@Order(7)
 	public void givenUpdatedBatch_WhenUpdateBatch_ThenReturnUpdateBatchObject()  throws Exception {
 		// given
 		Integer batchId = 1; Long programIdToUpdate = (long)2 ;
@@ -202,8 +221,8 @@ public class ProgBatchServiceTest {
 	
 	
 	@DisplayName("JUnit test for delete Batch")
-	//@Test
-	@Order(7)
+	@Test
+	@Order(8)
 	public void givenBatchId_WhenDeleteBatch_ThenDeleteBatchInDB() throws Exception{
 		//given
 		Integer batchId = 2;
