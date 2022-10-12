@@ -77,6 +77,7 @@ public class ProgBatchServices {
     	batchDetailToUpdt.setProgram(program);
     	batchDetailToUpdt.setCreationTime(exisBatch.getCreationTime() );
     	batchDetailToUpdt.setLastModTime( new Timestamp( new Date().getTime()));
+        batchDetailToUpdt.setBatchId(exisBatch.getBatchId()); //setting existing batch id
     	return batchMapper.toBatchDTO( progBatchRepository.save(batchDetailToUpdt) );
     }
 
