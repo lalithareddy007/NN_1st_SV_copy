@@ -139,7 +139,7 @@ public class ClassService {
   	 }
   		
     //get all classes by batchId
-      @Transactional
+     /* @Transactional
       public List<ClassDto> getClassesByBatchId(Integer batchId) throws ResourceNotFoundException,IllegalArgumentException
   	{
   		if(batchId!=null)
@@ -158,10 +158,32 @@ public class ClassService {
   			System.out.println("batchId search string cannot be null");
   			throw new IllegalArgumentException();
   		}
-   	}
+   	}*/
+
+	//get all classes by batchId
+	@Transactional
+	public List<ClassDto> getClassesByBatchId(Integer batchId) throws ResourceNotFoundException,IllegalArgumentException
+	{
+		if(batchId!=null)
+		{
+			List<Class> result=classRepository.findByBatchInClass_batchId(batchId);
+			if(!(result.size()<=0))
+			{
+				return (classMapper.toClassScheduleDTOList(result));
+
+			}else
+			{
+				throw new ResourceNotFoundException("classes with this batchId "+batchId +"not found");
+			}
+		}else
+		{
+			System.out.println("batchId search string cannot be null");
+			throw new IllegalArgumentException();
+		}
+	}
       
     //get all classes by classStaffId
-      public List<ClassDto> getClassesByStaffId(String staffId) throws ResourceNotFoundException,IllegalArgumentException
+     /* public List<ClassDto> getClassesByStaffId(String staffId) throws ResourceNotFoundException,IllegalArgumentException
     	{
     		if(staffId!=null)
     		{ 
@@ -179,8 +201,27 @@ public class ClassService {
     			System.out.println("staffId search string cannot be null");
     			throw new IllegalArgumentException();
     		}
-     	}
-      
+     	}*/
+//get all classes by classStaffId
+	public List<ClassDto> getClassesByStaffId(String staffId) throws ResourceNotFoundException,IllegalArgumentException
+	{
+		if(staffId!=null)
+		{
+			List<Class> result=classRepository.findBystaffInClass_userId(staffId);
+			if(!(result.size()<=0))
+			{
+				return (classMapper.toClassScheduleDTOList(result));
+
+			}else
+			{
+				throw new ResourceNotFoundException("classes with this staffId "+staffId +" not found");
+			}
+		}else
+		{
+			System.out.println("staffId search string cannot be null");
+			throw new IllegalArgumentException();
+		}
+	}
     //get all classes by classDate
       //coming soon
     
