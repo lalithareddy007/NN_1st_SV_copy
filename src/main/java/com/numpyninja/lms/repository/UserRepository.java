@@ -5,7 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import com.numpyninja.lms.entity.User;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository< User, String>{
 
+        Optional<User> findById(String s);
 }
