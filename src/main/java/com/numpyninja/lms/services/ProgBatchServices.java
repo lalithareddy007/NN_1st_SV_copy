@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+import com.numpyninja.lms.entity.Class;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -100,8 +101,23 @@ public class ProgBatchServices {
 
 
     // get Batches by Program ID         
+   /* public List<BatchDTO> findBatchByProgramId(Long programid) {
+      return batchMapper.toBatchDTOs(progBatchRepository.findByProgramProgramId(programid));
+    }*/
+    // get Batches by Program ID
     public List<BatchDTO> findBatchByProgramId(Long programid) {
-      return batchMapper.toBatchDTOs(progBatchRepository.findByProgramProgramId(programid));      
+        if (programid != null) {
+            List<Batch> result = progBatchRepository.findByProgramProgramId(programid);
+            if (!(result.size() <= 0)) {
+                return (batchMapper.toBatchDTOs(result));
+
+            } else {
+                throw new ResourceNotFoundException("batch with this programId " + programid + "not found");
+            }
+        } else {
+            System.out.println("programId search string cannot be null");
+            throw new IllegalArgumentException();
+        }
     }
 
     public void deleteProgramBatch(Integer batchId) {
