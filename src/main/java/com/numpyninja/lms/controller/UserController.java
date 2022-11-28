@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.numpyninja.lms.dto.UserAndRoleDTO;
 import com.numpyninja.lms.dto.UserDto;
+import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.exception.DuplicateResourceFound;
 import com.numpyninja.lms.exception.InvalidDataException;
@@ -42,65 +43,87 @@ public class UserController {
  
     }
 
-
+	//get all users from LMS_Users table
 	@GetMapping("/users")
 	public ResponseEntity<List<User>> getAllUsers() {
 		List<User> userList = userServices.getAllUsers();
 		return ResponseEntity.ok(userList);  
 	}
 	
+	//get user by ID from LMS_Users table	
 	@GetMapping("/users/{id}")
 	public ResponseEntity<UserDto> getAllUsersById(@PathVariable String id) throws ResourceNotFoundException {
 		UserDto userDto = userServices.getAllUsersById(id);
 		return ResponseEntity.status(200).body(userDto);
 	}
 	
-    @GetMapping("/users/roles/{rolename}")
-    protected List<?> getAllRoles(@PathVariable(value="rolename")String roleName) {
-    	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
+	//Get all users with all their info - Role, status, Program, Batch
+	@GetMapping("/users/roles")
+    protected List<?> getAllUsersWithRoles() {
+    	return userServices.getAllUsersWithRoles() ;
     }
     
+	//Check if this is needed form front end or not??
+	//Get all the users for a given role (Admin,Staff,User)- only giving user table info
+    @GetMapping("/users/roles/{rolename}")
+    protected List<?> getAllUsersByRole(@PathVariable(value="rolename")String roleName) {
+    	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
+    }
+	
+   /* @GetMapping("/users/roles/{rolename}")
+    protected List<?> getAllRoles(@PathVariable(value="rolename")String roleName) {
+    	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
+    }*/
+    
+    //To check if this is needed from front end? 
+    // Batch value coming empty?? - check this logic
     @GetMapping("/users/programs/{programid}")
     protected List<?> getUsersForProgram(@PathVariable(value="programid")Long programId) {
         return userServices.getUsersForProgram(programId);
     }
     
+    //Creates user only but no role added
     @PostMapping("/users")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto newuserDto) throws InvalidDataException, DuplicateResourceFound {
     	UserDto responseDto = userServices.createUser(newuserDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);  
     }
     
+    //create user with Role 
     @PostMapping("/users/roleStatus")
     public ResponseEntity<UserDto> createUserWithRole(@RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFound {
     	UserDto responseDto = userServices.createUserWithRole(newUserRoleDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); 
     }
     
+    //update user info in User Table
     @PutMapping("/users/{userId}")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUser(updateuserDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }
     
-   /* @PutMapping("/users/roleStatus/{userId}")
+    //Ask front end to include a separate link to update role status for user
+    //update User role - (Active/inactive) for a given user id and role id 
+    @PutMapping("/users/roleStatus/{userId}")
+    public ResponseEntity<String> updateUserRoleStatus(@PathVariable(value="userId") String userId, @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
+    		//String UserRole, String UserStatus
+    	String responseDto = userServices.updateUserRoleStatus(updateUserRoleStatus,userId);
+    	return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " +userId); 
+    }
+    
+    /* @PutMapping("/users/roleStatus/{userId}")
     public ResponseEntity<UserDto> updateUserWithRole(@RequestBody UserAndRoleDTO updateUserRoleDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUserWithRole(updateUserRoleDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }*/
-    
+        
+    //cascade deletes users and User roles
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable(value="userId") String userId) throws ResourceNotFoundException{
     	String deletedUserId = userServices.deleteUser(userId);
     	return ResponseEntity.status(HttpStatus.OK).body("Deleted User ID:  "+deletedUserId);
     	//return deletedUserId;
     }
-    
-   /* @PutMapping("/users/roleStatus/{userId}")
-    public UserDto updateUserstatus(@RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
-    	//UserDto responseDto = userServices.updateUserStatus(updateuserDto, userId);
-    	//return responseDto;
-    	return null;
-    }*/
     
 }
