@@ -47,6 +47,7 @@ public class UserServices {
 		return userRepository.findAll();
 	}
 	
+	/*
 	public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
 		Optional<User> userById = userRepository.findById(Id);
 		if(userById.isEmpty()) {
@@ -55,6 +56,19 @@ public class UserServices {
 		else {
 			UserDto userDto = userMapper.userDto(userById.get());
 			return userDto;
+		}	
+	}*/
+	
+	
+	public List<UserRoleMap> getUserInfoById(String Id) throws ResourceNotFoundException {
+		Optional<User> userById = userRepository.findById(Id);
+		if(userById.isEmpty()) {
+			throw new ResourceNotFoundException("User Id " + Id +" not found");
+		}
+		else {
+			List<UserRoleMap> userroleMap = userRoleMapRepository.findUserRoleMapsByUserUserId(Id);
+			//System.out.println("userroleMap  " + userroleMap);
+			return userroleMap;
 		}	
 	}
 	
@@ -217,7 +231,7 @@ public class UserServices {
 				if(userById.isEmpty()) {
 					throw new ResourceNotFoundException("UserID: " + userId+ " Not Found");
 				}
-
+				
 				else {
 					if (!isTimeZoneValid(updateuserDto.getUserTimeZone())) {
 						throw new InvalidDataException("Failed to update user, as 'TimeZone' is invalid !! "); 
@@ -244,48 +258,46 @@ public class UserServices {
 			if(userId == null) {
 				throw new InvalidDataException("UserId cannot be blank/null");
 			}
-			
-			List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
-			//System.out.println("list of existingUserRoles   " + existingUserRoles);
-			
-			String roleIdToUpdate = updateUserRoleStatus.getRoleId();
-			
-			UserRoleMap UserRolefound = userRoleMapRepository.findUserRoleMapByUserUserIdAndRoleRoleId(userId, roleIdToUpdate);
-			//System.out.println("list of existingUserRole   " + UserRolefound);
-			
-			
-			String roleStatusToUpdate = updateUserRoleStatus.getUserRoleStatus();
-			
-			for (int roleCount = 0; roleCount<existingUserRoles.size();roleCount++) {
-				String existingRoleId = existingUserRoles.get(roleCount).getRole().getRoleId();
-				//System.out.println(" existingRoleId ----------" + existingRoleId);
+		
+			else {
+				Optional<User> userById = userRepository.findById(userId);
 				
-				if(roleIdToUpdate.equals(existingRoleId)){
-						
-					//if role id exists - update role status	
-					//System.out.println("inside if ");
-					Long userRoleId = existingUserRoles.get(roleCount).getUserRoleId();
-						
-					//using Update custom query					
-					userRoleMapRepository.updateUserRole(userRoleId,roleStatusToUpdate);
-						
-					System.out.println("After running update query");
-					break;
-	
+				if(userById.isEmpty()) {
+					throw new ResourceNotFoundException("UserID: " + userId+ " Not Found");
 				}
 				else {
-					System.out.println(" else ");
-					//handle else condition
-				}
-				//else {
-
-					//throw new ResourceNotFoundException("RoleID: " +roleIdToUpdate + " not found for the " + "UserID: " + userId);
-					//System.out.println("exiting for ");
-				throw new ResourceNotFoundException("RoleID: " +roleIdToUpdate + " not found for the " + "UserID: " + userId);	
+				
+					List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
 					
-			}
+					String roleIdToUpdate = updateUserRoleStatus.getRoleId();
+				
+					String roleStatusToUpdate = updateUserRoleStatus.getUserRoleStatus();
+					List<String> roleIdList;
+					boolean roleFound = false;
+					for (int roleCount = 0; roleCount<existingUserRoles.size();roleCount++) {
+
+						String existingRoleId = existingUserRoles.get(roleCount).getRole().getRoleId();
+					
+						if(roleIdToUpdate.equals(existingRoleId)){
+							roleFound= true;
+							
+							//if role id exists - update role status	
+							Long userRoleId = existingUserRoles.get(roleCount).getUserRoleId();
+								
+							//using Update custom query					
+							userRoleMapRepository.updateUserRole(userRoleId,roleStatusToUpdate);
+							break;
+						}
 			
-			return userId;
+					}
+			
+					if(!roleFound) {
+						throw new ResourceNotFoundException("RoleID: " +roleIdToUpdate + " not found for the " + "UserID: " + userId);	
+					}
+				}
+				
+				return userId;
+			}
 	
 		}
 

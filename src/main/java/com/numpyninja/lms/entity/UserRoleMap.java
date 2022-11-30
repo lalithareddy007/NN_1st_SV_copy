@@ -17,6 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,9 +56,11 @@ public class UserRoleMap {
 	@Column( name ="user_role_status")
 	private String userRoleStatus;
 	
+	@JsonIgnore
 	@Column( name ="creation_time")
 	private Timestamp creationTime;
 	
+	@JsonIgnore
 	@Column( name ="last_mod_time")
 	private Timestamp lastModTime;
 	
