@@ -7,9 +7,6 @@ spring:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}   #changed as per Local DB
     password: ${SPRING_DATASOURCE_PASSWORD}   #changed as per Local DB
-  sql:
-    init:
-      mode: always
   profiles:
     active: local
   jackson.deserialization.fail-on-unknown-properties: true

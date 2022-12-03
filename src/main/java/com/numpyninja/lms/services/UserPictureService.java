@@ -58,8 +58,8 @@ public class UserPictureService {
 	private UserPictureRepository userpicturerepo;
 	
 	
-	
-	private final String uploadFolderpath = new ClassPathResource("static/logo/").getFile().getAbsolutePath();
+	// TODO: Commented due to error in docker running. Need to revisit
+	private final String uploadFolderpath = "";//new ClassPathResource("static/logo/").getFile().getAbsolutePath();
 	
 	
 	public UserPictureService() throws IOException
