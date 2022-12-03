@@ -1,0 +1,31 @@
+version: '3.1'
+services:
+  postgresqldb:
+    image: 'postgres'
+    container_name: postgresqldb
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5455:5432
+    environment:
+      - POSTGRES_DB=lms_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespwd
+
+  lms-service:
+    container_name: lms-service
+    image: 'lms-service:latest'
+    depends_on:
+      - postgresqldb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqldb:5455/lms_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgrespwd
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+    ports:
+      - 8080:8080
+    build:
+      context: .
+volumes:
+  pgdata: {}

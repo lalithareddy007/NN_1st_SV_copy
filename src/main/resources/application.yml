@@ -1,18 +1,23 @@
 server:
-  port: 1234
+  port: 8080
   servlet:
     context-path: /lms
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/LMS_DB
-    username: postgres   #changed as per Local DB
-    password: admin   #changed as per Local DB
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}   #changed as per Local DB
+    password: ${SPRING_DATASOURCE_PASSWORD}   #changed as per Local DB
+  sql:
+    init:
+      mode: always
+  profiles:
+    active: local
   jackson.deserialization.fail-on-unknown-properties: true
   jackson.serialization.fail-on-empty-beans: false  # LMSPhase2 changes
   mvc.hiddenmethod.filter.enabled: true
   main.allow-bean-definition-overriding: true
   #hibernate ddl Auto for CURDOperations
-  jpa.hibernate.ddl-auto: update
+  jpa.hibernate.ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
 
 
 #File related Configurations

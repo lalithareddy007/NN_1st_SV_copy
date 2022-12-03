@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/LMS_DB
+    username: postgres   #changed as per Local DB
+    password: admin   #changed as per Local DB
+  #hibernate ddl Auto for CURDOperations
+  jpa.hibernate.ddl-auto: none
