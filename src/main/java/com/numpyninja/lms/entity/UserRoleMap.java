@@ -64,10 +64,5 @@ public class UserRoleMap {
 	@Column( name ="last_mod_time")
 	private Timestamp lastModTime;
 
-	/* Multiple roles can be mapped to single user */
-	@ManyToOne
-	@JoinColumn(name = "user_id", insertable = false, updatable = false)
-	private UserLogin userLogin;
-
 }
 
