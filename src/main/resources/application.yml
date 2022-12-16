@@ -4,9 +4,9 @@ server:
     context-path: /lms
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/LMS_DB
-    username: postgres   #changed as per Local DB
-    password: admin   #changed as per Local DB
+    url: jdbc:postgresql://ec2-3-217-251-77.compute-1.amazonaws.com:5432/d73fal507rokm8
+    username: cyhhwycxvhgool  #changed as per Local DB
+    password: 32283ade1303728d8066f6b5155f6b9900072e130996662720bbcf021a49cbf2  #changed as per Local DB
   jackson.deserialization.fail-on-unknown-properties: true
   jackson.serialization.fail-on-empty-beans: false  # LMSPhase2 changes
   mvc.hiddenmethod.filter.enabled: true
