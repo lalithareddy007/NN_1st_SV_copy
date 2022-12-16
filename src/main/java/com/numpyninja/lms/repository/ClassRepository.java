@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ClassRepository extends JpaRepository<Class, Serializable> {
+public interface ClassRepository extends JpaRepository<Class,Long>{
+
+    Optional<Class> findById(Long id);
 
     List<Class> findByClassTopicContainingIgnoreCaseOrderByClassTopicAsc(String classTopic);
     
