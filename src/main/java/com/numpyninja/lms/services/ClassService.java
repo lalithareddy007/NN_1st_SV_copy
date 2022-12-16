@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -56,8 +57,11 @@ public class ClassService {
 				newClassScheduleEntity= classMapper.toClassScheduleEntity(newClassDto);
 				Integer batchIdInClass= newClassDto.getBatchId();
 				String StaffInClass = newClassDto.getClassStaffId();
+			
 				
-				if(batchRepository.existsById(batchIdInClass) && userRepository.existsById(StaffInClass))
+				
+				
+  if(batchRepository.existsById(batchIdInClass) && userRepository.existsById(StaffInClass))
 				{
 					batchEntity = batchRepository.findById(batchIdInClass).get();
 					userEntity = userRepository.findById(StaffInClass).get();

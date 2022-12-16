@@ -27,4 +27,9 @@ public interface ClassRepository extends JpaRepository<Class, Serializable> {
     
     //@Query(value = "SELECT * FROM ClassSchedule WHERE staffInClass.userId = ?1")
     List<Class> findBystaffInClass_userId(String staffId);
+
+    //
+    //List<Class> findByRoles(@Param("roles")List<String> roles);
+    
+   // List<Class> findByRolesIn(List<String> roles);
 }
