@@ -1,17 +1,28 @@
 package com.numpyninja.lms.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import lombok.Getter;
+import lombok.Setter;
 
-@ResponseStatus(value=HttpStatus.BAD_REQUEST)
-public class InvalidDataException extends Exception {
+@Getter
+@Setter
+public class InvalidDataException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
+
+	String resourceName;
+	String fieldName;
+	long fieldValue;
+
+	public InvalidDataException(String resourceName, String fieldName, long fieldValue) {
+		super(String.format("%s already exists with given %s : %s ",resourceName, fieldName, fieldValue));
+		this.resourceName = resourceName;
+		this.fieldName = fieldName;
+		this.fieldValue = fieldValue;
+	}
 
 	public InvalidDataException(String message) {
 		super(message);
 		
 	}
 
-	
 }

@@ -18,6 +18,7 @@ import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.services.AssignmentService;
 
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/assignments")
@@ -28,14 +29,14 @@ public class AssignmentController {
 	
 	//create an assignment
 	@PostMapping("")
-	public ResponseEntity<AssignmentDto> createAssignment(@RequestBody AssignmentDto assignmentDto) {
+	public ResponseEntity<AssignmentDto> createAssignment(@Valid @RequestBody AssignmentDto assignmentDto) {
 		AssignmentDto createdAssignmentDto =  this.assignmentService.createAssignment(assignmentDto);
 		return new ResponseEntity<>(createdAssignmentDto, HttpStatus.CREATED);
 	}
 	
 	//update an assignment
 	@PutMapping("/{id}")
-	public ResponseEntity<AssignmentDto> updateAssignment(@RequestBody AssignmentDto assignmentDto, @PathVariable Long id) {
+	public ResponseEntity<AssignmentDto> updateAssignment(@Valid @RequestBody AssignmentDto assignmentDto, @PathVariable Long id) {
 		AssignmentDto updatedAssignmentDto =  this.assignmentService.updateAssignment(assignmentDto, id);
 		return ResponseEntity.ok(updatedAssignmentDto);
 	}
@@ -49,7 +50,7 @@ public class AssignmentController {
 	
 	//get all assignments
     @GetMapping("")
-    protected ResponseEntity<List<AssignmentDto>> getAllAssignments() {
+    public ResponseEntity<List<AssignmentDto>> getAllAssignments() {
         return ResponseEntity.ok(this.assignmentService.getAllAssignments());  
     }
     

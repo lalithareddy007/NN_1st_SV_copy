@@ -13,12 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,20 +31,15 @@ public class Assignment {
 	@Column(name="a_id")
 	private Long assignmentId;
 	
-	@NotEmpty
 	@Column(name="a_name")
 	private String assignmentName;
 
-	@NotEmpty
 	@Column(name="a_description")
 	private String assignmentDescription;
 
 	@Column(name="a_comments")
 	private String comments;
 	
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@Temporal(TemporalType.DATE	)
-	@NotNull
 	@Column(name="a_due_date")
 	private Date dueDate;
 	
@@ -69,18 +58,17 @@ public class Assignment {
 	@Column(name="a_path_attach5")
 	private String pathAttachment5;
 
-	@NotEmpty
-	@Column(name="a_created_by")
-	private String createdBy;
-
-
-	@ManyToOne (fetch=FetchType.LAZY)     
+	@ManyToOne (fetch=FetchType.LAZY)
     @JoinColumn (name="a_batch_id", nullable=false)  
     private Batch batch;  
-	
-	@ManyToOne (fetch=FetchType.LAZY)     
-    @JoinColumn (name="a_grader_id", nullable=false)  
-    private User user;  
+
+	@ManyToOne (fetch=FetchType.LAZY)
+    @JoinColumn (name="a_created_by", nullable=false)
+    private User user;
+
+	@ManyToOne (fetch=FetchType.LAZY)
+	@JoinColumn (name="a_grader_id", nullable=false)
+	private User user1;
 	
 	@Column(name="creation_time")
 	private Timestamp creationTime;

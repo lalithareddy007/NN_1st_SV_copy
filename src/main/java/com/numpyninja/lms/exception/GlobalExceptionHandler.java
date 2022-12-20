@@ -23,4 +23,11 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(InvalidDataException.class)
+	public ResponseEntity<ApiResponse> invalidDataExceptionHandler(InvalidDataException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.BAD_REQUEST);
+	}
+
 }
