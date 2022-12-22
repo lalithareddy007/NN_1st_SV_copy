@@ -9,14 +9,17 @@ import org.mapstruct.factory.Mappers;
 
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.entity.Assignment;
+import org.springframework.stereotype.Component;
 
+@Component
 @Mapper(componentModel = "spring", uses={BatchMapper.class, UserMapper.class})
 public interface AssignmentMapper {
  
     AssignmentMapper INSTANCE = Mappers.getMapper(AssignmentMapper.class);
 
 	@Mapping(source="assignment.batch.batchId", target="batchId")
-	@Mapping(source="assignment.user.userId", target="graderId")
+	@Mapping(source="assignment.user.userId", target="createdBy")
+	@Mapping(source="assignment.user1.userId", target="graderId")
     AssignmentDto toAssignmentDto(Assignment assignment); 
     
 	@InheritInverseConfiguration

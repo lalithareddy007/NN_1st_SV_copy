@@ -26,7 +26,8 @@ import com.numpyninja.lms.entity.User;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class AssignmentRepositoryTest {
-	
+/*
+
 	
 	@Autowired
 	private AssignmentRepository repo;
@@ -89,5 +90,6 @@ class AssignmentRepositoryTest {
 				"U02", batch, user, timestamp, timestamp);
 		return assignment;
 	}
+*/
 
 }
