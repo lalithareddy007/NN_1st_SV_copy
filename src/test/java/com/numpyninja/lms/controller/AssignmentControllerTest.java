@@ -2,7 +2,6 @@ package com.numpyninja.lms.controller;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,11 +29,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.dto.AssignmentDto;
-import com.numpyninja.lms.dto.BatchDTO;
-import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.AssignmentService;
 
 
@@ -42,7 +38,7 @@ import com.numpyninja.lms.services.AssignmentService;
 @WebMvcTest(AssignmentController.class )
 class AssignmentControllerTest {
 
-	/*@Autowired
+	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
@@ -67,9 +63,11 @@ class AssignmentControllerTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		mockAssignmentDto = new AssignmentDto(1L, "Test Assignment", "Junit test", "practice",
-				dueDate, "Filepath1", "Filepath2", "Filepath3", "Filepath4", "Filepath5",
-				"U02", 1, "U01");
+
+		mockAssignmentDto = new AssignmentDto(1L, "Test Assignment",
+                "Junit test", "practice", dueDate, "Filepath1",
+                "Filepath2", "Filepath3", "Filepath4",
+                "Filepath5", 1, "U02", "U01");
 	}
 
 	@DisplayName("test for creating a new assignment")
@@ -189,5 +187,4 @@ class AssignmentControllerTest {
 				.andDo(print())
 				.andExpect(jsonPath("$", hasSize(assignmentDtoList.size())));
 	}
-*/
 }
