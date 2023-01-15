@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.stereotype.Component;
 
 import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.Batch;
@@ -26,9 +25,7 @@ import com.numpyninja.lms.entity.User;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class AssignmentRepositoryTest {
-/*
 
-	
 	@Autowired
 	private AssignmentRepository repo;
 	
@@ -81,15 +78,27 @@ class AssignmentRepositoryTest {
 		}
 		LocalDateTime now= LocalDateTime.now();
 		Timestamp timestamp= Timestamp.valueOf(now);
-		Program program = new Program((long) 7,"Django","new Prog", "nonActive",timestamp, timestamp);
-		Batch batch = new Batch(1, "SDET 1", "SDET Batch 1", "Active", program, 5, timestamp, timestamp);
-		User user = new User("U01", "Steve", "Jobs", "", (long) 1234567890, "CA", "PST", "@stevejobs",
-				"", "", "", "Citizen", timestamp, timestamp);
-		Assignment assignment = new Assignment((long) 1, "Test Assignment", "Junit test", "practice",
-				dueDate, "Filepath1", "Filepath2", "Filepath3", "Filepath4", "Filepath5", 
-				"U02", batch, user, timestamp, timestamp);
+
+		Program program = new Program(7L,"Django","new Prog",
+				"Active", timestamp, timestamp);
+
+		Batch batch = new Batch(1, "SDET 1", "SDET Batch 1", "Active", program,
+                5, timestamp, timestamp);
+
+		User user = new User("U01", "Steve", "Jobs", "",
+				1234567890L, "CA", "PST", "@stevejobs", "",
+				"", "", "Citizen", timestamp, timestamp);
+
+        User user1 = new User("U02", "Elon", "Musk", "",
+				1234567809L, "CA", "PST", "@elonmusk", "",
+				"", "", "Citizen", timestamp, timestamp);
+
+		Assignment assignment = new Assignment(1L, "Test Assignment",
+				"Junit test", "practice", dueDate, "Filepath1",
+				"Filepath2", "Filepath3", "Filepath4",
+				"Filepath5", batch, user, user1, timestamp, timestamp);
+
 		return assignment;
 	}
-*/
 
 }

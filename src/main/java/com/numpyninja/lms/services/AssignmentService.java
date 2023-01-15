@@ -73,7 +73,7 @@ public class AssignmentService {
 
 		//Check assignment is edited by Admin or Staff user
 		if (userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
-				(assignmentDto.getCreatedBy(), "R03", "Active")
+						(assignmentDto.getCreatedBy(), "R03", "Active")
 				.isEmpty()) //No Active Admin or Staff role available for user
 			throw new ResourceNotFoundException("User", "Role(Admin/Staff)", assignmentDto.getCreatedBy());
 
@@ -152,9 +152,8 @@ public class AssignmentService {
 		Batch batch = this.batchRepository.findById(batchId)
 				.orElseThrow(() -> new ResourceNotFoundException("Batch", "Id", batchId));
 		List<Assignment> assignments = this.assignmentRepository.findByBatch(batch);
-		List<AssignmentDto> assignmentDtos = assignmentMapper.toAssignmentDtoList(assignments);
-		if (assignmentDtos.isEmpty())
+		if (assignments.isEmpty())
 			throw new ResourceNotFoundException("Assignments", "BatchId", batchId);
-		return assignmentDtos;
+		return assignmentMapper.toAssignmentDtoList(assignments);
 	}
 }
