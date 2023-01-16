@@ -2,7 +2,6 @@ package com.numpyninja.lms.controller;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,34 +29,31 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.dto.AssignmentDto;
-import com.numpyninja.lms.dto.BatchDTO;
-import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.AssignmentService;
 
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(AssignmentController.class )
 class AssignmentControllerTest {
-	
+
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
 	private AssignmentService assignmentService;
-	
+
 	@Autowired
 	private ObjectMapper objectMapper;
-	
+
 	private AssignmentDto mockAssignmentDto;
-	
+
 	@BeforeEach
 	public void setup() {
 		setMockAssignmentAndDto();
 	}
-	
+
 	private void setMockAssignmentAndDto() {
 		String sDate = "05/25/2022";
 		Date dueDate = null;
@@ -67,9 +63,11 @@ class AssignmentControllerTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		mockAssignmentDto = new AssignmentDto(1L, "Test Assignment", "Junit test", "practice",
-				dueDate, "Filepath1", "Filepath2", "Filepath3", "Filepath4", "Filepath5", 
-				"U02", 1, "U01");
+
+		mockAssignmentDto = new AssignmentDto(1L, "Test Assignment",
+                "Junit test", "practice", dueDate, "Filepath1",
+                "Filepath2", "Filepath3", "Filepath4",
+                "Filepath5", 1, "U02", "U01");
 	}
 
 	@DisplayName("test for creating a new assignment")
@@ -77,17 +75,17 @@ class AssignmentControllerTest {
 	void testCreateAssignment() throws Exception {
 		//given
 		given(assignmentService.createAssignment(ArgumentMatchers.any(AssignmentDto.class)))
-			.willAnswer((i) -> i.getArgument(0));
-		
+				.willAnswer((i) -> i.getArgument(0));
+
 		//when
 		ResultActions response = mockMvc.perform(post("/assignments")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(mockAssignmentDto)));
-		
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(mockAssignmentDto)));
+
 		//then
 		response.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.assignmentId", is(mockAssignmentDto.getAssignmentId()), Long.class))
-			.andExpect(jsonPath("$.assignmentName", is(mockAssignmentDto.getAssignmentName())));
+				.andExpect(jsonPath("$.assignmentId", is(mockAssignmentDto.getAssignmentId()), Long.class))
+				.andExpect(jsonPath("$.assignmentName", is(mockAssignmentDto.getAssignmentName())));
 	}
 
 	@DisplayName("test for updating an assignment")
@@ -98,18 +96,18 @@ class AssignmentControllerTest {
 		AssignmentDto updatedAssignmentDto = mockAssignmentDto;
 		updatedAssignmentDto.setAssignmentName("New Test Assignment");
 		given(assignmentService.updateAssignment(ArgumentMatchers.any(AssignmentDto.class)
-			, ArgumentMatchers.any(Long.class))).willReturn(updatedAssignmentDto); 
-		
+				, ArgumentMatchers.any(Long.class))).willReturn(updatedAssignmentDto);
+
 		//when
 		ResultActions response = mockMvc.perform(put("/assignments/{id}", assignmentId)
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(objectMapper.writeValueAsString(updatedAssignmentDto)));
-		
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(updatedAssignmentDto)));
+
 		//then
 		response.andExpect(status().isOk())
-			.andDo(print())
-			.andExpect(jsonPath("$.assignmentId", is(updatedAssignmentDto.getAssignmentId()), Long.class))
-			.andExpect(jsonPath("$.assignmentName", is(updatedAssignmentDto.getAssignmentName())));
+				.andDo(print())
+				.andExpect(jsonPath("$.assignmentId", is(updatedAssignmentDto.getAssignmentId()), Long.class))
+				.andExpect(jsonPath("$.assignmentName", is(updatedAssignmentDto.getAssignmentName())));
 	}
 
 	@DisplayName("test for deleting an assignment")
@@ -117,14 +115,14 @@ class AssignmentControllerTest {
 	void testDeleteAssignment() throws Exception {
 		//given
 		Long assignmentId = 1L;
-		willDoNothing().given(assignmentService).deleteAssignment(assignmentId);  
-		
+		willDoNothing().given(assignmentService).deleteAssignment(assignmentId);
+
 		//when 
 		ResultActions response = mockMvc.perform(delete("/assignments/{id}", assignmentId));
-			
+
 		//then
 		response.andExpect(status().isOk())
-		.andDo(print());
+				.andDo(print());
 	}
 
 	@DisplayName("test to get all the assignments")
@@ -138,14 +136,14 @@ class AssignmentControllerTest {
 		assignmentDtoList.add(mockAssignmentDto);
 		assignmentDtoList.add(mockAssignmentDto2);
 		given(assignmentService.getAllAssignments()).willReturn(assignmentDtoList);
-		
+
 		//when
 		ResultActions response = mockMvc.perform(get("/assignments"));
-		
+
 		//then
 		response.andExpect(status().isOk())
-			.andDo(print())
-			.andExpect(jsonPath("$", hasSize(assignmentDtoList.size())));
+				.andDo(print())
+				.andExpect(jsonPath("$", hasSize(assignmentDtoList.size())));
 	}
 
 	@DisplayName("test to get an assignment by Id")
@@ -154,18 +152,18 @@ class AssignmentControllerTest {
 		//given 
 		Long assignmentId = 1L;
 		given(assignmentService.getAssignmentById(assignmentId))
-			.willReturn(mockAssignmentDto);
-		
+				.willReturn(mockAssignmentDto);
+
 		//when 
 		ResultActions response = mockMvc.perform(get("/assignments/{id}", assignmentId));
-		
+
 		//then
 		response.andExpect(status().isOk())
-		.andDo(print())
-		.andExpect(jsonPath("$.assignmentName", is(mockAssignmentDto.getAssignmentName())));
-		
+				.andDo(print())
+				.andExpect(jsonPath("$.assignmentName", is(mockAssignmentDto.getAssignmentName())));
+
 	}
-	
+
 
 	@DisplayName("test to get assignments for a batch")
 	@Test
@@ -179,15 +177,14 @@ class AssignmentControllerTest {
 		assignmentDtoList.add(mockAssignmentDto);
 		assignmentDtoList.add(mockAssignmentDto2);
 		given(assignmentService.getAssignmentsForBatch(batchId))
-			.willReturn(assignmentDtoList);
-		
+				.willReturn(assignmentDtoList);
+
 		//when 
 		ResultActions response = mockMvc.perform(get("/assignments/batch/{batchId}", batchId));
-		
+
 		//then
 		response.andExpect(status().isOk())
-		.andDo(print())
-		.andExpect(jsonPath("$", hasSize(assignmentDtoList.size())));
-}
-
+				.andDo(print())
+				.andExpect(jsonPath("$", hasSize(assignmentDtoList.size())));
+	}
 }

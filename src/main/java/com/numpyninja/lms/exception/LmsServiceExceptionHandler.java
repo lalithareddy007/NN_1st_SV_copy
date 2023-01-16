@@ -66,12 +66,12 @@ public class LmsServiceExceptionHandler {
     }*/
     
     
-    @ExceptionHandler(ResourceNotFoundException.class)
+    /*@ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ResponseBody
     public LmsError handleValidationError(ResourceNotFoundException ex) {
         return new LmsError("ENTITY_DOES_NOT_EXIST",ex.getMessage());
-    }
+    }*/
     
     @ExceptionHandler(DuplicateResourceFound.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
@@ -80,12 +80,12 @@ public class LmsServiceExceptionHandler {
         return new LmsError("DUPLICATE_ENTITY",ex.getMessage());
     }
     
-    @ExceptionHandler(InvalidDataException.class)
+    /*@ExceptionHandler(InvalidDataException.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ResponseBody
     public LmsError handleValidationError(InvalidDataException ex) {
         return new LmsError("INVALID_DATA",ex.getMessage());
-    }
+    }*/
     
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)

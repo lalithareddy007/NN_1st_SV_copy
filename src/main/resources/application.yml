@@ -1,11 +1,11 @@
 server:
-  port: 1234
+  port: 8080
   servlet:
     context-path: /lms
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/LMS_DB
-    username: postgres   #changed as per Local DB
+    username: postgres  #changed as per Local DB
     password: admin   #changed as per Local DB
   jackson.deserialization.fail-on-unknown-properties: true
   jackson.serialization.fail-on-empty-beans: false  # LMSPhase2 changes
@@ -81,3 +81,4 @@ layout:
         classId: "Class Id"
         studentId: "Student Id"
         attendance: "Attendance"
+
