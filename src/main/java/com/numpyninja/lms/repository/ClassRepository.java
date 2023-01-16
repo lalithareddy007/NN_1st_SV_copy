@@ -2,6 +2,8 @@ package com.numpyninja.lms.repository;
 
 
 import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.dto.ClassRecordingDTO;
+import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.entity.Batch;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,13 +27,23 @@ public interface ClassRepository extends JpaRepository<Class,Long>{
 	List<Class> findByClassIdAndBatchId ( Long csId, Integer batchIdClass);
     
     //@Param("BatchInClass.batchId")
+    @Query(value = "SELECT * FROM tbl_lms_class_sch WHERE batch_id = ?1", nativeQuery = true)
     List<Class> findByBatchInClass_batchId( Integer batchId);
     
     //@Query(value = "SELECT * FROM ClassSchedule WHERE staffInClass.userId = ?1")
     List<Class> findBystaffInClass_userId(String staffId);
 
     //
+    
+    @Query(value = "SELECT * FROM tbl_lms_class_sch WHERE class_recording_path = ?1", nativeQuery = true)
+    List<ClassRecordingDTO> findByclassRecordingPath_ClassRecordingDTOInClasses(List<ClassRecordingDTO> class1 );
+   // List<Class> findByBatch(Batch batch);
     //List<Class> findByRoles(@Param("roles")List<String> roles);
     
    // List<Class> findByRolesIn(List<String> roles);
+    
+
+
+    
+
 }

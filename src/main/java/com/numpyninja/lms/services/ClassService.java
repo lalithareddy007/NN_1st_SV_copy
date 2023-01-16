@@ -2,9 +2,11 @@ package com.numpyninja.lms.services;
 
 
 
+import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.dto.ClassDto;
-
+import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.entity.Batch;
 
 import com.numpyninja.lms.entity.User;
@@ -19,10 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.persistence.ElementCollection;
 
 
 @Service
@@ -42,7 +52,7 @@ public class ClassService {
     
     
     //create a new class schedule for existing batchId and staffId 
-    public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFound {
+ /*   public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFound {
     	 Class newClassScheduleEntity;
     	 
     	 Batch batchEntity;
@@ -51,7 +61,8 @@ public class ClassService {
 		ClassDto savedclassSchdDto =null;
 		 Class savedEntity =null;
 		 
-  if(newClassDto != null && newClassDto.getCsId()!=null && newClassDto.getBatchId()!=null && newClassDto.getClassStaffId()!=null) {
+		 if(newClassDto != null  && newClassDto.getCsId()!=null && newClassDto.getBatchId()!=null && newClassDto.getClassStaffId()!=null) 
+   {
 			 
 
 				newClassScheduleEntity= classMapper.toClassScheduleEntity(newClassDto);
@@ -98,11 +109,34 @@ public class ClassService {
 				throw new NullPointerException();
 			}
         return savedclassSchdDto;
-    }
+    } */
 
-		 
-		 
-		
+    
+    
+    public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFound
+    {
+    	int batchId = newClassDto.getBatchId();
+    	String staffId = newClassDto.getClassStaffId();
+    	
+    	
+    	Batch batchobj =  batchRepository.findById(batchId)
+    			.orElseThrow(() -> new ResourceNotFoundException("Batch", "Id", batchId));
+    	User user = userRepository.findById(staffId)
+ 				.orElseThrow(() -> new ResourceNotFoundException("staffid " + staffId + " not found"));
+    	
+    	
+    	Class class1 = classMapper.toClassScheduleEntity(newClassDto);
+    	
+    	LocalDateTime now = LocalDateTime.now();
+ 		Timestamp timestamp = Timestamp.valueOf(now);
+ 		class1.setCreationTime(timestamp);
+ 		class1.setLastModTime(timestamp);
+    	
+ 		Class class2 = classRepository.save(class1);
+ 		return classMapper.toClassSchdDTO(class2);
+    }
+    
+    
     //get All Class schedules -not mentioned in Excel
     public List<ClassDto> getAllClasses() throws ResourceNotFoundException{
       List<Class> ClassScheduleList= classRepository.findAll();
@@ -304,4 +338,74 @@ public class ClassService {
 			
 		}
 
+    	
+    	//get class Recording by batchId
+  	  	
+    	public List<ClassRecordingDTO> getClassesRecordingByBatchId(Integer batchId) throws ResourceNotFoundException {
+    		
+    		List<Class> ClassObj =classRepository.findByBatchInClass_batchId(batchId);
+    			List<ClassRecordingDTO> classRecordingList = new ArrayList<>();
+    			ClassObj.stream().forEach((k) -> {
+    			ClassRecordingDTO classRecordObject = new ClassRecordingDTO();
+    			classRecordObject.setCsId(k.getCsId());
+    			classRecordObject.setClassRecordingPath(k.getClassRecordingPath());
+                classRecordingList.add(classRecordObject);
+    		});
+    		return classRecordingList;
+    	} 
+    	
+    	
+    	
+    	
+    	
+    	
+ //get class Recording by ClassId	   	
+  	public ClassRecordingDTO getClassRecordingByClassId(Long id) throws ResourceNotFoundException{
+			
+    		Class ClassRecord= classRepository.findById(id).get();
+    		String classRecordingPath = classRepository.getById(id).getClassRecordingPath();
+    		
+    		
+    		if(ClassRecord== null) {
+    			throw new ResourceNotFoundException("ClassRecording is not found for classId :"+id);
+    		}
+    		
+      		else {
+      	    	    return new ClassRecordingDTO(id,classRecordingPath);
+      		}
+    			 
+    	}
+    	
+    	
+    	
+    //Update Class Recording by ClassId
+    	public ClassDto updateClassRecordingByClassId(Long id, ClassRecordingDTO classRecordingDTO) throws ResourceNotFoundException{
+    		{
+
+    			Class updateClassSchedule;
+    			ClassDto savedClassDTO = null;
+    			Class savedClassSchedule =null;
+    			if(id!=null)
+    			{
+    				//Class newClassSchedule  = classMapper.toClassScheduleEntity();
+    				Boolean isPresentTrue=classRepository.findById(id).isPresent();
+
+    				if(isPresentTrue)
+    				{
+    					updateClassSchedule = classRepository.getById(id);
+    					updateClassSchedule.setClassRecordingPath(classRecordingDTO.getClassRecordingPath());
+    					savedClassSchedule = classRepository.save(updateClassSchedule);
+    					savedClassDTO = classMapper.toClassSchdDTO(savedClassSchedule);
+
+    					return savedClassDTO;
+    				}
+    				else {
+    					throw new ResourceNotFoundException("no record found with "+ id);
+    				}
+
+    			}else {
+    				throw new IllegalArgumentException();
+    			}
+    		}
+    	}	
 }
