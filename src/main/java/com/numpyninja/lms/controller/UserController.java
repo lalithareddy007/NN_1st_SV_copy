@@ -46,8 +46,9 @@ public class UserController {
 
 	//get all users from LMS_Users table
 	@GetMapping("/users")
-	public ResponseEntity<List<User>> getAllUsers() {
-		List<User> userList = userServices.getAllUsers();
+	public ResponseEntity<List<UserDto>> getAllUsers() {
+		//List<User> userList = userServices.getAllUsers();
+		List<UserDto> userList = userServices.getAllUsers();
 		return ResponseEntity.ok(userList);  
 	}
 	

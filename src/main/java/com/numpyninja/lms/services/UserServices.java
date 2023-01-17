@@ -43,8 +43,9 @@ public class UserServices {
 	@Autowired
 	UserMapper userMapper;
 	
-	public List<User> getAllUsers() {
-		return userRepository.findAll();
+	public List<UserDto> getAllUsers() {
+		return userMapper.userDtos( userRepository.findAll());
+		//return userRepository.findAll();
 	}
 	
 	/*
