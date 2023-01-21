@@ -7,6 +7,8 @@ import javax.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -46,14 +48,37 @@ public class Class {
     
     //@Column(name="class_staff_id")
     //private String classStaffId;
-    
-    @ManyToOne//(fetch= FetchType.LAZY,cascade = CascadeType.ALL)
+    //present one working 
+   @ManyToOne//(fetch= FetchType.LAZY,cascade = CascadeType.ALL)
 	@JoinColumn(name="class_staff_id", nullable=false)//,insertable=false, updatable=false,referencedColumnName = "program_id", unique = true)
 	//@JsonIgnore
 	@javax.persistence.Embedded
 	@AttributeOverride( name = "userId", column = @Column(name = "class_staff_id"))	
 	//@AttributeOverride( name = "userId", column = @Column(name = "classStaffId"))
 	private User staffInClass;
+    
+    
+   /* @ManyToOne
+	@JoinColumn(name="class_staff_id", nullable=false)
+    @javax.persistence.Embedded
+	@AttributeOverride( name = "userId", column = @Column(name = "class_staff_id"))	
+    private UserRoleMap staffInClass;
+    
+    
+    @OneToMany 
+	@JoinTable(name=" tbl_lms_userrole_map",
+               joinColumns={@JoinColumn(name="user_id")},
+               inverseJoinColumns={@JoinColumn(name="role_id")})
+	//private Set<Role> UserRole = new HashSet<Role>();
+    private Set<User> staffInClass;
+    
+    @ManyToOne
+	@JoinTable(name=" tbl_lms_userrole_map",
+               joinColumns={@JoinColumn(name="user_id")},
+               inverseJoinColumns={@JoinColumn(name="role_id")})
+	private Set<Role> UserRole = new HashSet<Role>();
+    //private Set<User> user ;*/
+    
     
     @Column(name="class_description")
     private String classDescription;

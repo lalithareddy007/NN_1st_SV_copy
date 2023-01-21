@@ -46,8 +46,9 @@ public class UserController {
 
 	//get all users from LMS_Users table
 	@GetMapping("/users")
-	public ResponseEntity<List<User>> getAllUsers() {
-		List<User> userList = userServices.getAllUsers();
+	public ResponseEntity<List<UserDto>> getAllUsers() {
+		//List<User> userList = userServices.getAllUsers();
+		List<UserDto> userList = userServices.getAllUsers();
 		return ResponseEntity.ok(userList);  
 	}
 	
@@ -65,13 +66,6 @@ public class UserController {
     	return userServices.getAllUsersWithRoles() ;
     }
     
-	//Check if this is needed form front end or not??
-	//Get all the users for a given role (Admin,Staff,User)- only giving user table info
-    @GetMapping("/users/roles/{rolename}")
-    protected List<?> getAllUsersByRole(@PathVariable(value="rolename")String roleName) {
-    	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
-    }
-
     //create user with Role 
     @PostMapping("/users/roleStatus")
     public ResponseEntity<UserDto> createUserWithRole(@RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFound {
@@ -105,19 +99,28 @@ public class UserController {
     }
     
     /** Check if the below end points are required or not for the future**/
-	
+    
+    /*
+	//Check if this is needed form front end or not??
+	//Get all the users for a given role (Admin,Staff,User)- only giving user table info
+    @GetMapping("/users/roles/{rolename}")
+    protected List<?> getAllUsersByRole(@PathVariable(value="rolename")String roleName) {
+    	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
+    }
+	*/
     /* @GetMapping("/users/roles/{rolename}")
      protected List<?> getAllRoles(@PathVariable(value="rolename")String roleName) {
      	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
      }*/
      
+    /*
      //To check if this is needed from front end? 
      // Batch value coming empty?? - check this logic
      @GetMapping("/users/programs/{programid}")
      protected List<?> getUsersForProgram(@PathVariable(value="programid")Long programId) {
          return userServices.getUsersForProgram(programId);
      }
-     
+     */
  	/*
  	//get user by ID from LMS_Users table	
  	@GetMapping("/users/{id}")

@@ -20,8 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.ClassDto;
-
+import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.exception.DuplicateResourceFound;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.ClassService;
@@ -37,11 +38,11 @@ public class ClassController {
 	//createClass
 	@PostMapping(path="/CreateClassSchedule",consumes = "application/json", produces = "application/json")  
 	@ResponseBody
-	private ResponseEntity<?> createAndSaveClass(@Valid @RequestBody ClassDto classDTO)throws  DuplicateResourceFound
+	private ResponseEntity<ClassDto> createAndSaveClass(@Valid @RequestBody ClassDto classDTO)throws  DuplicateResourceFound
 	{  
 		System.out.println("in create a new class schedule");
-		ClassDto savedClassDTO = classServices.createClass(classDTO);
-	return ResponseEntity.status(HttpStatus.CREATED).body(savedClassDTO);  
+		ClassDto savedClassDTO = this.classServices.createClass(classDTO);
+	return ResponseEntity.status(HttpStatus.CREATED).body(savedClassDTO);	
 	} 
 	
 	//GetAllClasses
@@ -117,4 +118,39 @@ public class ClassController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}  
 
+	
+	////Update Class Recording by ClassId
+	@PutMapping(path="updateClassrecording/{classId}", consumes = "application/json", produces = "application/json")  
+	@ResponseBody
+	private ResponseEntity <ClassDto> updateClassRecordingByClassId(@PathVariable @NotBlank @Positive Long classId ,@Valid @RequestBody ClassRecordingDTO classRecordingDTO) throws ResourceNotFoundException
+	{  
+	return ResponseEntity.ok(classServices.updateClassRecordingByClassId(classId,classRecordingDTO));
+	} 
+	
+	
+	//get class Recording by classId
+	
+	@GetMapping(path="classrecordings/{classId}", produces = "application/json")  
+	@ResponseBody
+	private ResponseEntity <ClassRecordingDTO> getClassRecordingByClassId(@PathVariable("classId") @NotBlank @Positive Long classId)throws ResourceNotFoundException
+	{  
+		System.out.println("in get class recordng by ClassId");
+		
+		
+		return ResponseEntity.ok(classServices.getClassRecordingByClassId(classId));
+	} 
+	
+	
+	@GetMapping(path="batchrecordings/{batchId}", produces = "application/json")  
+	@ResponseBody
+	private ResponseEntity<List<ClassRecordingDTO>> getClassRecordingByBatchId(@PathVariable("batchId") @NotBlank @Positive Integer batchId)throws ResourceNotFoundException
+	{  
+		System.out.println("in get class recordng by batchId");
+		
+		
+		return ResponseEntity.ok(classServices.getClassesRecordingByBatchId(batchId));
+	}
+	
+	
+	
 }

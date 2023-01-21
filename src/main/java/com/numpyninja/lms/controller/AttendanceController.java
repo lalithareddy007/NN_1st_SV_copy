@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.AttendanceDto;
@@ -23,6 +24,7 @@ import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.mappers.AttendanceMapper;
 import com.numpyninja.lms.repository.AttendanceRepository;
 import com.numpyninja.lms.services.AttendanceServices;
+
 
 @RestController
 @RequestMapping("/attendance")
