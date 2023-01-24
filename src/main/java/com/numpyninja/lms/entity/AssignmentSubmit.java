@@ -1,6 +1,5 @@
 package com.numpyninja.lms.entity;
 
-
 import lombok.Data;
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -14,13 +13,15 @@ public class AssignmentSubmit {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "submission_generator")
     @SequenceGenerator(name="submission_generator", sequenceName="tbl_lms_submissions_sub_id_seq", allocationSize = 1)
     @Column(name="sub_id")
-    private Long submitID;
+    private Long submissionId;
 
-    @Column(name="sub_a_id")
-    private Long subAssignmentID;
+    @OneToOne(fetch = FetchType.LAZY )
+    @JoinColumn(name="sub_a_id", nullable=false)
+    private Assignment assignment;
 
-    @Column(name="sub_student_id")
-    private String subUserID;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="sub_student_id", nullable = false)
+    private User user;
 
     @Column(name="sub_description")
     private String subDesc;
@@ -53,7 +54,7 @@ public class AssignmentSubmit {
     private Timestamp gradedDateTime;
 
     @Column(name="grade")
-    private String grade;
+    private int grade;
 
     @Column(name="creation_time")
     private Timestamp creationTime;
