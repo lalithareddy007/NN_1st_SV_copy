@@ -46,17 +46,19 @@ public class AssignmentSubmitService {
     }
 
     public AssignmentSubmitDTO createSubmissions(AssignmentSubmitDTO assignmentSubmitDTO) {
+        validateAssignmentSubmitDTO(assignmentSubmitDTO); //to be completed
+
         String studentId = assignmentSubmitDTO.getUserId();
-        if(studentId==null || !studentId.isEmpty() && !userRepository.existsById(studentId))
+        if(!userRepository.existsById(studentId))
                 throw (new ResourceNotFoundException("Student","ID",studentId));
 
         Long assignmentId = assignmentSubmitDTO.getAssignmentId();
-        if(assignmentId==null || !assignmentRepository.existsById(assignmentId))
+        if(!assignmentRepository.existsById(assignmentId))
                 throw(new ResourceNotFoundException("Assignment", "ID", assignmentId));
 
         List<AssignmentSubmit> assignmentSubmitList = assignmentSubmitRepository
                                     .findByStudentIdAndAssignmentId(studentId,assignmentId);
-        if(assignmentSubmitList.size()>0) {
+        if(!assignmentSubmitList.isEmpty()) {
             throw (new DuplicateResourceFoundException("Assignment with ID " + assignmentId + " already submitted by student " + studentId
                     + ". Please visit 'Submissions' to resubmit assignment!"));
         }
@@ -68,5 +70,9 @@ public class AssignmentSubmitService {
         AssignmentSubmit createdAssignmentSubmit = assignmentSubmitRepository.save(assignmentSubmit);
         AssignmentSubmitDTO createdAssignmentSubmitDTO = assignmentSubmitMapper.toAssignmentSubmitDTO(createdAssignmentSubmit);
         return createdAssignmentSubmitDTO;
+    }
+
+    private void validateAssignmentSubmitDTO(AssignmentSubmitDTO assignmentSubmitDTO){
+
     }
 }
