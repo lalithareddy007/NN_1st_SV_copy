@@ -34,7 +34,7 @@ public class UserDto {
 	
 	@NotNull(message = "Phone Number is required")
 	@JsonProperty("userPhoneNumber")
-	private long userPhoneNumber;
+	private Long userPhoneNumber;
 	
 	@JsonProperty("userLocation")
 	private String userLocation;

@@ -1,5 +1,7 @@
 package com.numpyninja.lms.dto;
 
+import javax.validation.constraints.NotEmpty;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
@@ -16,16 +18,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserRoleMapSlimDTO {
 	
-	//@JsonProperty("userId")
-	//private String userId;
-	
+	@NotEmpty(message = "Role Id is mandatory")
 	@JsonProperty("roleId")
 	private String roleId;
-	//private Role role;
 	
 	//@JsonProperty("roleName")
 	//private String roleName;
 	
+	@NotEmpty(message = "Role Status is Mandatory")
 	@JsonProperty("userRoleStatus")
 	private String userRoleStatus;
 }
