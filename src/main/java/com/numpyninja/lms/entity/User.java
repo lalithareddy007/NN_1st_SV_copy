@@ -48,7 +48,7 @@ public class User {
 	private String userMiddleName;
 	
 	@Column
-	private long userPhoneNumber;
+	private Long userPhoneNumber;
 	
 	@Column
 	private String userLocation;
