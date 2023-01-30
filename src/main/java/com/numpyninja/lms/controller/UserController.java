@@ -3,6 +3,8 @@ package com.numpyninja.lms.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,14 +70,14 @@ public class UserController {
     
     //create user with Role 
     @PostMapping("/users/roleStatus")
-    public ResponseEntity<UserDto> createUserWithRole(@RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFound {
+    public ResponseEntity<UserDto> createUserWithRole(@Valid @RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFound {
     	UserDto responseDto = userServices.createUserWithRole(newUserRoleDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); 
     }
     
     //update user info in User Table
     @PutMapping("/users/{userId}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUser(updateuserDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }
@@ -83,7 +85,7 @@ public class UserController {
     //Ask front end to include a separate link to update role status for user
     //update User role - (Active/inactive) for a given user id and role id 
     @PutMapping("/users/roleStatus/{userId}")
-    public ResponseEntity<String> updateUserRoleStatus(@PathVariable(value="userId") String userId, @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
+    public ResponseEntity<String> updateUserRoleStatus(@Valid @PathVariable(value="userId") String userId, @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
     		//String UserRole, String UserStatus
     	String responseDto = userServices.updateUserRoleStatus(updateUserRoleStatus,userId);
     	return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " +userId); 
@@ -133,14 +135,14 @@ public class UserController {
     /*
     //Creates user only but no role added
     @PostMapping("/users")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto newuserDto) throws InvalidDataException, DuplicateResourceFound {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto newuserDto) throws InvalidDataException, DuplicateResourceFound {
     	UserDto responseDto = userServices.createUser(newuserDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);  
     }
     */
     
     /* @PutMapping("/users/roleStatus/{userId}")
-    public ResponseEntity<UserDto> updateUserWithRole(@RequestBody UserAndRoleDTO updateUserRoleDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
+    public ResponseEntity<UserDto> updateUserWithRole(@Valid @RequestBody UserAndRoleDTO updateUserRoleDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUserWithRole(updateUserRoleDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }*/
