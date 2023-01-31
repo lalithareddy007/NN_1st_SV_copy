@@ -10,6 +10,8 @@ import com.numpyninja.lms.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,11 +70,16 @@ public class ProgramServices {
 				Program newProgramEntity = programMapper.toProgramEntity(program);
 				 ProgramDTO savedProgramDTO =null;
 				 Program savedEntity =null;
+				LocalDateTime now = LocalDateTime.now();
+				Timestamp timestamp = Timestamp.valueOf(now);
+				newProgramEntity.setCreationTime(timestamp);
+				newProgramEntity.setLastModTime(timestamp);
 				 
 				 List<Program>result= programRepository.findByProgramName(newProgramEntity.getProgramName());
 				 if(result.size()>0) {
 					 throw new DuplicateResourceFound("cannot create program , since already exists");
 				 }else {
+
 					 savedEntity = programRepository.save(newProgramEntity);
 					 savedProgramDTO= programMapper.INSTANCE.toProgramDTO(savedEntity);
 				 		return (savedProgramDTO);
@@ -165,8 +172,8 @@ public class ProgramServices {
 						 programRepository.delete(progEntity);
 						 return value;
 					 }else {
-						 System.out.println("no record found with programId"+programId);
-						 throw new ResourceNotFoundException("no record found with programId");
+						 System.out.println("no record found with programId"+ "  "+ programId);
+						 throw new ResourceNotFoundException("no record found with programId" + programId);
 					 }
 					 
 				 }
