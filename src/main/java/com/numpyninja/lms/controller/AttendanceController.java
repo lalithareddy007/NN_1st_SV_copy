@@ -63,7 +63,7 @@ public class AttendanceController{
 		return ResponseEntity.ok(this.attendanceServices.getAttendanceByBatch(batchId));
 	}
 
-	@DeleteMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
+	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<String> deleteAttendance(@PathVariable Long id) {
 		attendanceServices.deleteAttendance(id);
 		String message = "Message:" + " Attendance Id-" + id + " deleted Successfully!";
@@ -77,7 +77,7 @@ public class AttendanceController{
 	}
 
 	// update an Attendance
-	@PutMapping("/{id}")
+	@PutMapping(path="/{id}",consumes = "application/json", produces = "application/json")
 	public ResponseEntity<AttendanceDto> updateAttendance(@RequestBody AttendanceDto attendanceDto,
 			@PathVariable Long id) {
 		AttendanceDto updatedAttendanceDto = this.attendanceServices.updateAttendance(attendanceDto, id);

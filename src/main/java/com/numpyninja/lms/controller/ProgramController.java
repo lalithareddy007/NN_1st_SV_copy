@@ -78,15 +78,16 @@ public class ProgramController{
   	//delete mapping that deletes a specified program  
   	@DeleteMapping(path="/deletebyprogid/{programId}")  
   	@ResponseBody
-  	private ResponseEntity<?>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException  
-  	{  
+  	private ResponseEntity<String>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException
+  	{
   	System.out.println("in delete by programID controller");
-  	boolean deleted = programServices.deleteByProgramId(programId); 
-  	if(deleted)
-  		return ResponseEntity.status(HttpStatus.OK).build();
+  	boolean deleted = programServices.deleteByProgramId(programId);
+  	if(deleted){
+		String message = "Message:" + " Program Id-" + programId + " is deleted Successfully!";
+  		return ResponseEntity.ok(message);}
   			else
   		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-  	}  
+  	}
   			 
   	//delete mapping that deletes a specified program by ProgramName  
   	@DeleteMapping(path="/deletebyprogname/{programName}")  
@@ -95,8 +96,9 @@ public class ProgramController{
   	{  
   	System.out.println("in delete by programName controller");
   	boolean deleted =programServices.deleteByProgramName(programName);
-  	if(deleted)
-  		return ResponseEntity.status(HttpStatus.OK).build();
+  	if(deleted){
+		String message = "Message:" + " Program Name -" + programName + " is deleted Successfully!";
+  		return ResponseEntity.ok(message);}
   			else
   		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
   	}
