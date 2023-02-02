@@ -85,10 +85,10 @@ class AttendanceControllerTest {
 	
 	@BeforeEach
 	public void setup() {
-		setMockAssignmentAndDto();
+		setMockAttendanceAndDto();
 	}
 	
-	private void setMockAssignmentAndDto() {
+	private void setMockAttendanceAndDto() {
 		
 		attendanceDtos =new AttendanceDto(7L,7L,"U03","Present", Timestamp.valueOf(LocalDateTime.now()),Timestamp.valueOf(LocalDateTime.now()));		
 		attendanceList=new ArrayList<AttendanceDto>();

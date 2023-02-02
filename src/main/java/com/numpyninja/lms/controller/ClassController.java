@@ -108,7 +108,7 @@ public class ClassController {
 	//DeleteClassById
 	@DeleteMapping(path="deletebyClass/{classId}",produces = "application/json")  
 	@ResponseBody
-	private ResponseEntity<?>  deleteBySkillId(@PathVariable("classId")@NotBlank @Positive Long classId) throws ResourceNotFoundException  
+	private ResponseEntity<?>  deleteByClassId(@PathVariable("classId")@NotBlank @Positive Long classId) throws ResourceNotFoundException  
 	{  
 	System.out.println("in delete by classId controller");
 	boolean deleted = classServices.deleteByClassId(classId); 

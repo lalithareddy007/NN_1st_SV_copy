@@ -85,7 +85,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
        mockClassDto = new ClassDto (1L,1,1,classDate ,"Selenium1",
                 "UO2","Selenium Class", "OK",
                 "c:/ClassNotes",
-                "c:/RecordingPath",Timestamp.valueOf(LocalDateTime.now()),Timestamp.valueOf(LocalDateTime.now()));
+                "c:/RecordingPath");
         classDtoList = new ArrayList<ClassDto>();
     }
 

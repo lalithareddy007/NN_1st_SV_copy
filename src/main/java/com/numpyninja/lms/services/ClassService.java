@@ -2,10 +2,13 @@ package com.numpyninja.lms.services;
 
 
 
+import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.dto.ClassDto;
 import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.entity.Role;
+import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.entity.Batch;
 
@@ -15,11 +18,14 @@ import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.ClassScheduleMapper;
 import com.numpyninja.lms.repository.ClassRepository;
 import com.numpyninja.lms.repository.ProgBatchRepository;
+import com.numpyninja.lms.repository.RoleRepository;
 import com.numpyninja.lms.repository.UserRepository;
+import com.numpyninja.lms.repository.UserRoleMapRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -49,7 +55,11 @@ public class ClassService {
     @Autowired
     private ClassScheduleMapper classMapper;
     
+    @Autowired
+	private UserRoleMapRepository userRoleMapRepository;
     
+    @Autowired
+    RoleRepository roleRepository;
     
     //create a new class schedule for existing batchId and staffId 
  /*   public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFound {
@@ -115,6 +125,8 @@ public class ClassService {
     
     public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFound
     {
+    	
+    	
     	int batchId = newClassDto.getBatchId();
     	String staffId = newClassDto.getClassStaffId();
     	
@@ -123,6 +135,14 @@ public class ClassService {
     			.orElseThrow(() -> new ResourceNotFoundException("Batch", "Id", batchId));
     	User user = userRepository.findById(staffId)
  				.orElseThrow(() -> new ResourceNotFoundException("staffid " + staffId + " not found"));
+    	
+    	boolean roleMapRepository = 
+    			 userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
+    	(newClassDto.getClassStaffId(), "R02","Active").isEmpty();
+    	
+    	if(!roleMapRepository)
+    	throw new ResourceNotFoundException("User", "Role(Admin/Staff)", newClassDto.getClassStaffId());
+    	
     	
     	
     	Class class1 = classMapper.toClassScheduleEntity(newClassDto);
@@ -134,6 +154,10 @@ public class ClassService {
     	
  		Class class2 = classRepository.save(class1);
  		return classMapper.toClassSchdDTO(class2);
+ 		
+ 		
+ 		
+ 		
     }
     
     
@@ -266,51 +290,125 @@ public class ClassService {
      
 
     //Update Class Schedules by Id
-    public ClassDto updateClassByClassId(Long id,ClassDto modifiedClassDTO) throws ResourceNotFoundException{
-    	{
-			System.out.println("in updateClassServiceById method");
-			Class updateClassSchedule;
-			ClassDto savedClassDTO = null;
-			Class savedClassSchedule =null;
-			if(id!=null)
-			{
-				Class newClassSchedule  = classMapper.toClassScheduleEntity(modifiedClassDTO);
-			Boolean isPresentTrue=classRepository.findById(id).isPresent();
-			
-			if(isPresentTrue)
-			{
-				updateClassSchedule = classRepository.getById(id);
-				updateClassSchedule.setClassComments(modifiedClassDTO.getClassComments());
-				updateClassSchedule.setClassDate(modifiedClassDTO.getClassDate());
-				updateClassSchedule.setClassDescription(modifiedClassDTO.getClassDescription());
-				updateClassSchedule.setClassNo(modifiedClassDTO.getClassNo());
-				updateClassSchedule.setCreationTime(modifiedClassDTO.getCreationTime());
-				updateClassSchedule.setLastModTime(modifiedClassDTO.getLastModTime());
-				updateClassSchedule.setClassNotes(modifiedClassDTO.getClassNotes());
-				updateClassSchedule.setClassRecordingPath(modifiedClassDTO.getClassRecordingPath());
-				updateClassSchedule.setClassTopic(modifiedClassDTO.getClassTopic());
-				
-				
-				Batch updatedBatchEntityInClass = batchRepository.getById(modifiedClassDTO.getBatchId());
-				User updatedStaffEntityInClass = userRepository.getById(modifiedClassDTO.getClassStaffId());
-				
-				updateClassSchedule.setBatchInClass(updatedBatchEntityInClass);
-				updateClassSchedule.setStaffInClass(updatedStaffEntityInClass);
-				
-				savedClassSchedule = classRepository.save(updateClassSchedule);
-				 savedClassDTO = classMapper.toClassSchdDTO(savedClassSchedule);
-				 
-				 return savedClassDTO; 
-			}
-			else {
-				throw new ResourceNotFoundException("no record found with "+ id);
-			}
-			
-		}else {
-			throw new IllegalArgumentException();
-		}
+	
+	public ClassDto updateClassByClassId(Long id,ClassDto modifiedClassDTO) throws ResourceNotFoundException{
+		
+	 Class savedClass = this.classRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Class", "Id", id));
+
+		
+
+		Class updateClass = classMapper.toClassScheduleEntity(modifiedClassDTO);
+		LocalDateTime now= LocalDateTime.now();
+		Timestamp timestamp= Timestamp.valueOf(now);
+		//Batch batch = this.batchRepository.findById(modifiedClassDTO.getBatchId());
+
+		if(StringUtils.hasLength(modifiedClassDTO.getClassComments()))
+			updateClass.setClassComments(modifiedClassDTO.getClassComments());
+		else
+			updateClass.setClassComments(savedClass.getClassComments());
+
+		if(StringUtils.hasLength(modifiedClassDTO.getClassDescription()))
+			updateClass.setClassDescription(modifiedClassDTO.getClassDescription());
+		else
+			updateClass.setClassDescription(savedClass.getClassDescription());
+
+		if(StringUtils.hasLength(modifiedClassDTO.getClassNotes()))
+			updateClass.setClassNotes(modifiedClassDTO.getClassNotes());
+		else
+			updateClass.setClassNotes(savedClass.getClassNotes());
+
+		if(StringUtils.hasLength(modifiedClassDTO.getClassRecordingPath()))
+			updateClass.setClassRecordingPath(modifiedClassDTO.getClassRecordingPath());
+		else
+			updateClass.setClassRecordingPath(savedClass.getClassRecordingPath());
+
+		if(StringUtils.hasLength(modifiedClassDTO.getClassStaffId()))
+		//	updateClass.setStaffInClass(modifiedClassDTO.getClassStaffId());
+		//else
+			updateClass.setStaffInClass(savedClass.getStaffInClass());
+		
+		if(StringUtils.hasLength(modifiedClassDTO.getClassTopic()))
+			updateClass.setClassTopic(modifiedClassDTO.getClassTopic());
+		else
+			updateClass.setClassTopic(savedClass.getClassTopic());
+		
+		//if(StringUtils.(modifiedClassDTO.getClassNo()))
+		updateClass.setClassNo(modifiedClassDTO.getClassNo());
+		//else 
+			//updateClass.setClassNo(modifiedClassDTO.getClassNo());
+		
+		updateClass.setClassDate(modifiedClassDTO.getClassDate());
+		
+		
+		
+		updateClass.setBatchInClass(savedClass.getBatchInClass());
+		updateClass.setCsId(id);
+		updateClass.setCreationTime(savedClass.getCreationTime());
+		updateClass.setLastModTime(timestamp);
+
+		Class updatedClass = this.classRepository.save(updateClass);
+		ClassDto updatedClassDto = classMapper.toClassSchdDTO(updatedClass);
+		return updatedClassDto;
 	}
-   }    
+		
+		
+		
+		
+		
+		
+	
+	
+//    public ClassDto updateClassByClassId(Long id,ClassDto modifiedClassDTO) throws ResourceNotFoundException{
+//    	{
+//			System.out.println("in updateClassServiceById method");
+//			Class updateClassSchedule;
+//			ClassDto savedClassDTO = null;
+//			Class savedClassSchedule =null;
+//			
+//		        //Class savedClassSchedule = this.classRepository.findById(id);
+//			if(id!=null)
+//			{
+//				Class newClassSchedule  = classMapper.toClassScheduleEntity(modifiedClassDTO);
+//			LocalDateTime now= LocalDateTime.now();
+//				Timestamp timestamp= Timestamp.valueOf(now);
+//			Boolean isPresentTrue=classRepository.findById(id).isPresent();
+//			
+//			if(isPresentTrue)
+//			{
+//				updateClassSchedule = classRepository.getById(id);
+//				updateClassSchedule.setClassComments(modifiedClassDTO.getClassComments());
+//				updateClassSchedule.setClassDate(modifiedClassDTO.getClassDate());
+//				updateClassSchedule.setClassDescription(modifiedClassDTO.getClassDescription());
+//				updateClassSchedule.setClassNo(modifiedClassDTO.getClassNo());
+//				updateClassSchedule.setCreationTime(newClassSchedule.getCreationTime());     
+//				//updateClassSchedule.setCreationTime(modifiedClassDTO.getCreationTime());
+//				updateClassSchedule.setLastModTime(timestamp);
+//				updateClassSchedule.setClassNotes(modifiedClassDTO.getClassNotes());
+//				updateClassSchedule.setClassRecordingPath(modifiedClassDTO.getClassRecordingPath());
+//				updateClassSchedule.setClassTopic(modifiedClassDTO.getClassTopic());
+//				
+//				
+//				Batch updatedBatchEntityInClass = batchRepository.getById(modifiedClassDTO.getBatchId());
+//				User updatedStaffEntityInClass = userRepository.getById(modifiedClassDTO.getClassStaffId());
+//				
+//				updateClassSchedule.setBatchInClass(updatedBatchEntityInClass);
+//				updateClassSchedule.setStaffInClass(updatedStaffEntityInClass);
+//				
+//				savedClassSchedule = classRepository.save(updateClassSchedule);
+//				 savedClassDTO = classMapper.toClassSchdDTO(savedClassSchedule);
+//				 
+//				 return savedClassDTO; 
+//			}
+//			else {
+//				throw new ResourceNotFoundException("no record found with "+ id);
+//			}
+//			
+//		}else {
+//			throw new IllegalArgumentException();
+//		}
+//	}
+//   }    
 
     
     	//delete by classId
