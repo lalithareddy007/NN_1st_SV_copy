@@ -19,7 +19,7 @@ public interface UserSkillRepository extends JpaRepository<UserSkill,String> {
     @Query(value = "Select * from tbl_lms_userskill_map WHERE user_id=?", nativeQuery = true)
     List<UserSkill> getByUserId(String id);
 
-    void deleteByUser(User user);
-@Query(value = "select * from tbl_lms_userskill_map WHERE user_id=?",nativeQuery = true)
+    //void deleteByUser(User user);
+    @Query(value = "select * from tbl_lms_userskill_map WHERE user_id=?",nativeQuery = true)
     List<UserSkill> existsByUserId(String id);
 }

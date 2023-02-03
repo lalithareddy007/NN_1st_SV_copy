@@ -44,11 +44,11 @@ public class UserSkillController {
     }
 
 
-    @DeleteMapping(path="/deleteByUser/{id}")
+   /* @DeleteMapping(path="/deleteByUser/{id}")
     public ResponseEntity<ApiResponse> deleteUserByUserId(@PathVariable String id) {
         this.userSkillService.deleteUserByUserId(id);
         return new ResponseEntity<ApiResponse>(new ApiResponse("Users deleted successfully", true), HttpStatus.OK);
-    }
+    }*/
     @DeleteMapping(path="/deleteByUserSkillId/{id}")
     public ResponseEntity< ApiResponse>deleteUserSkillByUserSkillId(@PathVariable String id){
         this.userSkillService.deleteUserSkillByUserSkillId(id);
