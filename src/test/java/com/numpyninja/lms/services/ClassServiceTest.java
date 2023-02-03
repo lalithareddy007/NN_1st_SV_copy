@@ -10,7 +10,8 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+import com.numpyninja.lms.dto.AssignmentDto;
+import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.dto.ClassDto;
 
 import com.numpyninja.lms.entity.*;
@@ -53,6 +54,9 @@ class ClassServiceTest {
 
     @Mock
     private ClassScheduleMapper classScheduleMapper;
+    
+    @Mock
+     private UserRoleMapRepository userRoleMapRepository;
 
     private Class mockClass, mockClass2;
 
@@ -61,6 +65,8 @@ class ClassServiceTest {
     private List<Class> classList;
 
     private List<ClassDto> classDtoList;
+
+    private List<UserRoleMap> mockUserRoleMaps;
 
 
     @BeforeEach
@@ -93,7 +99,7 @@ class ClassServiceTest {
         mockClassDto = new ClassDto((long) 1, 1, 1, classDate,
                 "Selenium", "U01", "Selenium Class", "OK",
                 "c:/ClassNotes",
-                "c:/RecordingPath", timestamp, timestamp);
+                "c:/RecordingPath");
 
         mockClass2 = new Class((long) 2, batchInClass, 2, classDate,
                 "Selenium1", staffInClass, "Selenium Class1", "OK",
@@ -103,7 +109,24 @@ class ClassServiceTest {
         mockClassDto2= new ClassDto((long) 2, 2, 2, classDate,
                 "Selenium1", "U02", "Selenium Class1", "OK",
                 "c:/ClassNotes",
-                "c:/RecordingPath", timestamp, timestamp);
+                "c:/RecordingPath");
+        
+        User user = new User("U01", "Steve", "Jobs", "Martin",
+				1234567890L, "CA", "PST", "@stevejobs", "",
+				"", "", "Citizen", timestamp, timestamp);
+        
+    	mockUserRoleMaps = new ArrayList<UserRoleMap>();
+
+		Role role = new Role("R01", "Admin", "LMS_Admin", timestamp, timestamp);
+
+		UserRoleMap userRoleMap = new UserRoleMap();
+		userRoleMap.setUserRoleId(1L);
+		userRoleMap.setUserRoleStatus("Active");
+		userRoleMap.setUser(user);
+		userRoleMap.setRole(role);
+		userRoleMap.setCreationTime(timestamp);
+		userRoleMap.setLastModTime(timestamp);
+		mockUserRoleMaps.add(userRoleMap);
         classList = new ArrayList<>();
         classDtoList = new ArrayList<>();
         return mockClass;
@@ -266,25 +289,94 @@ class ClassServiceTest {
         @SneakyThrows
         @Test
         void testCreateClass() throws DuplicateResourceFound {
+        	
+        	
+        	
+    		//given
+    		//given(classRepository.findByClassIdAndBatchId(mockClassDto.getCsId()))
+    			//	.willReturn(Optional.empty());
+    		given(classRepository.findByClassIdAndBatchId(mockClassDto.getCsId(), mockClassDto.getBatchId()
+                 )).willReturn(classList);
+    		given(userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase(
+    				mockClassDto.getClassStaffId(), "R02", "Active"))
+    				.willReturn(mockUserRoleMaps);
+    		given(userRepository.existsById(mockClassDto.getClassStaffId())).willReturn(true);
+    		given(classScheduleMapper.toClassScheduleEntity(mockClassDto)).willReturn(mockClass);
+    		given(classRepository.save(mockClass)).willReturn(mockClass);
+    		given(classScheduleMapper.toClassSchdDTO(mockClass)).willReturn(mockClassDto);
 
+    		//when
+    		//AssignmentDto assignmentDto = assignmentService.createAssignment(mockAssignmentDto);
+    		ClassDto classDto = classService.createClass(mockClassDto);
+    		//then
+    		assertThat(classDto).isNotNull();
+        	
+        	
+        	
+        	
+//        	
+//    		//given
+//        	given(classRepository.findByClassIdAndBatchId(mockClassDto.getCsId(), mockClassDto.getBatchId()
+//                )).willReturn(classList);
+//    		
+//    		
+//    		//given(userRepository.existsById(mockAssignmentDto.getGraderId())).willReturn(true);
+//    		given(classScheduleMapper.toClassScheduleEntity(mockClassDto)).willReturn(mockClass);
+//    		given(classRepository.save(mockClass)).willReturn(mockClass);
+//    		given(classScheduleMapper.toClassSchdDTO(mockClass)).willReturn(mockClassDto);
+//
+//    		//when
+//    		ClassDto classDto = classService.createClass(mockClassDto);
+//
+//    		//then
+//    		assertThat(classDto).isNotNull();
+
+        	
+        	
+        	
             //given
-            Batch batch = setMockBatch();
-            User user = setMockClassAndDto1();
-            when(classScheduleMapper.toClassScheduleEntity(mockClassDto)).thenReturn(mockClass);
-            when(batchRepository.existsById(mockClass.getBatchInClass().getBatchId())).thenReturn(true);
-            when(userRepository.existsById(mockClass.getStaffInClass().getUserId())).thenReturn(true);
-            when(batchRepository.findById(mockClass.getBatchInClass().getBatchId())).thenReturn(Optional.of(batch));
-            when(userRepository.findById(mockClass.getStaffInClass().getUserId())).thenReturn(Optional.of(user));
-            when(classRepository.findByClassIdAndBatchId(mockClassDto.getCsId(), mockClassDto.getBatchId()
-            )).thenReturn(classList);
-            when(classRepository.save(mockClass)).thenReturn(mockClass);
-            when(classScheduleMapper.toClassSchdDTO(mockClass)).thenReturn(mockClassDto);
-
-            //when
-            ClassDto classDto = classService.createClass(mockClassDto);
-
-            //then
-            AssertionsForClassTypes.assertThat(classDto).isNotNull();
+//            Batch batch = setMockBatch();
+//            User user = setMockClassAndDto1();
+//            when(classScheduleMapper.toClassScheduleEntity(mockClassDto)).thenReturn(mockClass);
+//          // when(batchRepository.existsById(mockClass.getBatchInClass().getBatchId())).thenReturn(true);
+//      when(batchRepository.findById(mockClass.getBatchInClass().getBatchId())).thenReturn(Optional.of(batch));
+//       when(userRepository.findById(mockClass.getStaffInClass().getUserId())).thenReturn(Optional.of(user));
+//            when(classRepository.findByClassIdAndBatchId(mockClassDto.getCsId(), mockClassDto.getBatchId()
+//            )).thenReturn(classList);
+//            when(classRepository.save(mockClass)).thenReturn(mockClass);
+//            when(classScheduleMapper.toClassSchdDTO(mockClass)).thenReturn(mockClassDto);
+//
+//            //when
+//            ClassDto classDto = classService.createClass(mockClassDto);
+//
+//            //then
+//            AssertionsForClassTypes.assertThat(classDto).isNotNull();
+        	
+//        	Batch batch = setMockBatch();
+//        	User user = setMockClassAndDto1();
+//        	
+//        	when(classScheduleMapper.toClassScheduleEntity(mockClassDto)).thenReturn(mockClass);
+//            
+//        	
+//        	when(batchRepository.findById(mockClass.getBatchInClass().getBatchId())).thenReturn(Optional.of(batch));
+//           // when(classRepository.findById(mockClass.getObjClass().getCsId())).thenReturn(Optional.of(class2));
+//           // when(userRepository.findById(mockClass.getStaffInClass())).thenReturn(Optional.of(user));
+//        	when(userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase(mockClassDto.getClassStaffId(), "R02","Active").isEmpty())
+//        	.thenReturn(Optional.of());
+//        	
+//        	//.thenThrow(ResourceNotFoundException("User", "Role(Admin/Staff)", mockClassDto.getClassStaffId()));
+//        	when(userRepository.findById(mockClass.getStaffInClass().getUserId())).thenReturn(Optional.of(user)); 
+//           
+//            when(classRepository.save(mockClass)).thenReturn(mockClass);
+//            when(classScheduleMapper.toClassSchdDTO(mockClass)).thenReturn(mockClassDto);
+//
+//            //when
+//            ClassDto classDto = classService.createClass(mockClassDto);
+//            // AttendanceDto attendanceDto = attendanceService.createAttendance(mockAttendanceDto);
+//
+//            //then
+//            AssertionsForClassTypes.assertThat(classDto).isNotNull();
+        	
         }
 
 
@@ -469,9 +561,9 @@ class ClassServiceTest {
 
             given(classScheduleMapper.toClassScheduleEntity(mockClassDto)).willReturn(mockClass);
             given(classRepository.findById(classId)).willReturn(Optional.of(mockClass));
-            given(classRepository.getById(classId)).willReturn(mockClass);
-            given(batchRepository.getById(mockClassDto.getBatchId())).willReturn(mockClass.getBatchInClass());
-            given(userRepository.getById(mockClassDto.getClassStaffId())).willReturn(mockClass.getStaffInClass());
+          //  given(classRepository.getById(classId)).willReturn(mockClass);
+          //  given(batchRepository.getById(mockClassDto.getBatchId())).willReturn(mockClass.getBatchInClass());
+            //given(userRepository.getById(mockClassDto.getClassStaffId())).willReturn(mockClass.getStaffInClass());
             given(classRepository.save(mockClass)).willReturn(savedClass);
             given(classScheduleMapper.toClassSchdDTO(mockClass)).willReturn(updatedClassDto);
 

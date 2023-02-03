@@ -26,6 +26,8 @@ private String classDescription;
 private String classComments;
 private String classNotes;
 private String classRecordingPath;
-private Timestamp creationTime;
-private Timestamp lastModTime;
+//private String createdby;
+
+//private Timestamp creationTime;
+//private Timestamp lastModTime;
 }
