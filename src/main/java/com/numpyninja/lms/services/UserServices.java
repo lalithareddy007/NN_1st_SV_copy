@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.numpyninja.lms.dto.UserAndRoleDTO;
 import com.numpyninja.lms.dto.UserDto;
@@ -178,6 +179,37 @@ public class UserServices {
 				}
 
 				toBeupdatedUser = userMapper.user(updateuserDto);
+				if(StringUtils.hasLength(updateuserDto.getUserLinkedinUrl()))
+					toBeupdatedUser.setUserLinkedinUrl(updateuserDto.getUserLinkedinUrl());
+				else
+					toBeupdatedUser.setUserLinkedinUrl(userById.get().getUserLinkedinUrl());
+				
+				if(StringUtils.hasLength(updateuserDto.getUserLocation()))
+					toBeupdatedUser.setUserLocation(updateuserDto.getUserLocation());
+				else
+					toBeupdatedUser.setUserLocation(userById.get().getUserLocation());
+				
+				if(StringUtils.hasLength(updateuserDto.getUserEduPg()))
+					toBeupdatedUser.setUserEduPg(updateuserDto.getUserEduPg());
+				else
+					toBeupdatedUser.setUserEduPg(userById.get().getUserEduPg());
+				
+				if(StringUtils.hasLength(updateuserDto.getUserEduUg()))
+					toBeupdatedUser.setUserEduUg(updateuserDto.getUserEduUg());
+				else
+					toBeupdatedUser.setUserEduUg(userById.get().getUserEduUg());
+				
+				if(StringUtils.hasLength(updateuserDto.getUserComments()))
+					toBeupdatedUser.setUserComments(updateuserDto.getUserComments());
+				else
+					toBeupdatedUser.setUserComments(userById.get().getUserComments());
+				
+				if(StringUtils.hasLength(updateuserDto.getUserMiddleName()))
+					toBeupdatedUser.setUserMiddleName(updateuserDto.getUserMiddleName());
+				else
+					toBeupdatedUser.setUserMiddleName(userById.get().getUserMiddleName());
+				
+				
 				toBeupdatedUser.setUserId(userId);
 				toBeupdatedUser.setCreationTime(userById.get().getCreationTime());
 				toBeupdatedUser.setLastModTime(new Timestamp(utilDate.getTime()));

@@ -85,7 +85,7 @@ public class UserController {
     //Ask front end to include a separate link to update role status for user
     //update User role - (Active/inactive) for a given user id and role id 
     @PutMapping("/users/roleStatus/{userId}")
-    public ResponseEntity<String> updateUserRoleStatus(@Valid @PathVariable(value="userId") String userId, @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
+    public ResponseEntity<String> updateUserRoleStatus(@Valid @PathVariable(value="userId") String userId, @Valid @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
     		//String UserRole, String UserStatus
     	String responseDto = userServices.updateUserRoleStatus(updateUserRoleStatus,userId);
     	return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " +userId); 
