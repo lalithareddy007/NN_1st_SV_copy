@@ -40,7 +40,6 @@ import com.numpyninja.lms.entity.Program;
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
@@ -139,7 +138,7 @@ class UserServicesTest {
 	@DisplayName("test for createUser method")
 	@Test
 	//@Order(2)
-	void createUserTest() throws InvalidDataException, DuplicateResourceFound {
+	void createUserTest() throws InvalidDataException, DuplicateResourceFoundException {
 
 		//given(userMapper.user(org.mockito.ArgumentMatchers.any())).willReturn(mockUser);
 		
@@ -161,7 +160,7 @@ class UserServicesTest {
 	@DisplayName("test for creating user with Role info")
 	@Test
 	//@Order(2)
-	void createUserWithRole() throws InvalidDataException, DuplicateResourceFound {
+	void createUserWithRole() throws InvalidDataException, DuplicateResourceFoundException {
 
 		String roleId = "R01";
 	

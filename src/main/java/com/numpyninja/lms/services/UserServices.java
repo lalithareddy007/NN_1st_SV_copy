@@ -16,7 +16,7 @@ import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
@@ -71,7 +71,7 @@ public class UserServices {
 	}
 
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
-			throws InvalidDataException, DuplicateResourceFound {
+			throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
 		UserRoleMap newUserRoleMap = null;
 		Role userRole = null;
@@ -86,7 +86,7 @@ public class UserServices {
 			if (userList.size() > 0) {
 				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserRoleDto.getUserPhoneNumber());
 				if (isPhoneNumberExists) {
-					throw new DuplicateResourceFound("Failed to create new User as phone number "
+					throw new DuplicateResourceFoundException("Failed to create new User as phone number "
 							+ newUserRoleDto.getUserPhoneNumber() + " already exists !!");
 				}
 			}
@@ -295,7 +295,7 @@ public class UserServices {
 	 * controller endpoints for these are commented out for now.
 	 */
 
-	public UserDto createUser(UserDto newUserDto) throws InvalidDataException, DuplicateResourceFound {
+	public UserDto createUser(UserDto newUserDto) throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
 		Date utilDate = new Date();
 
@@ -306,7 +306,7 @@ public class UserServices {
 			if (userList.size() > 0) {
 				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserDto.getUserPhoneNumber());
 				if (isPhoneNumberExists) {
-					throw new DuplicateResourceFound("Failed to create new User as phone number "
+					throw new DuplicateResourceFoundException("Failed to create new User as phone number "
 							+ newUserDto.getUserPhoneNumber() + " already exists !!");
 				}
 			}

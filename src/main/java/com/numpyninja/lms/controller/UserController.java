@@ -22,7 +22,7 @@ import com.numpyninja.lms.dto.UserDto;
 import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
@@ -70,14 +70,14 @@ public class UserController {
     
     //create user with Role 
     @PostMapping("/users/roleStatus")
-    public ResponseEntity<UserDto> createUserWithRole(@Valid @RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFound {
+    public ResponseEntity<UserDto> createUserWithRole(@Valid @RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFoundException {
     	UserDto responseDto = userServices.createUserWithRole(newUserRoleDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); 
     }
     
     //update user info in User Table
     @PutMapping("/users/{userId}")
-    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUser(updateuserDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }
@@ -135,14 +135,14 @@ public class UserController {
     /*
     //Creates user only but no role added
     @PostMapping("/users")
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto newuserDto) throws InvalidDataException, DuplicateResourceFound {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto newuserDto) throws InvalidDataException, DuplicateResourceFoundException {
     	UserDto responseDto = userServices.createUser(newuserDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);  
     }
     */
     
     /* @PutMapping("/users/roleStatus/{userId}")
-    public ResponseEntity<UserDto> updateUserWithRole(@Valid @RequestBody UserAndRoleDTO updateUserRoleDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFound, ResourceNotFoundException, InvalidDataException {
+    public ResponseEntity<UserDto> updateUserWithRole(@Valid @RequestBody UserAndRoleDTO updateUserRoleDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFoundException, ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUserWithRole(updateUserRoleDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }*/
