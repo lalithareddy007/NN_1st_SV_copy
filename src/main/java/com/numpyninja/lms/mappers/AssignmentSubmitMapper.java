@@ -6,9 +6,11 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 @Mapper(componentModel = "spring", uses={UserMapper.class,AssignmentMapper.class})
 public interface AssignmentSubmitMapper {
 
@@ -19,7 +21,7 @@ public interface AssignmentSubmitMapper {
     AssignmentSubmitDTO toAssignmentSubmitDTO(AssignmentSubmit assignmentSubmit);
 
     @InheritInverseConfiguration
-    AssignmentSubmit toAssignmentSubmit(AssignmentSubmitDTO assigmentSubmitDTO);
+    AssignmentSubmit toAssignmentSubmit(AssignmentSubmitDTO assignmentSubmitDTO);
 
     List<AssignmentSubmitDTO> toAssignmentSubmitDTOList(List<AssignmentSubmit> assignmentSubmitList);
 

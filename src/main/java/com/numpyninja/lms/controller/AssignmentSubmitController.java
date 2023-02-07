@@ -15,8 +15,12 @@ import java.util.List;
 @RequestMapping("/assignmentsubmission")
 public class AssignmentSubmitController {
 
-    @Autowired
+    //@Autowired
     private AssignmentSubmitService assignmentSubmitService;
+
+    public AssignmentSubmitController(AssignmentSubmitService assignmentSubmitService) {
+        this.assignmentSubmitService = assignmentSubmitService;
+    }
 
     @GetMapping("/student/{userID}")
     public ResponseEntity<List<AssignmentSubmitDTO>> getSubmissionsByUserID(@PathVariable String userID) {
@@ -26,7 +30,7 @@ public class AssignmentSubmitController {
     }
 
     @PostMapping(path="", consumes="application/json", produces="application/json")
-    public ResponseEntity<AssignmentSubmitDTO> createSubmssions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
+    public ResponseEntity<AssignmentSubmitDTO> createSubmissions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
     {
         AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.createSubmissions(assignmentSubmitDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAssignSubmitDTO);

@@ -1,9 +1,13 @@
 package com.numpyninja.lms.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -44,14 +48,19 @@ public class AssignmentSubmitDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String subPathAttach5;
 
-    //@DateTimeFormat(pattern="MM-dd-yyyy")
+    @JsonFormat(pattern="MM-dd-yyyy")
     private Timestamp subDateTime;
 
     private String gradedBy;
 
+    @JsonFormat(pattern="MM-dd-yyyy")
     private Timestamp gradedDateTime;
 
-    private int grade;
+    /*Defaulting the grade value to -1 inorder to not save 0 as value
+    in db during submission creation. Front-end needs to diplay 'grade' if its value is
+    greater than the default value.
+     */
+    private int grade=-1;
 
     private Timestamp creationTime;
 

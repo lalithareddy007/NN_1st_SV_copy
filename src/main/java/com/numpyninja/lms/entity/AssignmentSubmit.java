@@ -15,11 +15,11 @@ public class AssignmentSubmit {
     @Column(name="sub_id")
     private Long submissionId;
 
-    @OneToOne(fetch = FetchType.LAZY )
+    @OneToOne
     @JoinColumn(name="sub_a_id", nullable=false)
     private Assignment assignment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="sub_student_id", nullable = false)
     private User user;
 

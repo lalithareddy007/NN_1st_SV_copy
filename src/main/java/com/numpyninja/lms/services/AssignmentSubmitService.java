@@ -1,11 +1,9 @@
 package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
-import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.AssignmentSubmit;
-import com.numpyninja.lms.entity.User;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
+import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
 import com.numpyninja.lms.repository.AssignmentRepository;
@@ -13,40 +11,55 @@ import com.numpyninja.lms.repository.AssignmentSubmitRepository;
 import com.numpyninja.lms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AssignmentSubmitService {
 
-    @Autowired
+    //@Autowired
     public AssignmentSubmitRepository assignmentSubmitRepository;
 
-    @Autowired
+    //@Autowired
     public UserRepository userRepository;
 
-    @Autowired
+    //@Autowired
     public AssignmentRepository assignmentRepository;
 
-    @Autowired
+    //@Autowired
     public AssignmentSubmitMapper assignmentSubmitMapper;
+
+    public AssignmentSubmitService(AssignmentSubmitRepository assignmentSubmitRepository,
+                                   AssignmentRepository assignmentRepository,
+                                   UserRepository userRepository,
+                                   AssignmentSubmitMapper assignmentSubmitMapper){
+        this.assignmentSubmitRepository = assignmentSubmitRepository;
+        this.assignmentRepository = assignmentRepository;
+        this.userRepository = userRepository;
+        this.assignmentSubmitMapper = assignmentSubmitMapper;
+
+    }
 
     public List<AssignmentSubmitDTO> getSubmissionsByUserID(String userId){
 
+        if (!userRepository.existsById(userId))
+            throw new ResourceNotFoundException("User","UserID",userId);
+
         List<AssignmentSubmit> assignmentSubmitList = assignmentSubmitRepository.findByUser_userId(userId);
-        System.out.println("Submissions list:"+assignmentSubmitList.size());
-        System.out.println("Submissions list:"+assignmentSubmitList.get(0));
-        List<AssignmentSubmitDTO> assignmentSubmitDTOS = assignmentSubmitMapper
+        List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
                 .toAssignmentSubmitDTOList(assignmentSubmitList);
-        System.out.println("Submissions DTO list:"+assignmentSubmitDTOS.size());
-        System.out.println("Submissions DTO list:"+assignmentSubmitDTOS.get(0));
-        return assignmentSubmitDTOS;
+        return assignmentSubmitDTOs;
     }
 
     public AssignmentSubmitDTO createSubmissions(AssignmentSubmitDTO assignmentSubmitDTO) {
-        validateAssignmentSubmitDTO(assignmentSubmitDTO); //to be completed
+        validateAssignmentSubmitDTO(assignmentSubmitDTO);
 
         String studentId = assignmentSubmitDTO.getUserId();
         if(!userRepository.existsById(studentId))
@@ -65,6 +78,7 @@ public class AssignmentSubmitService {
 
         AssignmentSubmit assignmentSubmit = assignmentSubmitMapper.toAssignmentSubmit(assignmentSubmitDTO);
         LocalDateTime presentDateTime = LocalDateTime.now();
+        assignmentSubmit.setSubDateTime(Timestamp.valueOf(presentDateTime));
         assignmentSubmit.setCreationTime(Timestamp.valueOf(presentDateTime));
         assignmentSubmit.setLastModTime(Timestamp.valueOf(presentDateTime));
         AssignmentSubmit createdAssignmentSubmit = assignmentSubmitRepository.save(assignmentSubmit);
@@ -73,6 +87,15 @@ public class AssignmentSubmitService {
     }
 
     private void validateAssignmentSubmitDTO(AssignmentSubmitDTO assignmentSubmitDTO){
-
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        Set<ConstraintViolation<AssignmentSubmitDTO>> violationSet = validator.validate(assignmentSubmitDTO);
+        StringBuffer sb = new StringBuffer();
+        violationSet.forEach(a->{
+            sb.append(a.getMessage());
+            sb.append("\n ");
+        });
+        if(StringUtils.hasLength(sb)){
+            throw new InvalidDataException(sb.toString());
+        }
     }
 }
