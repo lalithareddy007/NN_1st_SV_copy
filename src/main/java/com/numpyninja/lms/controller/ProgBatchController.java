@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.BatchDTO;
 import com.numpyninja.lms.services.ProgBatchServices;
 
@@ -79,4 +80,9 @@ public class ProgBatchController  {
         String message = "Message:" + " Batch with Id-" + id + " deleted Successfully!";
         return message;
     }
+   // @DeleteMapping(path = "/batches/{id}" , produces = "application/json" )
+   // public ResponseEntity<ApiResponse>deleteBatch( @PathVariable Integer id) {
+     //    this.batchService.deleteProgramBatch(id);
+       //  return new ResponseEntity<ApiResponse>(new ApiResponse("Batch deleted successfully", true), HttpStatus.OK);
+
 }

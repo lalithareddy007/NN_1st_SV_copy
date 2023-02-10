@@ -22,6 +22,9 @@ import com.numpyninja.lms.repository.RoleRepository;
 import com.numpyninja.lms.repository.UserRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
 
+import ch.qos.logback.core.joran.conditional.IfAction;
+
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -292,15 +296,44 @@ public class ClassService {
     //Update Class Schedules by Id
 	
 	public ClassDto updateClassByClassId(Long id,ClassDto modifiedClassDTO) throws ResourceNotFoundException{
+		String staffId = modifiedClassDTO.getClassStaffId();
+		Integer batchid = modifiedClassDTO.getBatchId();
 		
 	 Class savedClass = this.classRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Class", "Id", id));
-
+	 User user = userRepository.findById(staffId)
+				.orElseThrow(() -> new ResourceNotFoundException("Staff Id " + staffId + " not found"));
 		
+     Batch batch = batchRepository.findById(batchid)
+     		.orElseThrow(() -> new ResourceNotFoundException("Batch Id " + batchid + " not found"));
 
-		Class updateClass = classMapper.toClassScheduleEntity(modifiedClassDTO);
-		LocalDateTime now= LocalDateTime.now();
-		Timestamp timestamp= Timestamp.valueOf(now);
+	boolean roleMapRepository = 
+		userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
+	(modifiedClassDTO.getClassStaffId(), "R02","Active").isEmpty();
+	 
+	 
+	 /*if (userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
+				(modifiedClassDTO.getClassStaffId(), "R03", "Active")
+		.isEmpty());*/
+		 
+	
+	if(!roleMapRepository)
+	throw new ResourceNotFoundException("User", "Role(Staff)", modifiedClassDTO.getClassStaffId());
+	 
+	 
+	 
+	 
+	 //	 if (userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
+	//			(modifiedClassDTO.getClassStaffId(), "R02", "Active")
+		//.isEmpty()) 
+	//throw new ResourceNotFoundException("User", "Role(Admin/Staff)", modifiedClassDTO.getClassStaffId());
+	 
+		
+        
+        
+	Class updateClass = classMapper.toClassScheduleEntity(modifiedClassDTO);
+	LocalDateTime now= LocalDateTime.now();
+	Timestamp timestamp= Timestamp.valueOf(now);
 		//Batch batch = this.batchRepository.findById(modifiedClassDTO.getBatchId());
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassComments()))
@@ -324,8 +357,8 @@ public class ClassService {
 			updateClass.setClassRecordingPath(savedClass.getClassRecordingPath());
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassStaffId()))
-		//	updateClass.setStaffInClass(modifiedClassDTO.getClassStaffId());
-		//else
+			updateClass.setStaffInClass(user);
+		else
 			updateClass.setStaffInClass(savedClass.getStaffInClass());
 		
 		if(StringUtils.hasLength(modifiedClassDTO.getClassTopic()))
@@ -333,16 +366,22 @@ public class ClassService {
 		else
 			updateClass.setClassTopic(savedClass.getClassTopic());
 		
-		//if(StringUtils.(modifiedClassDTO.getClassNo()))
+		if(modifiedClassDTO.getClassNo().getClass() == Integer.class)
 		updateClass.setClassNo(modifiedClassDTO.getClassNo());
-		//else 
-			//updateClass.setClassNo(modifiedClassDTO.getClassNo());
+		else 
+		updateClass.setClassNo(savedClass.getClassNo());
 		
+		if(modifiedClassDTO.getClassDate().getClass() == Date.class)
 		updateClass.setClassDate(modifiedClassDTO.getClassDate());
+		else 
+			updateClass.setClassDate(savedClass.getClassDate());
 		
-		
-		
+		if(modifiedClassDTO.getBatchId().getClass() == Integer.class)
+			updateClass.setBatchInClass(batch);
+		else
 		updateClass.setBatchInClass(savedClass.getBatchInClass());
+		
+		
 		updateClass.setCsId(id);
 		updateClass.setCreationTime(savedClass.getCreationTime());
 		updateClass.setLastModTime(timestamp);
@@ -352,6 +391,7 @@ public class ClassService {
 		return updatedClassDto;
 	}
 		
+	
 		
 		
 		
@@ -460,21 +500,21 @@ public class ClassService {
  //get class Recording by ClassId	   	
   	public ClassRecordingDTO getClassRecordingByClassId(Long id) throws ResourceNotFoundException{
 			
-    		Class ClassRecord= classRepository.findById(id).get();
-    		String classRecordingPath = classRepository.getById(id).getClassRecordingPath();
+    		Class ClassRecord= classRepository.findById(id).
+    				orElseThrow(() -> new ResourceNotFoundException("Class", "Id", id));
     		
+    		String classRecordingPath = ClassRecord.getClassRecordingPath();
     		
-    		if(ClassRecord== null) {
-    			throw new ResourceNotFoundException("ClassRecording is not found for classId :"+id);
-    		}
-    		
-      		else {
-      	    	    return new ClassRecordingDTO(id,classRecordingPath);
-      		}
+    		ClassRecordingDTO classRecordingDTO = new ClassRecordingDTO(id,classRecordingPath);
+    		return classRecordingDTO;
+    		//return new ClassRecordingDTO(id,classRecordingPath);
     			 
     	}
     	
     	
+  	
+  ;
+  	
     	
     //Update Class Recording by ClassId
     	public ClassDto updateClassRecordingByClassId(Long id, ClassRecordingDTO classRecordingDTO) throws ResourceNotFoundException{

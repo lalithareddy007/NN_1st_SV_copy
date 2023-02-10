@@ -75,7 +75,13 @@ public class ProgBatchServices {
     	Batch newBatch = batchMapper.toBatch(batchDTO );
     	Program program = programRepository.findById( programId ).orElseThrow(()-> new ResourceNotFoundException("Program", "Id", programId));
     	newBatch.setProgram(program);
-		Batch result = progBatchRepository.findByBatchNameAndProgram_ProgramId(newBatch.getBatchName(), programId);
+    	
+    	//check null values
+    	boolean batchstatus = batchDTO.getBatchStatus().equalsIgnoreCase("null");
+    	if (batchstatus)
+        throw new ResourceNotFoundException("Batch", "Id not found",batchDTO.getBatchStatus());
+    	
+    	Batch result = progBatchRepository.findByBatchNameAndProgram_ProgramId(newBatch.getBatchName(), programId);
 		if ( result != null)
 			 throw new DuplicateResourceFoundException ( "Program " +program.getProgramName() + " with Batch-" + newBatch.getBatchName() 
 			            + " already exists:" + " ; Please give a different batch Name or Choose a different Program"); 

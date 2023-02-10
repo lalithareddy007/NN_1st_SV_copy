@@ -22,6 +22,7 @@ public class BatchDTO {
 	
 	private String batchDescription;
 	
+	
 	@NotBlank ( message = "Batch status is needed"  )
 	private String batchStatus;
 	
