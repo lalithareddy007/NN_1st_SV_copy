@@ -2,7 +2,7 @@ package com.numpyninja.lms.controller;
 
 import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.UserSkillDTO;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.mappers.UserSkillMapper;
 import com.numpyninja.lms.services.UserSkillService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ public class UserSkillController {
 
     }
     @PostMapping("/create")
-        public ResponseEntity<UserSkillDTO> createUserSkill(@RequestBody  UserSkillDTO newuserskillDTO ) throws DuplicateResourceFound {
+        public ResponseEntity<UserSkillDTO> createUserSkill(@RequestBody  UserSkillDTO newuserskillDTO ) throws DuplicateResourceFoundException {
             UserSkillDTO responseDto = this.userSkillService.createUserSkill(newuserskillDTO);
             return new ResponseEntity<>(responseDto,HttpStatus.CREATED);
     }

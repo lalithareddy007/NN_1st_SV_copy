@@ -2,26 +2,19 @@ package com.numpyninja.lms.controller;
 
 
 import com.numpyninja.lms.dto.ProgramDTO;
-import com.numpyninja.lms.entity.Program;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.repository.ProgramRepository;
 import com.numpyninja.lms.services.ProgramServices;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-
 import java.util.List;
 
 @RestController
@@ -53,7 +46,7 @@ public class ProgramController{
   	//post mapping that creates the program detail in the database  
   	@PostMapping(path="/saveprogram",consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
-  	private ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFound
+  	private ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
   	{  
   	ProgramDTO savedProgramedDTO = programServices.createAndSaveProgram(newProgram);
   	return ResponseEntity.status(HttpStatus.CREATED).body(savedProgramedDTO);  

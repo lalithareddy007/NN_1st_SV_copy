@@ -2,7 +2,7 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.SkillMasterDto;
 import com.numpyninja.lms.entity.SkillMaster;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.SkillMasterMapper;
 import com.numpyninja.lms.repository.SkillMasterRepository;
@@ -249,7 +249,7 @@ public class SkillMasterServiceTest {
             when(skillMasterRepository.findBySkillName(mockSkillMaster.getSkillName())).thenReturn(skillMasterList);
 
             //when
-            Exception e = assertThrows(DuplicateResourceFound.class, () -> skillMasterService.createAndSaveSkillMaster(mockSkillMasterDto));
+            Exception e = assertThrows(DuplicateResourceFoundException.class, () -> skillMasterService.createAndSaveSkillMaster(mockSkillMasterDto));
 
             //then
             assertEquals(message, e.getMessage());

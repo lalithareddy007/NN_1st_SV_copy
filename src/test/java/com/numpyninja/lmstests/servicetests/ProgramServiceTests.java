@@ -1,18 +1,12 @@
 package com.numpyninja.lmstests.servicetests;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
+import com.numpyninja.lms.dto.ProgramDTO;
+import com.numpyninja.lms.entity.Program;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
+import com.numpyninja.lms.exception.ResourceNotFoundException;
+import com.numpyninja.lms.mappers.ProgramMapper;
+import com.numpyninja.lms.repository.ProgramRepository;
+import com.numpyninja.lms.services.ProgramServices;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,19 +14,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.numpyninja.lms.dto.ProgramDTO;
-import com.numpyninja.lms.entity.Program;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
-import com.numpyninja.lms.exception.ResourceNotFoundException;
-import com.numpyninja.lms.mappers.ProgramMapper;
-import com.numpyninja.lms.repository.ProgramRepository;
-import com.numpyninja.lms.services.ProgramServices;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ProgramServiceTests {
@@ -130,7 +121,7 @@ public class ProgramServiceTests {
 	
 	//createAndSaveProgram 
 	@Test
-	void testcreateAndSaveProgram() throws ResourceNotFoundException, DuplicateResourceFound
+	void testcreateAndSaveProgram() throws ResourceNotFoundException, DuplicateResourceFoundException
 	{
 		//Given
 		Long programId =Long.valueOf(50);
@@ -182,7 +173,7 @@ public class ProgramServiceTests {
 	
 	//updateProgramById
 	@Test
-	void testupdateProgramById() throws ResourceNotFoundException, DuplicateResourceFound
+	void testupdateProgramById() throws ResourceNotFoundException, DuplicateResourceFoundException
 	{
 		//Given
 		Long programId =Long.valueOf(50);
@@ -229,7 +220,7 @@ public class ProgramServiceTests {
 	
 	//updateProgramByName
 	@Test
-	void testUpdateProgramByName() throws ResourceNotFoundException, DuplicateResourceFound
+	void testUpdateProgramByName() throws ResourceNotFoundException, DuplicateResourceFoundException
 	{
 		//Given
 		String programName ="DesignPatterns";
@@ -274,7 +265,7 @@ public class ProgramServiceTests {
 	
 	//deleteByProgramId
 	@Test
-	void testDeleteByProgramId() throws ResourceNotFoundException, DuplicateResourceFound
+	void testDeleteByProgramId() throws ResourceNotFoundException, DuplicateResourceFoundException
 	{
 		//Given
 		Long programId =(long) 5;
@@ -306,7 +297,7 @@ public class ProgramServiceTests {
 	
 	//deleteByProgramName
 	@Test
-	void testDeleteByProgramName() throws ResourceNotFoundException, DuplicateResourceFound
+	void testDeleteByProgramName() throws ResourceNotFoundException, DuplicateResourceFoundException
 	{
 		//Given
 		String programName ="Spring MVC";
