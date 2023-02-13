@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.numpyninja.lms.dto.SkillMasterDto;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
-
 import com.numpyninja.lms.exception.ResourceNotFoundException;
-
 import com.numpyninja.lms.services.SkillMasterService;
 
 @RestController
@@ -36,7 +33,7 @@ public class SkillMasterController {
 	//createSkills
 	@PostMapping(path="/SaveSkillMaster",consumes = "application/json", produces = "application/json")  
 	@ResponseBody
-	private ResponseEntity<?> createAndSaveSkill(@Valid @RequestBody SkillMasterDto newSkillMaster)throws  DuplicateResourceFound
+	private ResponseEntity<?> createAndSaveSkill(@Valid @RequestBody SkillMasterDto newSkillMaster)throws DuplicateResourceFoundException
 	{  
 		SkillMasterDto savedSkillMasterDTO = skillMasterService.createAndSaveSkillMaster(newSkillMaster);
 	return ResponseEntity.status(HttpStatus.CREATED).body(savedSkillMasterDTO);  

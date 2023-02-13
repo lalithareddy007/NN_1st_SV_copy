@@ -1,41 +1,40 @@
 package com.numpyninja.lms.services;
 
 
+import com.numpyninja.lms.dto.ClassDto;
+import com.numpyninja.lms.dto.ClassRecordingDTO;
+import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
+import com.numpyninja.lms.exception.ResourceNotFoundException;
+import com.numpyninja.lms.mappers.ClassScheduleMapper;
+import com.numpyninja.lms.repository.ClassRepository;
+import com.numpyninja.lms.repository.ProgBatchRepository;
+import com.numpyninja.lms.repository.UserRepository;
+import com.numpyninja.lms.repository.UserRoleMapRepository;
+import lombok.SneakyThrows;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import com.numpyninja.lms.dto.AssignmentDto;
-import com.numpyninja.lms.dto.AttendanceDto;
-import com.numpyninja.lms.dto.ClassDto;
-import com.numpyninja.lms.dto.ClassRecordingDTO;
-import com.numpyninja.lms.entity.*;
-import com.numpyninja.lms.entity.Class;
-import com.numpyninja.lms.exception.DuplicateResourceFound;
-
-import com.numpyninja.lms.exception.ResourceNotFoundException;
-import com.numpyninja.lms.mappers.ClassScheduleMapper;
-import com.numpyninja.lms.repository.*;
-import lombok.SneakyThrows;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
-
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ClassServiceTest {
@@ -295,7 +294,7 @@ class ClassServiceTest {
         @DisplayName("test for creating a new class")
         @SneakyThrows
         @Test
-        void testCreateClass() throws DuplicateResourceFound {
+        void testCreateClass() throws DuplicateResourceFoundException {
         	
 //given
           Batch batch = setMockBatch();
