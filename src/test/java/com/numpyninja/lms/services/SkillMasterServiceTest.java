@@ -3,6 +3,7 @@ package com.numpyninja.lms.services;
 import com.numpyninja.lms.dto.SkillMasterDto;
 import com.numpyninja.lms.entity.SkillMaster;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
+import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.SkillMasterMapper;
 import com.numpyninja.lms.repository.SkillMasterRepository;
@@ -206,7 +207,7 @@ public class SkillMasterServiceTest {
         @Test
         public void testDeleteSkillByIdWhenIdIsNull() {
             //when
-            assertThrows(IllegalArgumentException.class, () -> skillMasterService.deleteBySkillId(null));
+            assertThrows(InvalidDataException.class, () -> skillMasterService.deleteBySkillId(null));
 
             //then
             verifyNoInteractions(skillMasterRepository);
@@ -322,7 +323,7 @@ public class SkillMasterServiceTest {
             updatedSkillMasterDto.setSkillName(skillName);
 
             //when
-            assertThrows(IllegalArgumentException.class, () -> skillMasterService.updateSkillMasterById(null, updatedSkillMasterDto));
+            assertThrows(InvalidDataException.class, () -> skillMasterService.updateSkillMasterById(null, updatedSkillMasterDto));
 
             //then
             verifyNoInteractions(skillMasterRepository);

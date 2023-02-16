@@ -4,7 +4,6 @@ package com.numpyninja.lms.controller;
 import com.numpyninja.lms.dto.ProgramDTO;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
-import com.numpyninja.lms.repository.ProgramRepository;
 import com.numpyninja.lms.services.ProgramServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,9 +22,6 @@ public class ProgramController{
     @Autowired
     private ProgramServices programServices;
 
-    @Autowired
-    private ProgramRepository programRepository;
-    
   //get list of programs
   	@GetMapping(value = "/allPrograms")
   	private ResponseEntity<?> getPrograms()  throws ResourceNotFoundException 
