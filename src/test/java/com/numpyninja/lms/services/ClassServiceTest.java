@@ -6,6 +6,7 @@ import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.entity.*;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
+import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.ClassScheduleMapper;
 import com.numpyninja.lms.repository.ClassRepository;
@@ -362,7 +363,7 @@ class ClassServiceTest {
         @Test
         public void testDeleteSClassByIdWhenIdIsNull() {
             //when
-            assertThrows(IllegalArgumentException.class, () -> classService.deleteByClassId(null));
+            assertThrows(InvalidDataException.class, () -> classService.deleteByClassId(null));
 
             //then
             verifyNoInteractions(classRepository);
@@ -415,9 +416,9 @@ class ClassServiceTest {
         @DisplayName("test - When Batch ID for class is Null")
         @SneakyThrows
         @Test
-        public void testGetClassesForBatchIdWhenIdIsNull()  throws ResourceNotFoundException,IllegalArgumentException{
+        public void testGetClassesForBatchIdWhenIdIsNull()  throws ResourceNotFoundException,InvalidDataException{
             //when
-            assertThrows(IllegalArgumentException.class, () -> classService.getClassesByBatchId(null));
+            assertThrows(InvalidDataException.class, () -> classService.getClassesByBatchId(null));
 
             //then
             verifyNoInteractions(classRepository);
@@ -475,7 +476,7 @@ class ClassServiceTest {
         @Test
         public void testGetClassesByStaffIdWhenIdIsNull() {
             //when.
-            assertThrows(IllegalArgumentException.class, () -> classService.getClassesByStaffId(null));
+            assertThrows(InvalidDataException.class, () -> classService.getClassesByStaffId(null));
 
             //then
             verifyNoInteractions(classRepository);
@@ -724,7 +725,7 @@ class ClassServiceTest {
 	        	Integer batchid =3;
 	        given(classScheduleMapper.toClassScheduleEntity(mockClassDto)).willReturn(mockClass);
 	        given(classRepository.findById(classid)).willReturn(Optional.of(mockClass));
-	       // given(userRepository.findById(staffid)).willReturn(Optional.of(mockClass.getStaffInClass()));
+	        //given(userRepository.findById(staffid)).willReturn(Optional.of(mockClass.getStaffInClass()));
 	       
 	        given(batchRepository.findById(batchid)).willReturn(Optional.of(mockClass.getBatchInClass()));
 	        mockClassDto.setClassRecordingPath("C://note");

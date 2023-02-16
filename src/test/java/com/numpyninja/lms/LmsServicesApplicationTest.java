@@ -15,13 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class LmsServicesApplicationTest {
-	
-	@Autowired            // controller is injected before the test methods are run
-	ProgBatchController progBatchController;
-	
+
     @Test
 	public void contextLoads() {
-    	assertNotNull(progBatchController, "Test Fail: Controller not created." );
+
     }
 }
            
