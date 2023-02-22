@@ -33,12 +33,16 @@ public interface ClassRepository extends JpaRepository<Class,Long>{
     //@Query(value = "SELECT * FROM ClassSchedule WHERE staffInClass.userId = ?1")
     List<Class> findBystaffInClass_userId(String staffId);
 
-    //
+    
+    Optional<Class> findByCsIdAndBatchInClass_BatchId(Long csId, Integer batchid);
+    
     
     @Query(value = "SELECT * FROM tbl_lms_class_sch WHERE class_recording_path = ?1", nativeQuery = true)
     List<ClassRecordingDTO> findByclassRecordingPath_ClassRecordingDTOInClasses(List<ClassRecordingDTO> class1 );
    // List<Class> findByBatch(Batch batch);
     //List<Class> findByRoles(@Param("roles")List<String> roles);
+
+	Optional<Batch> findByCsIdAndBatchInClass_BatchId(Long id, Batch batchobj);
     
    // List<Class> findByRolesIn(List<String> roles);
     

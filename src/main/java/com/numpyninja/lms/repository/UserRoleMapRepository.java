@@ -26,6 +26,10 @@ public interface UserRoleMapRepository  extends JpaRepository <UserRoleMap, Long
 	List<UserRoleMap> findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
 			(String userId, String roleId, String userRoleStatus);
 
+	boolean existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase
+	(String userId, String roleId, String userRoleStatus);
+
+	
 	@Modifying
 	@Query("update UserRoleMap u set u.userRoleStatus = :roleStatusToUpdate, u.lastModTime= CURRENT_TIMESTAMP where u.userRoleId = :userRoleId")
 	void updateUserRole(@Param(value = "userRoleId") Long userRoleId, @Param(value = "roleStatusToUpdate") String roleStatusToUpdate);

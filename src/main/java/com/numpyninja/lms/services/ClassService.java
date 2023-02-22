@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -44,6 +45,7 @@ public class ClassService {
 	RoleRepository roleRepository;
 
 	//create a new class schedule for existing batchId and staffId
+	//this had a bug related to csid entering in json so writing another method foe create class
  /*   public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFound {
     	 Class newClassScheduleEntity;
     	 
@@ -279,156 +281,67 @@ public class ClassService {
 
 		Class savedClass = this.classRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Class", "Id", id));
+		
 		User user = userRepository.findById(staffId)
 				.orElseThrow(() -> new ResourceNotFoundException("Staff Id " + staffId + " not found"));
 
-		Batch batch = batchRepository.findById(batchid)
-				.orElseThrow(() -> new ResourceNotFoundException("Batch Id " + batchid + " not found"));
+		Batch batchobj =  batchRepository.findById(batchid)
+				.orElseThrow(() -> new ResourceNotFoundException("Batch", "Id", batchid));
+		
+		Class classBatchOptional = classRepository.findByCsIdAndBatchInClass_BatchId(id,batchid)
+				.orElseThrow(() -> new ResourceNotFoundException("ClassId with " +id+ " and batchId with " +batchid+ " not found"));
 
-		boolean roleMapRepository =
-				userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
-						(modifiedClassDTO.getClassStaffId(), "R02","Active").isEmpty();
+       boolean roleMapRepository =
+        		userRoleMapRepository.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase
+				(modifiedClassDTO.getClassStaffId(), "R02","Active");
 	 
-	 
-	 /*if (userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
-				(modifiedClassDTO.getClassStaffId(), "R03", "Active")
-		.isEmpty());*/
+	    if(!roleMapRepository)
+		throw new ResourceNotFoundException("User", "Role(Staff)", modifiedClassDTO.getClassStaffId());
 
 
-		if(!roleMapRepository)
-			throw new ResourceNotFoundException("User", "Role(Staff)", modifiedClassDTO.getClassStaffId());
-
-
-
-
-		//	 if (userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase
-		//			(modifiedClassDTO.getClassStaffId(), "R02", "Active")
-		//.isEmpty()) 
-		//throw new ResourceNotFoundException("User", "Role(Admin/Staff)", modifiedClassDTO.getClassStaffId());
-
-
-
-
-		Class updateClass = classMapper.toClassScheduleEntity(modifiedClassDTO);
 		LocalDateTime now= LocalDateTime.now();
 		Timestamp timestamp= Timestamp.valueOf(now);
-		//Batch batch = this.batchRepository.findById(modifiedClassDTO.getBatchId());
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassComments()))
-			updateClass.setClassComments(modifiedClassDTO.getClassComments());
-		else
-			updateClass.setClassComments(savedClass.getClassComments());
+			savedClass.setClassComments(modifiedClassDTO.getClassComments());
+		
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassDescription()))
-			updateClass.setClassDescription(modifiedClassDTO.getClassDescription());
-		else
-			updateClass.setClassDescription(savedClass.getClassDescription());
+			savedClass.setClassDescription(modifiedClassDTO.getClassDescription());
+		
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassNotes()))
-			updateClass.setClassNotes(modifiedClassDTO.getClassNotes());
-		else
-			updateClass.setClassNotes(savedClass.getClassNotes());
-
+			savedClass.setClassNotes(modifiedClassDTO.getClassNotes());
+		
 		if(StringUtils.hasLength(modifiedClassDTO.getClassRecordingPath()))
-			updateClass.setClassRecordingPath(modifiedClassDTO.getClassRecordingPath());
-		else
-			updateClass.setClassRecordingPath(savedClass.getClassRecordingPath());
+			savedClass.setClassRecordingPath(modifiedClassDTO.getClassRecordingPath());
+		
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassStaffId()))
-			updateClass.setStaffInClass(user);
-		else
-			updateClass.setStaffInClass(savedClass.getStaffInClass());
+			savedClass.setStaffInClass(user);
+		
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassTopic()))
-			updateClass.setClassTopic(modifiedClassDTO.getClassTopic());
-		else
-			updateClass.setClassTopic(savedClass.getClassTopic());
+			savedClass.setClassTopic(modifiedClassDTO.getClassTopic());
+		
 
 		if(modifiedClassDTO.getClassNo().getClass() == Integer.class)
-			updateClass.setClassNo(modifiedClassDTO.getClassNo());
-		else
-			updateClass.setClassNo(savedClass.getClassNo());
+			savedClass.setClassNo(modifiedClassDTO.getClassNo());
+		
+		Optional<Date> optionalDate = Optional.ofNullable(modifiedClassDTO.getClassDate());
+        if(optionalDate.isPresent())
+        	savedClass.setClassDate(optionalDate.get());
+		
+     if(modifiedClassDTO.getBatchId().getClass() == Integer.class)
+    	savedClass.setBatchInClass(batchobj);
+      	savedClass.setLastModTime(timestamp);
 
-		if(modifiedClassDTO.getClassDate().getClass() == Date.class)
-			updateClass.setClassDate(modifiedClassDTO.getClassDate());
-		else
-			updateClass.setClassDate(savedClass.getClassDate());
-
-		if(modifiedClassDTO.getBatchId().getClass() == Integer.class)
-			updateClass.setBatchInClass(batch);
-		else
-			updateClass.setBatchInClass(savedClass.getBatchInClass());
-
-
-		updateClass.setCsId(id);
-		updateClass.setCreationTime(savedClass.getCreationTime());
-		updateClass.setLastModTime(timestamp);
-
-		Class updatedClass = this.classRepository.save(updateClass);
+		Class updatedClass = this.classRepository.save(savedClass);
 		ClassDto updatedClassDto = classMapper.toClassSchdDTO(updatedClass);
 		return updatedClassDto;
 	}
-
-
-
-
-
-
-
-
-
-//    public ClassDto updateClassByClassId(Long id,ClassDto modifiedClassDTO) throws ResourceNotFoundException{
-//    	{
-//			System.out.println("in updateClassServiceById method");
-//			Class updateClassSchedule;
-//			ClassDto savedClassDTO = null;
-//			Class savedClassSchedule =null;
-//			
-//		        //Class savedClassSchedule = this.classRepository.findById(id);
-//			if(id!=null)
-//			{
-//				Class newClassSchedule  = classMapper.toClassScheduleEntity(modifiedClassDTO);
-//			LocalDateTime now= LocalDateTime.now();
-//				Timestamp timestamp= Timestamp.valueOf(now);
-//			Boolean isPresentTrue=classRepository.findById(id).isPresent();
-//			
-//			if(isPresentTrue)
-//			{
-//				updateClassSchedule = classRepository.getById(id);
-//				updateClassSchedule.setClassComments(modifiedClassDTO.getClassComments());
-//				updateClassSchedule.setClassDate(modifiedClassDTO.getClassDate());
-//				updateClassSchedule.setClassDescription(modifiedClassDTO.getClassDescription());
-//				updateClassSchedule.setClassNo(modifiedClassDTO.getClassNo());
-//				updateClassSchedule.setCreationTime(newClassSchedule.getCreationTime());     
-//				//updateClassSchedule.setCreationTime(modifiedClassDTO.getCreationTime());
-//				updateClassSchedule.setLastModTime(timestamp);
-//				updateClassSchedule.setClassNotes(modifiedClassDTO.getClassNotes());
-//				updateClassSchedule.setClassRecordingPath(modifiedClassDTO.getClassRecordingPath());
-//				updateClassSchedule.setClassTopic(modifiedClassDTO.getClassTopic());
-//				
-//				
-//				Batch updatedBatchEntityInClass = batchRepository.getById(modifiedClassDTO.getBatchId());
-//				User updatedStaffEntityInClass = userRepository.getById(modifiedClassDTO.getClassStaffId());
-//				
-//				updateClassSchedule.setBatchInClass(updatedBatchEntityInClass);
-//				updateClassSchedule.setStaffInClass(updatedStaffEntityInClass);
-//				
-//				savedClassSchedule = classRepository.save(updateClassSchedule);
-//				 savedClassDTO = classMapper.toClassSchdDTO(savedClassSchedule);
-//				 
-//				 return savedClassDTO; 
-//			}
-//			else {
-//				throw new ResourceNotFoundException("no record found with "+ id);
-//			}
-//			
-//		}else {
-//			throw new IllegalArgumentException();
-//		}
-//	}
-//   }    
-
-
+	
+	
 	//delete by classId
 	public Boolean deleteByClassId(Long classId) throws ResourceNotFoundException
 	{
