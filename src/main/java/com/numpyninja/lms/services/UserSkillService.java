@@ -77,7 +77,7 @@ public UserSkillDTO createUserSkill(UserSkillDTO userSkillDTO){
                 .orElseThrow(()-> new ResourceNotFoundException("UserSkill","Id",id));
         this.userSkillRepository.deleteById(id);
     }
-    @Transactional
+   /* @Transactional
     public void deleteUserByUserId(String id) {
         List<UserSkill> userExists = userSkillRepository.existsByUserId(id);
         if(userExists.isEmpty()) {
@@ -89,5 +89,5 @@ public UserSkillDTO createUserSkill(UserSkillDTO userSkillDTO){
             user.setUserId(id);
             userSkillRepository.deleteByUser(user);
         }
-  }
+  }*/
 }
