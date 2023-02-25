@@ -2,11 +2,14 @@ package com.numpyninja.lms.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(name="tbl_lms_submissions")
 public class AssignmentSubmit {

@@ -48,7 +48,7 @@ public class AssignmentSubmitDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String subPathAttach5;
 
-    @JsonFormat(pattern="MM-dd-yyyy")
+    @JsonFormat(pattern="MM-dd-yyyy HH:mm:ss")
     private Timestamp subDateTime;
 
     private String gradedBy;

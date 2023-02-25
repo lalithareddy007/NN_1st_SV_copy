@@ -35,4 +35,12 @@ public class AssignmentSubmitController {
         AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.createSubmissions(assignmentSubmitDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAssignSubmitDTO);
     }
+
+    @PutMapping(path="/{id}", consumes="application/json", produces="application/json")
+    public ResponseEntity<AssignmentSubmitDTO> updateSubmissions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
+                                                                  @PathVariable Long id)
+    {
+        AssignmentSubmitDTO updatedAssignSubmitDTO = assignmentSubmitService.updateSubmissions(assignmentSubmitDTO,id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedAssignSubmitDTO);
+    }
 }
