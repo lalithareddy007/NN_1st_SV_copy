@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
+//@NoArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name="tbl_lms_submissions")

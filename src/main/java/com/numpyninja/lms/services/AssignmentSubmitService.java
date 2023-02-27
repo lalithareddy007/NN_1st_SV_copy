@@ -13,7 +13,6 @@ import com.numpyninja.lms.repository.AssignmentRepository;
 import com.numpyninja.lms.repository.AssignmentSubmitRepository;
 import com.numpyninja.lms.repository.ProgBatchRepository;
 import com.numpyninja.lms.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -80,9 +79,10 @@ public class AssignmentSubmitService {
         if(!assignmentRepository.existsById(assignmentId))
                 throw(new ResourceNotFoundException("Assignment", "ID", assignmentId));
 
-        List<AssignmentSubmit> assignmentSubmitList = assignmentSubmitRepository
-                                    .findByStudentIdAndAssignmentId(studentId,assignmentId);
-        if(!assignmentSubmitList.isEmpty()) {
+        Optional<List<AssignmentSubmit>> assignmentSubmitList = Optional.ofNullable(assignmentSubmitRepository
+                                    .findByStudentIdAndAssignmentId(studentId,assignmentId)).get();
+        System.out.println("Assignemnt and studientId list:"+assignmentSubmitList.get().toString());
+        if(!assignmentSubmitList.get().isEmpty()) {
             throw (new DuplicateResourceFoundException("Assignment with ID " + assignmentId + " already submitted by student " + studentId
                     + ". Please visit 'Submissions' to resubmit assignment!"));
         }
@@ -109,6 +109,7 @@ public class AssignmentSubmitService {
             throw new InvalidDataException(sb.toString());
         }
     }
+//<<<<<<< HEAD
     
     public List<AssignmentSubmitDTO> getAllSubmissions(){
     	
@@ -139,4 +140,52 @@ public class AssignmentSubmitService {
     	
     } 
     
+//=======
+
+    public AssignmentSubmitDTO updateSubmissions(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId) {
+        AssignmentSubmit savedAssignmentSubmit = assignmentSubmitRepository.findById(submissionId)
+                        .orElseThrow(() ->new ResourceNotFoundException("Submission","Submission ID",submissionId));
+
+
+        validateAssignmentSubmitDTO(assignmentSubmitDTO);
+
+        String studentId = assignmentSubmitDTO.getUserId();
+        /*
+        Assignment should only be resubmitted by the same student
+         */
+        if(!studentId.equals(savedAssignmentSubmit.getUser().getUserId()))
+            throw new InvalidDataException("Student with given ID "+studentId+ " cannot submit this assignment");
+
+        if(!userRepository.existsById(studentId))
+            throw (new ResourceNotFoundException("Student","ID",studentId));
+
+        Long assignmentId = assignmentSubmitDTO.getAssignmentId();
+
+        /*
+        Assignment ID should not change during resubmission
+         */
+        if(assignmentId!=savedAssignmentSubmit.getAssignment().getAssignmentId())
+            throw new InvalidDataException("Assignment with ID " +assignmentId+" is not part of this submission");
+
+        if(!assignmentRepository.existsById(assignmentId))
+            throw(new ResourceNotFoundException("Assignment", "ID", assignmentId));
+
+        /*
+        Submission description should not change during resubmission
+         */
+        String submissionDesc = assignmentSubmitDTO.getSubDesc();
+        if(!submissionDesc.equals(savedAssignmentSubmit.getSubDesc()))
+            throw new InvalidDataException("Submission Descrition does not match!");
+
+        AssignmentSubmit assignmentSubmit = assignmentSubmitMapper.toAssignmentSubmit(assignmentSubmitDTO);
+        LocalDateTime presentDateTime = LocalDateTime.now();
+        assignmentSubmit.setSubDateTime(Timestamp.valueOf(presentDateTime));
+        assignmentSubmit.setCreationTime(savedAssignmentSubmit.getCreationTime());
+        assignmentSubmit.setLastModTime(Timestamp.valueOf(presentDateTime));
+        assignmentSubmit.setSubmissionId(submissionId);
+        AssignmentSubmit updatedAssignmentSubmit = assignmentSubmitRepository.save(assignmentSubmit);
+        AssignmentSubmitDTO updatedAssignmentSubmitDTO = assignmentSubmitMapper.toAssignmentSubmitDTO(updatedAssignmentSubmit);
+        return updatedAssignmentSubmitDTO;
+    }
+//>>>>>>> 1dc3168166591ef2fc65f4444209a622ec0900a0
 }

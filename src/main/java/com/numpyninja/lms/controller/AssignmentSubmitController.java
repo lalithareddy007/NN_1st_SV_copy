@@ -35,6 +35,7 @@ public class AssignmentSubmitController {
         AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.createSubmissions(assignmentSubmitDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAssignSubmitDTO);
     }
+//<<<<<<< HEAD
     
    @GetMapping("/studentbatch/{batchid}")
     public ResponseEntity<List<AssignmentSubmitDTO>> getSubmissionsByBatch(@PathVariable Integer batchid) {
@@ -50,4 +51,14 @@ public class AssignmentSubmitController {
         return ResponseEntity.ok(submissionsListDTO);
     }
     
+//=======
+
+    @PutMapping(path="/{id}", consumes="application/json", produces="application/json")
+    public ResponseEntity<AssignmentSubmitDTO> updateSubmissions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
+                                                                  @PathVariable Long id)
+    {
+        AssignmentSubmitDTO updatedAssignSubmitDTO = assignmentSubmitService.updateSubmissions(assignmentSubmitDTO,id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updatedAssignSubmitDTO);
+    }
+//>>>>>>> 1dc3168166591ef2fc65f4444209a622ec0900a0
 }
