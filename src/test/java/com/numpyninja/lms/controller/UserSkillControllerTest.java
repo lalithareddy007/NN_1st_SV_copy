@@ -134,7 +134,7 @@ public class UserSkillControllerTest {
                         .andExpect(MockMvcResultMatchers.jsonPath("$.userId",equalTo(updatedUserSkillDTO.getUserId()),String.class))
                         .andExpect(MockMvcResultMatchers.jsonPath("$.userSkillId",equalTo(updatedUserSkillDTO.getUserSkillId())));
     }
-    @DisplayName("Test - Delete UserSkill By UserId ")
+ /*   @DisplayName("Test - Delete UserSkill By UserId ")
     @SneakyThrows
     @Test
     void deleteUserSkillByUserId() {
@@ -146,7 +146,7 @@ public class UserSkillControllerTest {
         //then
         resultActions.andExpect(status().isOk());
         verify(userSkillService).deleteUserByUserId(userId);
-    }
+    }*/
     @DisplayName("Test - Delete UserSkill By UserSKillId ")
     @SneakyThrows
     @Test

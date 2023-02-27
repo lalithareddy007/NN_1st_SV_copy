@@ -35,4 +35,19 @@ public class AssignmentSubmitController {
         AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.createSubmissions(assignmentSubmitDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAssignSubmitDTO);
     }
+    
+   @GetMapping("/studentbatch/{batchid}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getSubmissionsByBatch(@PathVariable Integer batchid) {
+       
+    	List<AssignmentSubmitDTO> submissionsListDTO = assignmentSubmitService.getSubmissionsByBatch(batchid);
+        return ResponseEntity.ok(submissionsListDTO);
+    }
+    
+    @GetMapping("/student")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getAllSubmissions() {
+       
+    	List<AssignmentSubmitDTO> submissionsListDTO = assignmentSubmitService.getAllSubmissions();
+        return ResponseEntity.ok(submissionsListDTO);
+    }
+    
 }

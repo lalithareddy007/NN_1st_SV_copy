@@ -1,13 +1,17 @@
 package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
+import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.AssignmentSubmit;
+import com.numpyninja.lms.entity.Batch;
+import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
 import com.numpyninja.lms.repository.AssignmentRepository;
 import com.numpyninja.lms.repository.AssignmentSubmitRepository;
+import com.numpyninja.lms.repository.ProgBatchRepository;
 import com.numpyninja.lms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,9 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -35,16 +41,21 @@ public class AssignmentSubmitService {
 
     //@Autowired
     public AssignmentSubmitMapper assignmentSubmitMapper;
+    
+   // @Autowired
+	private ProgBatchRepository batchRepository;
 
     public AssignmentSubmitService(AssignmentSubmitRepository assignmentSubmitRepository,
                                    AssignmentRepository assignmentRepository,
                                    UserRepository userRepository,
-                                   AssignmentSubmitMapper assignmentSubmitMapper){
+                                   AssignmentSubmitMapper assignmentSubmitMapper,
+                                  ProgBatchRepository batchRepository
+                                  ){
         this.assignmentSubmitRepository = assignmentSubmitRepository;
         this.assignmentRepository = assignmentRepository;
         this.userRepository = userRepository;
         this.assignmentSubmitMapper = assignmentSubmitMapper;
-
+       this.batchRepository = batchRepository;
     }
 
     public List<AssignmentSubmitDTO> getSubmissionsByUserID(String userId){
@@ -98,4 +109,34 @@ public class AssignmentSubmitService {
             throw new InvalidDataException(sb.toString());
         }
     }
+    
+    public List<AssignmentSubmitDTO> getAllSubmissions(){
+    	
+    	List<AssignmentSubmit> assignmentSubmit =	this.assignmentSubmitRepository.findAll();
+	
+    	List<AssignmentSubmitDTO> assignmentSubmitDto = assignmentSubmitMapper.toAssignmentSubmitDTOList(assignmentSubmit);
+    	return assignmentSubmitDto;
+    	
+    }
+    
+//get submissions by batchid
+    public List<AssignmentSubmitDTO> getSubmissionsByBatch(Integer batchid){
+    	
+    List<AssignmentSubmit> assignmentsubmitList = new ArrayList<AssignmentSubmit>();
+    	
+    List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findAll();
+    	
+    assignmentsubmits.forEach((as)->{
+    Assignment 	assignment2 =   as.getAssignment();
+    Integer bid = assignment2.getBatch().getBatchId(); 	
+    if(bid == batchid )
+    assignmentsubmitList.add(as);	
+    	});
+    	
+    List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
+    .toAssignmentSubmitDTOList(assignmentsubmitList);
+	return assignmentSubmitDTOs;
+    	
+    } 
+    
 }
