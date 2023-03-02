@@ -188,4 +188,14 @@ public class AssignmentSubmitService {
         return updatedAssignmentSubmitDTO;
     }
 //>>>>>>> 1dc3168166591ef2fc65f4444209a622ec0900a0
+    
+    	public List<AssignmentSubmitDTO> getGradesByAssinmentId(Long assignmentId)
+    	{
+    		AssignmentSubmit assSub = this.assignmentSubmitRepository.findById(assignmentId)
+    				.orElseThrow(() -> new ResourceNotFoundException("Assignment", "Id", assignmentId));
+    		List<AssignmentSubmit> assSubListForGrades = assignmentSubmitRepository.getGradesByAssignmentId(assignmentId);
+    		List<AssignmentSubmitDTO> assSubmDtoListForGrades = assignmentSubmitMapper.toAssignmentSubmitDTOList(assSubListForGrades);
+    		return assSubmDtoListForGrades;
+    }
+
 }

@@ -61,4 +61,12 @@ public class AssignmentSubmitController {
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedAssignSubmitDTO);
     }
 //>>>>>>> 1dc3168166591ef2fc65f4444209a622ec0900a0
+    
+    @GetMapping("/getGrades/{assignmentId}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByAssignmentId(@PathVariable Long assignmentId)
+    {
+    List<AssignmentSubmitDTO> getListGradesAssignmentDTO = assignmentSubmitService.getGradesByAssinmentId((assignmentId));
+    return ResponseEntity.ok(getListGradesAssignmentDTO);
+    }
+
 }
