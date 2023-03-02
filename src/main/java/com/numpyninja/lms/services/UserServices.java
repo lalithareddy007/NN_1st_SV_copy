@@ -25,6 +25,7 @@ import com.numpyninja.lms.mappers.UserMapper;
 import com.numpyninja.lms.repository.RoleRepository;
 import com.numpyninja.lms.repository.UserRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServices {
@@ -456,6 +457,20 @@ public class UserServices {
 		}
 
 	}
+	
+	public List<Object> getAllStaff()
+	{
+		List<Object> result=userRepository.getAllStaffList();
+		if(!(result.size()<=0))
+		{
+			//return (userMapper.toUserStaffDTO(result));
+			return result;
+		}else
+		{
+			throw new ResourceNotFoundException("No staff data is available in database");
+		}
+	}
+
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {

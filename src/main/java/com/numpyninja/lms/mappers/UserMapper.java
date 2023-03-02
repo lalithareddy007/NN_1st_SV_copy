@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.mapstruct.Mapper;
 
+import com.numpyninja.lms.dto.ClassDto;
 import com.numpyninja.lms.dto.UserAndRoleDTO;
 import com.numpyninja.lms.dto.UserDto;
 
 import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
+import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
 
@@ -37,4 +39,6 @@ public interface UserMapper {
 	//UserRoleDTO userRoleDto(UserRoleMap userRoleMap);
 	
 	UserRoleMapSlimDTO toUserSlimRoleMapDto(UserRoleMap userRoleMap);
+	
+	
 }
