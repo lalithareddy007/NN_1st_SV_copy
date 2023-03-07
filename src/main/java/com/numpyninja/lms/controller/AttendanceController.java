@@ -25,27 +25,34 @@ import com.numpyninja.lms.mappers.AttendanceMapper;
 import com.numpyninja.lms.repository.AttendanceRepository;
 import com.numpyninja.lms.services.AttendanceServices;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 
 @RestController
 @RequestMapping("/attendance")
+@Api(tags="Attendance Controller", description="Attendance CRUD Operations")
 public class AttendanceController{
 
 	@Autowired
 	private AttendanceServices attendanceServices;
 	// get all attendances
 	@GetMapping("")
+	@ApiOperation("Get all Attendance records")
 	protected ResponseEntity<List<AttendanceDto>> getAllAssignments() {
 		return ResponseEntity.ok(this.attendanceServices.getAllAttendances());
 	}
 
 	// get attendance By id
 	@GetMapping("/{id}")
+	@ApiOperation("Get Attendance by ID")
 	public ResponseEntity<AttendanceDto> findById(@PathVariable(value = "id") Long id) {
 		return ResponseEntity.ok(this.attendanceServices.getAttendanceById(id));
 	}
 
 	// get all Attendance of a Student
 	@GetMapping("/student/{studentId}")
+	@ApiOperation("Get Attendance for Student by Student ID")
 	public ResponseEntity<List<AttendanceDto>> getAttendancesForStudent(
 			@PathVariable(value = "studentId") String studentId) {
 		return ResponseEntity.ok(this.attendanceServices.getAttendanceForStudent(studentId));
@@ -53,17 +60,20 @@ public class AttendanceController{
 
 	// get all Attendance of a Class
 	@GetMapping("/class/{classId}")
+	@ApiOperation("Get Attendance by Class ID")
 	public ResponseEntity<List<AttendanceDto>> getAttendancesbyClass(@PathVariable(value = "classId") Long classId) {
 		return ResponseEntity.ok(this.attendanceServices.getAttendanceByClass(classId));
 	}
 
 	// get all Attendance of a Batch
 	@GetMapping("/batch/{batchId}")
+	@ApiOperation("Get Attendance by Batch ID")
 	public ResponseEntity<List<AttendanceDto>> getAttendancesbyBatch(@PathVariable(value = "batchId") Integer batchId) {
 		return ResponseEntity.ok(this.attendanceServices.getAttendanceByBatch(batchId));
 	}
 
 	@DeleteMapping(path = "/{id}")
+	@ApiOperation("Delete Attendance")
 	public ResponseEntity<String> deleteAttendance(@PathVariable Long id) {
 		attendanceServices.deleteAttendance(id);
 		String message = "Message:" + " Attendance Id-" + id + " deleted Successfully!";
@@ -71,6 +81,7 @@ public class AttendanceController{
 	}
 
 	@PostMapping(path = "", consumes = "application/json", produces = "application/json")
+	@ApiOperation("Create new Attendance")
 	public ResponseEntity<AttendanceDto> createAttendance(@Valid @RequestBody AttendanceDto attendanceDto) {
 		AttendanceDto newAttendance = attendanceServices.createAttendance(attendanceDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(newAttendance);
@@ -78,6 +89,7 @@ public class AttendanceController{
 
 	// update an Attendance
 	@PutMapping(path="/{id}",consumes = "application/json", produces = "application/json")
+	@ApiOperation("Update Attendance")
 	public ResponseEntity<AttendanceDto> updateAttendance(@RequestBody AttendanceDto attendanceDto,
 			@PathVariable Long id) {
 		AttendanceDto updatedAttendanceDto = this.attendanceServices.updateAttendance(attendanceDto, id);

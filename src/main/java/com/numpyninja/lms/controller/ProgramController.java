@@ -5,6 +5,10 @@ import com.numpyninja.lms.dto.ProgramDTO;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.ProgramServices;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +22,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping
+@Api(tags="Program Controller", description="Program CRUD Operations")
 public class ProgramController{
     @Autowired
     private ProgramServices programServices;
 
   //get list of programs
   	@GetMapping(value = "/allPrograms")
+	@ApiOperation("Get all Programs")
   	private ResponseEntity<?> getPrograms()  throws ResourceNotFoundException 
   	{ 
   		System.out.println("in getall programs");
@@ -34,6 +40,7 @@ public class ProgramController{
   	//retrieves the details of a specific program
   	@GetMapping(path="programs/{programId}")  
   	//@ResponseBody
+	@ApiOperation("Get Program by Program ID")
   	private ResponseEntity <ProgramDTO> getOneProgramById(@PathVariable("programId") @NotBlank @Positive Long programId)throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok().body(programServices.getProgramsById(programId));
@@ -42,6 +49,7 @@ public class ProgramController{
   	//post mapping that creates the program detail in the database  
   	@PostMapping(path="/saveprogram",consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
+	@ApiOperation("Create Program")
   	private ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
   	{  
   	ProgramDTO savedProgramedDTO = programServices.createAndSaveProgram(newProgram);
@@ -51,6 +59,7 @@ public class ProgramController{
   	//put mapping that updates the program detail by programId  
   	@PutMapping(path="/putprogram/{programId}", consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
+	@ApiOperation("Update Program by Program ID")
   	private ResponseEntity <ProgramDTO> updateProgramById(@PathVariable("programId")@NotBlank @Positive Long programId ,@Valid @RequestBody ProgramDTO modifyProgram) throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok(programServices.updateProgramById(programId,modifyProgram));
@@ -59,6 +68,7 @@ public class ProgramController{
   	//creating put mapping that updates the program detail  by programName 
   	@PutMapping(path="/program/{programName}", consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
+	@ApiOperation("Update Program by Program Name")
   	private ResponseEntity <ProgramDTO> updateProgramByName(@Valid @PathVariable("programName") String programName ,@Valid @RequestBody ProgramDTO modifyProgram)throws ResourceNotFoundException  
   	{  
   	return ResponseEntity.ok(programServices.updateProgramByName(programName,modifyProgram));
@@ -67,6 +77,7 @@ public class ProgramController{
   	//delete mapping that deletes a specified program  
   	@DeleteMapping(path="/deletebyprogid/{programId}")  
   	@ResponseBody
+	@ApiOperation("Delete Program by Program ID")
   	private ResponseEntity<String>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException
   	{
   	System.out.println("in delete by programID controller");
@@ -81,6 +92,7 @@ public class ProgramController{
   	//delete mapping that deletes a specified program by ProgramName  
   	@DeleteMapping(path="/deletebyprogname/{programName}")  
   	//@ResponseBody
+	@ApiOperation("Get Program by Program Name")
   	private ResponseEntity<?>  deleteByProgramName(@PathVariable("programName")@NotBlank @NotNull String programName) throws ResourceNotFoundException  
   	{  
   	System.out.println("in delete by programName controller");

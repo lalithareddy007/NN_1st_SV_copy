@@ -55,12 +55,14 @@ import com.numpyninja.lms.repository.UserPictureRepository;
 import com.numpyninja.lms.services.UserPictureService;
 
 import io.github.classgraph.Resource;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import javassist.expr.NewArray;
 
 @RestController
 @RequestMapping("/file")
 
-
+@Api(tags="User Picture Controller", description="User Picture CRUD Operations")
 public class UserPictureController {
 	
 	
@@ -68,6 +70,7 @@ public class UserPictureController {
     private UserPictureService userpictureservice;
 
 	@PostMapping(path = "/userpicture", consumes = "application/json", produces = "application/json")
+	@ApiOperation("Create New User Picture")
 	 public ResponseEntity<UserPictureEntityDTO> Save(@RequestBody UserPictureEntityDTO userpicturedto) throws IOException{
 		
 		
@@ -77,6 +80,7 @@ public class UserPictureController {
 
 	
 	@GetMapping("/userpicture/{userid}")
+	@ApiOperation("Get User Picture by User ID")
 	public ResponseEntity<UserPictureEntityDTO> download(@PathVariable String  userid,  @RequestParam String userfiletype) throws IOException{
 		UserPictureEntityDTO downloadpicture=	userpictureservice.download(userid, userfiletype);
 		return ResponseEntity.ok(downloadpicture);
@@ -85,6 +89,7 @@ public class UserPictureController {
 	
 	
 	@DeleteMapping("/userpicture/{userid}")
+	@ApiOperation("Delete User Picture")
 public ResponseEntity<MessageResponse> Delete(@PathVariable String userid,@RequestParam String userfiletype ) throws IOException
 	{
      this.userpictureservice.DeleteFile(userid, userfiletype);
@@ -93,6 +98,7 @@ public ResponseEntity<MessageResponse> Delete(@PathVariable String userid,@Reque
 	}
 	
 	@PutMapping("/userpicture/{userid}")
+	@ApiOperation("Update User Picture")
  public ResponseEntity<UserPictureEntityDTO> update(@RequestBody  UserPictureEntityDTO userpicturedto ,@PathVariable String userid) throws IOException
   {
   	UserPictureEntityDTO updatedPicture=this.userpictureservice.updateFile(userpicturedto,userid);

@@ -28,8 +28,12 @@ import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
 import com.numpyninja.lms.services.UserServices;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 //@RequestMapping("/users")
+@Api(tags="User Controller", description="User CRUD Operations")
 public class UserController {	
 	
 	private UserMapper userMapper;
@@ -48,6 +52,7 @@ public class UserController {
 
 	//get all users from LMS_Users table
 	@GetMapping("/users")
+	@ApiOperation("Get all Users")
 	public ResponseEntity<List<UserDto>> getAllUsers() {
 		//List<User> userList = userServices.getAllUsers();
 		List<UserDto> userList = userServices.getAllUsers();
@@ -57,6 +62,7 @@ public class UserController {
 
 	//get user by ID - information on role, user, batch and details displayed
 	@GetMapping("/users/{id}")
+	@ApiOperation("Get User Information by ID")
 	public ResponseEntity<?> getUserInfoById(@PathVariable String id) throws ResourceNotFoundException {
 		List<?> userInfo = userServices.getUserInfoById(id);
 		return ResponseEntity.status(200).body(userInfo);
@@ -64,12 +70,14 @@ public class UserController {
 	
 	//Get all users with all their info - Role, status, Program, Batch
 	@GetMapping("/users/roles")
+	@ApiOperation("Get all Users with Roles")
     protected List<?> getAllUsersWithRoles() {
     	return userServices.getAllUsersWithRoles() ;
     }
     
     //create user with Role 
     @PostMapping("/users/roleStatus")
+    @ApiOperation("Create new User with Role")
     public ResponseEntity<UserDto> createUserWithRole(@Valid @RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFoundException {
     	UserDto responseDto = userServices.createUserWithRole(newUserRoleDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto); 
@@ -77,6 +85,7 @@ public class UserController {
     
     //update user info in User Table
     @PutMapping("/users/{userId}")
+    @ApiOperation("Update User")
     public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUser(updateuserDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
@@ -85,6 +94,7 @@ public class UserController {
     //Ask front end to include a separate link to update role status for user
     //update User role - (Active/inactive) for a given user id and role id 
     @PutMapping("/users/roleStatus/{userId}")
+    @ApiOperation("Update User Role Status")
     public ResponseEntity<String> updateUserRoleStatus(@Valid @PathVariable(value="userId") String userId, @Valid @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
     		//String UserRole, String UserStatus
     	String responseDto = userServices.updateUserRoleStatus(updateUserRoleStatus,userId);
@@ -94,6 +104,7 @@ public class UserController {
        
     //cascade deletes users and User roles
     @DeleteMapping("/users/{userId}")
+    @ApiOperation("Delete User")
     public ResponseEntity<String> deleteUser(@PathVariable(value="userId") String userId) throws ResourceNotFoundException{
     	String deletedUserId = userServices.deleteUser(userId);
     	return ResponseEntity.status(HttpStatus.OK).body("Deleted User ID:  "+deletedUserId);
