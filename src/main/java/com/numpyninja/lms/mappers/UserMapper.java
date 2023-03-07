@@ -2,6 +2,8 @@ package com.numpyninja.lms.mappers;
 
 import java.util.List;
 
+import com.numpyninja.lms.dto.UserRoleProgramBatchSlimDto;
+import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 import org.mapstruct.Mapper;
 
 import com.numpyninja.lms.dto.UserAndRoleDTO;
@@ -37,4 +39,6 @@ public interface UserMapper {
 	//UserRoleDTO userRoleDto(UserRoleMap userRoleMap);
 	
 	UserRoleMapSlimDTO toUserSlimRoleMapDto(UserRoleMap userRoleMap);
+
+	UserRoleProgramBatchMap toUserRoleProgramBatchMap(UserRoleProgramBatchSlimDto userRoleProgramBatchSlimDto);
 }

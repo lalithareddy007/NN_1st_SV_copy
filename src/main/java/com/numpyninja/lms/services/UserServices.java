@@ -1,29 +1,27 @@
 package com.numpyninja.lms.services;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.numpyninja.lms.dto.*;
+import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.numpyninja.lms.dto.UserAndRoleDTO;
-import com.numpyninja.lms.dto.UserDto;
-import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
-import com.numpyninja.lms.entity.Role;
-import com.numpyninja.lms.entity.User;
-import com.numpyninja.lms.entity.UserRoleMap;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
-import com.numpyninja.lms.repository.RoleRepository;
-import com.numpyninja.lms.repository.UserRepository;
-import com.numpyninja.lms.repository.UserRoleMapRepository;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
 
 @Service
 public class UserServices {
@@ -39,6 +37,15 @@ public class UserServices {
 
 	@Autowired
 	UserMapper userMapper;
+
+	@Autowired
+	ProgramRepository programRepository;
+
+	@Autowired
+	ProgBatchRepository progBatchRepository;
+
+	@Autowired
+	UserRoleProgramBatchMapRepository userRoleProgramBatchMapRepository;
 
 	public List<UserDto> getAllUsers() {
 		return userMapper.userDtos(userRepository.findAll());
@@ -183,33 +190,33 @@ public class UserServices {
 					toBeupdatedUser.setUserLinkedinUrl(updateuserDto.getUserLinkedinUrl());
 				else
 					toBeupdatedUser.setUserLinkedinUrl(userById.get().getUserLinkedinUrl());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserLocation()))
 					toBeupdatedUser.setUserLocation(updateuserDto.getUserLocation());
 				else
 					toBeupdatedUser.setUserLocation(userById.get().getUserLocation());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserEduPg()))
 					toBeupdatedUser.setUserEduPg(updateuserDto.getUserEduPg());
 				else
 					toBeupdatedUser.setUserEduPg(userById.get().getUserEduPg());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserEduUg()))
 					toBeupdatedUser.setUserEduUg(updateuserDto.getUserEduUg());
 				else
 					toBeupdatedUser.setUserEduUg(userById.get().getUserEduUg());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserComments()))
 					toBeupdatedUser.setUserComments(updateuserDto.getUserComments());
 				else
 					toBeupdatedUser.setUserComments(userById.get().getUserComments());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserMiddleName()))
 					toBeupdatedUser.setUserMiddleName(updateuserDto.getUserMiddleName());
 				else
 					toBeupdatedUser.setUserMiddleName(userById.get().getUserMiddleName());
-				
-				
+
+
 				toBeupdatedUser.setUserId(userId);
 				toBeupdatedUser.setCreationTime(userById.get().getCreationTime());
 				toBeupdatedUser.setLastModTime(new Timestamp(utilDate.getTime()));
@@ -281,6 +288,77 @@ public class UserServices {
 			userRepository.deleteById(userId);
 		}
 		return userId;
+	}
+
+	@Transactional
+	public UserRoleProgramBatchDto assignUserRoleProgramBatchStatus(UserRoleProgramBatchDto userRoleProgramBatchDto,
+																	String userId) {
+		List<UserRoleProgramSlimDto> roleProgramList;
+		List<UserRoleProgramBatchSlimDto> roleProgramBatchList;
+		UserRoleProgramBatchMap userRoleProgramBatchMap = null;
+
+		User existingUser = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		String roleId = userRoleProgramBatchDto.getRoleId();
+		boolean isPresentUserAndRole = userRoleMapRepository.
+				existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(userId, roleId,
+						"Active");
+		if(!isPresentUserAndRole) // Active User-Role mapping should be present
+			throw new ResourceNotFoundException("User", "Role", roleId);
+
+		if("R03".equals(roleId)) {
+			roleProgramList = userRoleProgramBatchDto.getUserRolePrograms();
+			roleProgramBatchList = roleProgramList.get(0).getUserRoleProgramBatches();
+
+			// User with roleId 'R03' should be assigned to single program/batch
+			if (roleProgramList.size() != 1 || roleProgramBatchList.size() != 1)
+				throw new InvalidDataException("User with Role " + roleId + " can be assigned to single program/batch");
+
+			Role existingUserRole = roleRepository.findById(roleId)
+					.orElseThrow(() -> new ResourceNotFoundException("Role", "Id", roleId));
+
+			// Active Program should be present
+			Long programId = roleProgramList.get(0).getProgramId();
+			Program existingProgram = programRepository.findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(
+							programId, "Active")
+					.orElseThrow(() -> new ResourceNotFoundException("Program " + programId, "Program Status", "Active"));
+
+			//Active Program-Batch mapping should be present
+			Integer batchId = roleProgramBatchList.get(0).getBatchId();
+			Batch existingBatch = progBatchRepository.findBatchByBatchIdAndAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
+							(batchId, programId, "Active")
+					.orElseThrow(() -> new ResourceNotFoundException("Batch " + batchId, "Batch Status", "Active"));
+
+			String userRoleProgramBatchStatus = roleProgramBatchList.get(0).getUserRoleProgramBatchStatus();
+
+			Optional<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository
+					.findUserRoleProgramBatchMapByUser_UserIdAndProgram_ProgramIdAndBatch_BatchId(userId, programId, batchId);
+
+			if (optionalMap.isEmpty()) {
+				// assign Program/Batch to user
+				userRoleProgramBatchMap = userMapper.toUserRoleProgramBatchMap(roleProgramBatchList.get(0));
+				userRoleProgramBatchMap.setUser(existingUser);
+				userRoleProgramBatchMap.setRole(existingUserRole);
+				userRoleProgramBatchMap.setProgram(existingProgram);
+				userRoleProgramBatchMap.setBatch(existingBatch);
+				userRoleProgramBatchMap.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
+				userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+			} else {
+				// update existing Program/Batch mapping of user
+				userRoleProgramBatchMap = optionalMap.get();
+				userRoleProgramBatchMap.setUserRoleProgramBatchStatus(userRoleProgramBatchStatus);
+				userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+			}
+			UserRoleProgramBatchMap savedMap = userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
+
+			String message = "User " + userId + " with Batch " + batchId + ": " + userRoleProgramBatchStatus;
+			return UserRoleProgramBatchDto.builder()
+					.userId(userId)
+					.status(message)
+					.build();
+		}
+		return null;
 	}
 
 	/** Check for already existing phone number **/
