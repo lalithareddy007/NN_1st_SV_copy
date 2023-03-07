@@ -66,4 +66,11 @@ public class AssignmentSubmitController {
         assignmentSubmitService.deleteSubmissions(id);
         return new ResponseEntity(new ApiResponse("Submission deleted successfully", true),HttpStatus.OK);
     }
+    
+    @GetMapping("/getGrades/{assignmentId}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByAssignmentId(@PathVariable Long assignmentId)
+    {
+        List<AssignmentSubmitDTO> getListGradesAssignmentDTO = assignmentSubmitService.getGradesByAssinmentId((assignmentId));
+        return ResponseEntity.ok(getListGradesAssignmentDTO);
+    }
 }

@@ -223,5 +223,12 @@ public class AssignmentSubmitService {
                 assignmentSubmitRepository.deleteById(submissionID);
         else throw new ResourceNotFoundException("Submission", "ID",submissionID);
     }
-
+    
+    public List<AssignmentSubmitDTO> getGradesByAssinmentId(Long assignmentId){
+        AssignmentSubmit assSub = this.assignmentSubmitRepository.findById(assignmentId)
+    				.orElseThrow(() -> new ResourceNotFoundException("Assignment", "Id", assignmentId));
+        List<AssignmentSubmit> assSubListForGrades = assignmentSubmitRepository.getGradesByAssignmentId(assignmentId);
+    	  List<AssignmentSubmitDTO> assSubmDtoListForGrades = assignmentSubmitMapper.toAssignmentSubmitDTOList(assSubListForGrades);
+    	  return assSubmDtoListForGrades;
+    }
 }
