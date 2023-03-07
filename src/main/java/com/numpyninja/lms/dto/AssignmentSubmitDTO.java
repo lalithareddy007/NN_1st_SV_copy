@@ -60,9 +60,9 @@ public class AssignmentSubmitDTO {
     in db during submission creation. Front-end needs to diplay 'grade' if its value is
     greater than the default value.
      */
-    private int grade=-1;
+    private int grade =-1;
 
-    private Timestamp creationTime;
+   private Timestamp creationTime;
 
-    private Timestamp lastModTime;
+   private Timestamp lastModTime;
 }

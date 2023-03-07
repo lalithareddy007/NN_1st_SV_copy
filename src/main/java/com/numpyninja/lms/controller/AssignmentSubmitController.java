@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/assignmentsubmission")
@@ -61,4 +62,14 @@ public class AssignmentSubmitController {
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedAssignSubmitDTO);
     }
 //>>>>>>> 1dc3168166591ef2fc65f4444209a622ec0900a0
+
+
+   @GetMapping("/grades/{batchId}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByBatchId(@PathVariable Integer batchId) {
+        List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitService.getGradesByBatchId(batchId);
+        return ResponseEntity.ok(assignmentSubmitDTOs);
+    }
+    
 }
+
+

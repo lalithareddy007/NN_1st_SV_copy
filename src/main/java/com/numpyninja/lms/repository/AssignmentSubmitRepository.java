@@ -19,5 +19,6 @@ public interface AssignmentSubmitRepository extends JpaRepository<AssignmentSubm
     @Query(value="select * from tbl_lms_submissions where sub_student_id=?1 and sub_a_id=?2", nativeQuery = true)
     Optional<List<AssignmentSubmit>> findByStudentIdAndAssignmentId(String stdId, Long assignId);
 
-  
+    List<AssignmentSubmit> findByAssignment_Batch_BatchId(Integer batchId);
+
 }
