@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.numpyninja.lms.dto.UserAndRoleDTO;
@@ -71,6 +72,7 @@ public class UserServices {
 		}).collect(Collectors.toList());
 	}
 
+	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
 			throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
