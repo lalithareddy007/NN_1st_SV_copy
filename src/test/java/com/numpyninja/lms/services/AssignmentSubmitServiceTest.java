@@ -59,13 +59,13 @@ public class AssignmentSubmitServiceTest {
 
         mockAssignmentSubmitDTO1 = new AssignmentSubmitDTO(4L,2L,"U03","Selenium assignment Submission",
                 "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
-                timestamp1,null,null,-1,timestamp1,timestamp2);
+                timestamp1,null,null,-1);
         mockAssignmentSubmitDTO2 = new AssignmentSubmitDTO(3L,1L,"U03","SQL assignment Submission",
                 "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
-                timestamp1,null,null,-1,timestamp1,timestamp2);
+                timestamp1,null,null,-1);
         mockAssignmentSubmitDTO3 = new AssignmentSubmitDTO(8L,1L,"U05","SQL assignment Submission",
                 "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
-                timestamp1,null,null,-1,timestamp1,timestamp2);
+                timestamp1,null,null,-1);
 
         Batch batch = setMockBatch();
 
