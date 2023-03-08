@@ -22,4 +22,6 @@ public interface AssignmentSubmitRepository extends JpaRepository<AssignmentSubm
     @Query(value="select * from tbl_lms_submissions where sub_a_id=?", nativeQuery=true)
     List<AssignmentSubmit> getGradesByAssignmentId(Long assingmentId);
 
+    @Query(value="select * from tbl_lms_submissions where sub_student_id=? and grade<>-1;", nativeQuery=true)
+    List<AssignmentSubmit> getGradesByStudentID(String studentID);
 }

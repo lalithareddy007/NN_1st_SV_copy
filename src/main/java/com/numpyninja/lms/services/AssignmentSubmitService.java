@@ -231,4 +231,23 @@ public class AssignmentSubmitService {
     	  List<AssignmentSubmitDTO> assSubmDtoListForGrades = assignmentSubmitMapper.toAssignmentSubmitDTOList(assSubListForGrades);
     	  return assSubmDtoListForGrades;
     }
+    
+    public List<AssignmentSubmitDTO> getGradesByStudentId(String studentId){
+       	 if (!userRepository.existsById(studentId))
+             throw new ResourceNotFoundException("Student","Student ID: ",studentId);
+       	 
+       	 List<AssignmentSubmit> asssubmissionsByStuID = assignmentSubmitRepository.getGradesByStudentID(studentId);
+     	if(!(asssubmissionsByStuID.size()<=0))
+     	{
+            List<AssignmentSubmitDTO>  assSubByStudentIdDto = 	assignmentSubmitMapper.toAssignmentSubmitDTOList(asssubmissionsByStuID);
+            return assSubByStudentIdDto;
+     	}
+     	else
+     	{
+     		throw new ResourceNotFoundException("Assignments with grades are not available for Student ID : "+studentId);
+     	}
+    }
+    	
+    	
+    
 }
