@@ -100,6 +100,14 @@ public class UserController {
     	//return deletedUserId;
     }
     
+    
+    @GetMapping("/users/getAllStaff")
+    public ResponseEntity<List<Object>> getAllStaff(){
+    List<Object> list = userServices.getAllStaff();
+    return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
+    
     /** Check if the below end points are required or not for the future**/
     
     /*

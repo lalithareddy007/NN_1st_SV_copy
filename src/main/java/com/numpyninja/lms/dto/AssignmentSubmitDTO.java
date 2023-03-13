@@ -62,7 +62,7 @@ public class AssignmentSubmitDTO {
      */
     private int grade=-1;
 
-    private Timestamp creationTime;
+    //private Timestamp creationTime;
 
-    private Timestamp lastModTime;
+    //private Timestamp lastModTime;
 }
