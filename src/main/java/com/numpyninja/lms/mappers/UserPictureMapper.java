@@ -23,7 +23,7 @@ import com.numpyninja.lms.entity.UserPictureEntity;
 
 		UserPictureMapper INSTANCE = Mappers.getMapper(UserPictureMapper.class);
 	
-		
+		//changes made 
 		@Mapping ( source = "userpicturedto.userId", target = "user.userId" )
 		UserPictureEntity toUserPictureEntity(UserPictureEntityDTO userpicturedto);	
 		
