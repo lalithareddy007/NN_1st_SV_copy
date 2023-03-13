@@ -1,5 +1,7 @@
 package com.numpyninja.lms.mappers;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -28,7 +30,7 @@ import com.numpyninja.lms.entity.UserPictureEntity;
 		
 		
 		@Mapping(source = "userpictureentity.user.userId",target ="userId")
-		UserPictureEntityDTO toUserPictureEntityDto(UserPictureEntity userpictureentity);
+		UserPictureEntityDTO toUserPictureEntityDto(UserPictureEntity pictureindb);
 
 		
 		
