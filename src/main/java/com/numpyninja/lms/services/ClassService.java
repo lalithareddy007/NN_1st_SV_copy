@@ -27,6 +27,7 @@ import java.util.Optional;
 @Service
 public class ClassService {
 	@Autowired
+
 	private ClassRepository classRepository;
 
 	@Autowired
