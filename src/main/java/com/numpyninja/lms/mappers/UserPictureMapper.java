@@ -30,7 +30,7 @@ import com.numpyninja.lms.entity.UserPictureEntity;
 		
 		
 		@Mapping(source = "userpictureentity.user.userId",target ="userId")
-		UserPictureEntityDTO toUserPictureEntityDto(UserPictureEntity pictureindb);
+		UserPictureEntityDTO toUserPictureEntityDto(UserPictureEntity userpictureentity);
 
 		
 		
