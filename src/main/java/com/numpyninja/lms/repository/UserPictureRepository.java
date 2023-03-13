@@ -23,17 +23,23 @@ public interface UserPictureRepository extends JpaRepository<UserPictureEntity,L
 //			 + " and t.user_file_type = ?2 ", nativeQuery = true)
 //	UserPictureEntity findByuserAnduserFileType( User user_id,String user_file_type);
 
-	// @Modifying
-	 //@Transactional
+	 @Modifying
+	 @Transactional
 	@Query(value= "delete from  tbl_lms_user_files t WHERE  t.user_id = ?1 "
 			 + " and t.user_file_type = ?2 ", nativeQuery = true)
 
-	public UserPictureEntity deleteByuserAnduserFiletype(User userid, String filetype);
+	public void deleteByuserAnduserFiletype(User userid, String filetype);
 
 	
 	@Query(value= "SELECT *  FROM  tbl_lms_user_files t WHERE  t.user_id = ?1 "
 			 + " and t.user_file_type = ?2 ", nativeQuery = true)
-	public UserPictureEntity findByuserAnduserFileType1(String userId, String userFileType);
+	public UserPictureEntity findByuserAnduserFileType(String userId, String userFileType);
+
+//	@Modifying
+//	@Transactional
+//	@Query(value= "delete from  tbl_lms_user_files t WHERE  t.user_id = ?1 "
+//			 + " and t.user_file_type = ?2 ", nativeQuery = true)
+//	public void deleteByuserAnduserFiletype(String userid, String filetype);
 
 
 	//UserPictureEntity findByuserAnduserFileType2(User user, String filetype);
