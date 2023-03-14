@@ -9,9 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserRoleProgramBatchMapRepository extends JpaRepository<UserRoleProgramBatchMap, Long> {
 
-    Optional<UserRoleProgramBatchMap> findUserRoleProgramBatchMapByUser_UserIdAndProgram_ProgramIdAndBatch_BatchId
-            (String userId, Long programId, Integer batchId);
-
     Optional<UserRoleProgramBatchMap> findByUser_UserIdAndRoleRoleIdAndAndProgram_ProgramIdAndBatch_BatchId
             (String userId, String roleId, Long programId, Integer batchId);
 
