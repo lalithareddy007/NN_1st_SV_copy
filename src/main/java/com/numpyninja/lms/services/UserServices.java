@@ -21,7 +21,10 @@ import com.numpyninja.lms.mappers.UserMapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 @Service
 public class UserServices {
@@ -290,75 +293,131 @@ public class UserServices {
 		return userId;
 	}
 
-	@Transactional
-	public UserRoleProgramBatchDto assignUserRoleProgramBatchStatus(UserRoleProgramBatchDto userRoleProgramBatchDto,
-																	String userId) {
-		List<UserRoleProgramSlimDto> roleProgramList;
-		List<UserRoleProgramBatchSlimDto> roleProgramBatchList;
-		UserRoleProgramBatchMap userRoleProgramBatchMap = null;
+	private void validateUserRoleProgramBatchDtoForUser(UserRoleProgramBatchDto userRoleProgramBatchDto) {
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<UserRoleProgramBatchDto>> violations = validator.validate(userRoleProgramBatchDto);
+		StringBuffer sb = new StringBuffer();
+		violations.forEach(i -> {
+			sb.append(i.getMessage());
+			sb.append(" \n ");
+		});
+
+		if(StringUtils.hasLength(sb)){
+			throw new InvalidDataException(sb.toString());
+		}
+	}
+
+	private void assignUpdateUserRoleProgramBatch(User existingUser, Role existingUserRole, Program existingProgram,
+												  Batch existingBatch, UserRoleProgramBatchSlimDto dto) {
+		UserRoleProgramBatchMap userRoleProgramBatchMap;
+		Optional<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository
+				.findByUser_UserIdAndRoleRoleIdAndAndProgram_ProgramIdAndBatch_BatchId
+						(existingUser.getUserId(), existingUserRole.getRoleId(),
+								existingProgram.getProgramId(), existingBatch.getBatchId());
+		if (optionalMap.isEmpty()) {
+			// assign Program/Batch mapping to user
+			userRoleProgramBatchMap = userMapper.toUserRoleProgramBatchMap(dto);
+			userRoleProgramBatchMap.setUser(existingUser);
+			userRoleProgramBatchMap.setRole(existingUserRole);
+			userRoleProgramBatchMap.setProgram(existingProgram);
+			userRoleProgramBatchMap.setBatch(existingBatch);
+			userRoleProgramBatchMap.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
+			userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+		}
+		else {
+			// update existing Program/Batch mapping of user
+			userRoleProgramBatchMap = optionalMap.get();
+			userRoleProgramBatchMap.setUserRoleProgramBatchStatus(dto.getUserRoleProgramBatchStatus());
+			userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+		}
+		userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
+	}
+
+	public String assignUpdateUserRoleProgramBatchStatus(UserRoleProgramBatchDto userRoleProgramBatchDto,
+														 String userId) {
+
+		Boolean isBatchValid;
+		StringBuffer message = new StringBuffer();
+		String roleId = userRoleProgramBatchDto.getRoleId();
+		Long programId = userRoleProgramBatchDto.getProgramId();
+		List<UserRoleProgramBatchSlimDto> roleProgramBatchList = userRoleProgramBatchDto.getUserRoleProgramBatches();
+
+		validateUserRoleProgramBatchDtoForUser(userRoleProgramBatchDto);
 
 		User existingUser = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-		String roleId = userRoleProgramBatchDto.getRoleId();
+		Role existingUserRole = roleRepository.findById(roleId)
+				.orElseThrow(() -> new ResourceNotFoundException("Role", "Id", roleId));
+
 		boolean isPresentUserAndRole = userRoleMapRepository.
 				existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(userId, roleId,
 						"Active");
-		if(!isPresentUserAndRole) // Active User-Role mapping should be present
+		if (!isPresentUserAndRole) // Active User-Role mapping should be present
 			throw new ResourceNotFoundException("User", "Role", roleId);
 
-		if("R03".equals(roleId)) {
-			roleProgramList = userRoleProgramBatchDto.getUserRolePrograms();
-			roleProgramBatchList = roleProgramList.get(0).getUserRoleProgramBatches();
+		// Active Program should be present
+		Program existingProgram = programRepository.findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(
+						programId, "Active")
+				.orElseThrow(() -> new ResourceNotFoundException("Program " + programId, "Program Status", "Active"));
 
-			// User with roleId 'R03' should be assigned to single program/batch
-			if (roleProgramList.size() != 1 || roleProgramBatchList.size() != 1)
-				throw new InvalidDataException("User with Role " + roleId + " can be assigned to single program/batch");
+		// User with roleId 'R03' i.e. Student should be assigned to single program/batch
+		if (roleProgramBatchList.size() != 1 && "R03".equals(roleId))
+			throw new InvalidDataException("User with Role " + roleId + " can be assigned to single program/batch");
 
-			Role existingUserRole = roleRepository.findById(roleId)
-					.orElseThrow(() -> new ResourceNotFoundException("Role", "Id", roleId));
-
-			// Active Program should be present
-			Long programId = roleProgramList.get(0).getProgramId();
-			Program existingProgram = programRepository.findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(
-							programId, "Active")
-					.orElseThrow(() -> new ResourceNotFoundException("Program " + programId, "Program Status", "Active"));
+		if ("R03".equals(roleId)) {
+			UserRoleProgramBatchSlimDto dto = roleProgramBatchList.get(0);
+			String dtoStatus = dto.getUserRoleProgramBatchStatus();
 
 			//Active Program-Batch mapping should be present
-			Integer batchId = roleProgramBatchList.get(0).getBatchId();
-			Batch existingBatch = progBatchRepository.findBatchByBatchIdAndAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
+			Integer batchId = dto.getBatchId();
+			Batch existingBatch = progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
 							(batchId, programId, "Active")
 					.orElseThrow(() -> new ResourceNotFoundException("Batch " + batchId, "Batch Status", "Active"));
 
-			String userRoleProgramBatchStatus = roleProgramBatchList.get(0).getUserRoleProgramBatchStatus();
+			/* Check for existing assigned program/batch with Active status for given user */
+			Optional<UserRoleProgramBatchMap> optionalExistingMap = userRoleProgramBatchMapRepository
+					.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
+							(userId, roleId, "Active");
 
-			Optional<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository
-					.findUserRoleProgramBatchMapByUser_UserIdAndProgram_ProgramIdAndBatch_BatchId(userId, programId, batchId);
+			if (optionalExistingMap.isPresent()) {
+				UserRoleProgramBatchMap existingMap = optionalExistingMap.get();
+				Long existingProgramId = existingMap.getProgram().getProgramId();
+				Integer existingBatchId = existingMap.getBatch().getBatchId();
 
-			if (optionalMap.isEmpty()) {
-				// assign Program/Batch to user
-				userRoleProgramBatchMap = userMapper.toUserRoleProgramBatchMap(roleProgramBatchList.get(0));
-				userRoleProgramBatchMap.setUser(existingUser);
-				userRoleProgramBatchMap.setRole(existingUserRole);
-				userRoleProgramBatchMap.setProgram(existingProgram);
-				userRoleProgramBatchMap.setBatch(existingBatch);
-				userRoleProgramBatchMap.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
-				userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
-			} else {
-				// update existing Program/Batch mapping of user
-				userRoleProgramBatchMap = optionalMap.get();
-				userRoleProgramBatchMap.setUserRoleProgramBatchStatus(userRoleProgramBatchStatus);
-				userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+				/* Check whether received request for another program/batch with Active status */
+				if (existingProgramId != programId && existingBatchId != batchId && "Active".equalsIgnoreCase(dtoStatus))
+					throw new InvalidDataException
+							("Please deactivate User from existing program/batch and then activate for another program/batch");
+				else
+					assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, existingBatch, dto);
 			}
-			UserRoleProgramBatchMap savedMap = userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
-
-			String message = "User " + userId + " with Batch " + batchId + ": " + userRoleProgramBatchStatus;
-			return UserRoleProgramBatchDto.builder()
-					.userId(userId)
-					.status(message)
-					.build();
+			else
+				assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, existingBatch, dto);
 		}
-		return null;
+		else { // User with roleId 'R02' i.e. Staff can be assigned to multiple programs/batches
+			for(UserRoleProgramBatchSlimDto dto :  roleProgramBatchList) {
+				//Active Program-Batch mapping should be present
+				Integer batchId = dto.getBatchId();
+				Optional<Batch> optionalBatch = progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
+						(batchId, programId, "Active");
+
+				if(optionalBatch.isPresent())
+					isBatchValid = true;
+				else
+					isBatchValid = false;
+
+				if (isBatchValid)
+					assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
+				else {
+					message.append(String.format("%s not found with %s : %s ","Batch " + batchId, "Batch Status", "Active"));
+					message.append(" \n ");
+				}
+			}
+			if(StringUtils.hasLength(message.toString()))
+				return "Partial Success for User with ID " + userId + " - " + message;
+		}
+		return "Success for User with ID " + userId;
 	}
 
 	/** Check for already existing phone number **/

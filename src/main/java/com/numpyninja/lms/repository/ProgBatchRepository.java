@@ -19,6 +19,6 @@ public interface ProgBatchRepository extends JpaRepository<Batch, Integer>  {
     
 	Batch findByBatchNameAndProgram_ProgramId ( String batchName, Long programId);
 
-    Optional<Batch> findBatchByBatchIdAndAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(
+    Optional<Batch> findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(
             Integer batchId, Long programId, String batchStatus);
 }

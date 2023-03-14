@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -16,6 +17,7 @@ import javax.validation.constraints.NotNull;
 public class UserRoleProgramBatchSlimDto {
 
     @NotNull(message = "Batch Id is mandatory")
+    @DecimalMin(value = "1", message = "Batch Id must be greater than or equal to 1")
     @JsonProperty("batchId")
     private Integer batchId;
 

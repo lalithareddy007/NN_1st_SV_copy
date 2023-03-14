@@ -97,10 +97,10 @@ public class UserController {
 	// Ask front end to include a separate link to assign program/batch to existing user
 	// Update existing user to assign program and its corresponding batch
 	@PutMapping("/users/roleProgramBatchStatus/{userId}")
-	public ResponseEntity<UserRoleProgramBatchDto> assignUserRoleProgramBatchStatus(
-			@Valid @RequestBody UserRoleProgramBatchDto userRoleProgramBatchDto, @PathVariable String userId) {
-		UserRoleProgramBatchDto responseDto = userServices.assignUserRoleProgramBatchStatus(userRoleProgramBatchDto, userId);
-		return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+	public ResponseEntity<String> assignUpdateUserRoleProgramBatchStatus(@PathVariable String userId,
+																   @RequestBody UserRoleProgramBatchDto userRoleProgramBatchDto) {
+		String response = userServices.assignUpdateUserRoleProgramBatchStatus(userRoleProgramBatchDto, userId);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 
