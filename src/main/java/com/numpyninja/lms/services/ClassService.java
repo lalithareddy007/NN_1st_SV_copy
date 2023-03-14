@@ -27,6 +27,7 @@ import java.util.Optional;
 @Service
 public class ClassService {
 	@Autowired
+
 	private ClassRepository classRepository;
 
 	@Autowired
@@ -155,9 +156,21 @@ public class ClassService {
 			return (classMapper.toClassScheduleDTOList(ClassScheduleList));
 		}
 	}
-
 	//get class by classId
 	public ClassDto getClassByClassId(Long id) throws ResourceNotFoundException{
+		Optional<Class> classOptional = classRepository.findById(id);
+		if(classOptional.isPresent()) {
+			Class ClassScheduleById = classOptional.get();
+			return classMapper.toClassSchdDTO(ClassScheduleById);
+
+		}
+		else {
+
+			throw new ResourceNotFoundException("ClassSchedule is not found for classId :"+id);
+		}
+	}
+	//get class by classId
+	/*public ClassDto getClassByClassId(Long id) throws ResourceNotFoundException{
 		Class ClassScheduleById= classRepository.findById(id).get();
 		if(ClassScheduleById== null) {
 			throw new ResourceNotFoundException("ClassSchedule is not found for classId :"+id);
@@ -165,7 +178,7 @@ public class ClassService {
 		else {
 			return (classMapper.toClassSchdDTO(ClassScheduleById));
 		}
-	}
+	}*/
 	//get all classes by classTopic - not mentioned in Excel
 	public List<ClassDto> getClassesByClassTopic(String classTopic)throws ResourceNotFoundException
 	{
@@ -374,6 +387,9 @@ public class ClassService {
 
 		List<Class> ClassObj =classRepository.findByBatchInClass_batchId(batchId);
 		List<ClassRecordingDTO> classRecordingList = new ArrayList<>();
+		if(ClassObj.isEmpty()) {
+			throw new ResourceNotFoundException("Class Recording not found with batchId :" + batchId);
+		}
 		ClassObj.stream().forEach((k) -> {
 			ClassRecordingDTO classRecordObject = new ClassRecordingDTO();
 			classRecordObject.setCsId(k.getCsId());

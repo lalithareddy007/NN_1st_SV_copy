@@ -85,13 +85,18 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " +userId);
 	}
 
-
 	//cascade deletes users and User roles
 	@DeleteMapping("/users/{userId}")
 	public ResponseEntity<String> deleteUser(@PathVariable(value="userId") String userId) throws ResourceNotFoundException{
 		String deletedUserId = userServices.deleteUser(userId);
 		return ResponseEntity.status(HttpStatus.OK).body("Deleted User ID:  "+deletedUserId);
 		//return deletedUserId;
+	}
+
+	@GetMapping("/users/getAllStaff")
+	public ResponseEntity<List<Object>> getAllStaff(){
+		List<Object> list = userServices.getAllStaff();
+		return ResponseEntity.status(HttpStatus.OK).body(list);
 	}
 
 	// Ask front end to include a separate link to assign program/batch to existing user
@@ -105,7 +110,6 @@ public class UserController {
 
 
 	/** Check if the below end points are required or not for the future**/
-
     /*
 	//Check if this is needed form front end or not??
 	//Get all the users for a given role (Admin,Staff,User)- only giving user table info

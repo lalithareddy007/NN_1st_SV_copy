@@ -1,30 +1,24 @@
 package com.numpyninja.lms.services;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.*;
-import com.numpyninja.lms.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.numpyninja.lms.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServices {
@@ -81,6 +75,7 @@ public class UserServices {
 		}).collect(Collectors.toList());
 	}
 
+	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
 			throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
@@ -588,6 +583,20 @@ public class UserServices {
 		}
 
 	}
+	
+	public List<Object> getAllStaff()
+	{
+		List<Object> result=userRepository.getAllStaffList();
+		if(!(result.size()<=0))
+		{
+			//return (userMapper.toUserStaffDTO(result));
+			return result;
+		}else
+		{
+			throw new ResourceNotFoundException("No staff data is available in database");
+		}
+	}
+
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {

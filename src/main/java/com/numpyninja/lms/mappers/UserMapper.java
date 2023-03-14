@@ -6,10 +6,12 @@ import com.numpyninja.lms.dto.UserRoleProgramBatchSlimDto;
 import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 import org.mapstruct.Mapper;
 
+import com.numpyninja.lms.dto.ClassDto;
 import com.numpyninja.lms.dto.UserAndRoleDTO;
 import com.numpyninja.lms.dto.UserDto;
 
 import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
+import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
 import org.mapstruct.Mapping;
@@ -43,4 +45,5 @@ public interface UserMapper {
 
 	@Mapping(source="batchId", target="batch.batchId")
 	UserRoleProgramBatchMap toUserRoleProgramBatchMap(UserRoleProgramBatchSlimDto userRoleProgramBatchSlimDto);
+
 }

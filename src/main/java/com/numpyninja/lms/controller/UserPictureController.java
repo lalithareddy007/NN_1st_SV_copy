@@ -76,16 +76,17 @@ public class UserPictureController {
 	}
 
 	
-	@GetMapping("/userpicture/{userid}")
-	public ResponseEntity<UserPictureEntityDTO> download(@PathVariable String  userid,  @RequestParam String userfiletype) throws IOException{
+	@GetMapping(path="/userpicture/{userid}", produces = "application/json")
+	public ResponseEntity<UserPictureEntityDTO> download(@PathVariable (value="userid")String  userid,  @RequestParam (value="userfiletype") String userfiletype) throws IOException{
 		UserPictureEntityDTO downloadpicture=	userpictureservice.download(userid, userfiletype);
 		return ResponseEntity.ok(downloadpicture);
-	
+	//return	ResponseEntity.status(HttpStatus.OK).body(downloadpicture);
+		//return ResponseEntity.ok(this.userpictureservice.download(userid, userfiletype));
 	}	
 	
 	
 	@DeleteMapping("/userpicture/{userid}")
-public ResponseEntity<MessageResponse> Delete(@PathVariable String userid,@RequestParam String userfiletype ) throws IOException
+    public ResponseEntity<MessageResponse> Delete(@PathVariable String userid,@RequestParam String userfiletype ) throws IOException
 	{
      this.userpictureservice.DeleteFile(userid, userfiletype);
      return new ResponseEntity<MessageResponse>(new MessageResponse("file deleted successfully",true) , HttpStatus.OK);
@@ -93,11 +94,11 @@ public ResponseEntity<MessageResponse> Delete(@PathVariable String userid,@Reque
 	}
 	
 	@PutMapping("/userpicture/{userid}")
- public ResponseEntity<UserPictureEntityDTO> update(@RequestBody  UserPictureEntityDTO userpicturedto ,@PathVariable String userid) throws IOException
-  {
+    public ResponseEntity<UserPictureEntityDTO> update(@RequestBody  UserPictureEntityDTO userpicturedto ,@PathVariable String userid) throws IOException
+   {
   	UserPictureEntityDTO updatedPicture=this.userpictureservice.updateFile(userpicturedto,userid);
   	return ResponseEntity.ok(updatedPicture);
-  }
+   }
 	
 	
 	
