@@ -9,9 +9,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
-//@NoArgsConstructor
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name="tbl_lms_submissions")
 public class AssignmentSubmit {
 
@@ -25,7 +24,7 @@ public class AssignmentSubmit {
     @JoinColumn(name="sub_a_id", nullable=false)
     private Assignment assignment;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="sub_student_id", nullable = false)
     private User user;
 
