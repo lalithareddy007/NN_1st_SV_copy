@@ -26,8 +26,7 @@ public class AssignmentSubmitDTO {
     private String userId;
 
     /*This should be same as the assignment name and need to come from the front-end.
-    * This shouldn't be editable, or it would be difficult for the user
-    * to identify which assignment he/she has submitted. */
+     */
     @NotNull(message = "Submission description is mandatory")
     private String subDesc;
 
@@ -62,7 +61,4 @@ public class AssignmentSubmitDTO {
      */
     private int grade=-1;
 
-    //private Timestamp creationTime;
-
-    //private Timestamp lastModTime;
 }

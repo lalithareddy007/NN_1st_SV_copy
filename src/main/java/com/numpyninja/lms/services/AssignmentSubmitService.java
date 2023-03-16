@@ -170,9 +170,6 @@ public class AssignmentSubmitService {
         if(!studentId.equals(savedAssignmentSubmit.getUser().getUserId()))
             throw new InvalidDataException("Student with given ID "+studentId+ " cannot submit this assignment");
 
-        if(!userRepository.existsById(studentId))
-            throw (new ResourceNotFoundException("Student","ID",studentId));
-
         Long assignmentId = assignmentSubmitDTO.getAssignmentId();
 
         /**
