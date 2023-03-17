@@ -30,9 +30,9 @@ public class AssignmentSubmitController {
     }
 
     @PostMapping(path="", consumes="application/json", produces="application/json")
-    public ResponseEntity<AssignmentSubmitDTO> createSubmissions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
+    public ResponseEntity<AssignmentSubmitDTO> submitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
     {
-        AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.createSubmissions(assignmentSubmitDTO);
+        AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.submitAssignment(assignmentSubmitDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAssignSubmitDTO);
     }
 
@@ -53,11 +53,11 @@ public class AssignmentSubmitController {
 
 
     @PutMapping(path="/{id}", consumes="application/json", produces="application/json")
-    public ResponseEntity<AssignmentSubmitDTO> updateSubmissions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
+    public ResponseEntity<AssignmentSubmitDTO> resubmitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                   @PathVariable Long id)
     {
-        AssignmentSubmitDTO updatedAssignSubmitDTO = assignmentSubmitService.updateSubmissions(assignmentSubmitDTO,id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(updatedAssignSubmitDTO);
+        AssignmentSubmitDTO updatedAssignSubmitDTO = assignmentSubmitService.resubmitAssignment(assignmentSubmitDTO,id);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedAssignSubmitDTO);
     }
 
     @DeleteMapping(path="/{id}")
@@ -78,5 +78,12 @@ public class AssignmentSubmitController {
     public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByStudentId(@PathVariable String studentId){
     	 List<AssignmentSubmitDTO> getListGradesAssignmentByStudentIdDTO = assignmentSubmitService.getGradesByStudentId(studentId);
          return ResponseEntity.ok(getListGradesAssignmentByStudentIdDTO);
+    }
+
+    @PutMapping(path="/gradesubmission/{submissionId}",consumes="application/json", produces="application/json" )
+    public ResponseEntity<AssignmentSubmitDTO> gradeAssignmentSubmission(@RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
+                                                                     @PathVariable Long submissionId){
+        AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitService.gradeAssignmentSubmission(assignmentSubmitDTO,submissionId);
+        return ResponseEntity.status(HttpStatus.OK).body(gradedSubmissionDTO);
     }
 }

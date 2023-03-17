@@ -52,7 +52,7 @@ public class AssignmentSubmitDTO {
 
     private String gradedBy;
 
-    @JsonFormat(pattern="MM-dd-yyyy")
+    @JsonFormat(pattern="MM-dd-yyyy HH:mm:ss")
     private Timestamp gradedDateTime;
 
     /*Defaulting the grade value to -1 inorder to not save 0 as value
