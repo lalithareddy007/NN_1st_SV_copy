@@ -20,11 +20,11 @@ public class AssignmentSubmit {
     @Column(name="sub_id")
     private Long submissionId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="sub_a_id", nullable=false)
     private Assignment assignment;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="sub_student_id", nullable = false)
     private User user;
 
