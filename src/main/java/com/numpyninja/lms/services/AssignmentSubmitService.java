@@ -233,17 +233,11 @@ public class AssignmentSubmitService {
        	 if (!userRepository.existsById(studentId))
              throw new ResourceNotFoundException("Student","Student ID: ",studentId);
        	 
-       	 List<AssignmentSubmit> asssubmissionsByStuID = assignmentSubmitRepository.getGradesByStudentID(studentId);
-     	if(!(asssubmissionsByStuID.size()<=0))
-     	{
-            List<AssignmentSubmitDTO>  assSubByStudentIdDto = 	assignmentSubmitMapper.toAssignmentSubmitDTOList(asssubmissionsByStuID);
-            return assSubByStudentIdDto;
-     	}
-     	else
-     	{
-     		throw new ResourceNotFoundException("Assignments with grades are not available for Student ID : "+studentId);
-     	}
-    }
+       	 List<AssignmentSubmit> assignmentSubmissionsListByStudentID = assignmentSubmitRepository.getGradesByStudentID(studentId);
+         	 List<AssignmentSubmitDTO>  assignmentSubmissionListDTO = assignmentSubmitMapper.toAssignmentSubmitDTOList(assignmentSubmissionsListByStudentID);
+      
+        	 return assignmentSubmissionListDTO;
+     }
 
     public AssignmentSubmitDTO gradeAssignmentSubmission(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId){
         AssignmentSubmit savedAssignmentSubmit = this.assignmentSubmitRepository.findById(submissionId)
@@ -298,5 +292,7 @@ public class AssignmentSubmitService {
         return assignmentSubmitDTOs;
     }
 
+
+     	
 
 }

@@ -74,7 +74,7 @@ public class AssignmentSubmitController {
         return ResponseEntity.ok(getListGradesAssignmentDTO);
     }
     
-    @GetMapping("/getGradesByStudentId/{studentId}")
+    @GetMapping("/grades/student/{studentId}")
     public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByStudentId(@PathVariable String studentId){
     	 List<AssignmentSubmitDTO> getListGradesAssignmentByStudentIdDTO = assignmentSubmitService.getGradesByStudentId(studentId);
          return ResponseEntity.ok(getListGradesAssignmentByStudentIdDTO);
