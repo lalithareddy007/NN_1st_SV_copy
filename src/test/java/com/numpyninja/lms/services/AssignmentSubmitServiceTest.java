@@ -6,12 +6,15 @@ import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
 import com.numpyninja.lms.repository.AssignmentSubmitRepository;
 import com.numpyninja.lms.repository.UserRepository;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Timestamp;
@@ -20,6 +23,7 @@ import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -165,5 +169,94 @@ public class AssignmentSubmitServiceTest {
         verify(mockUserRepository).existsById(userId);
         verifyNoInteractions(mockAssignmentSubmitRepository);
     }
+    
+    @Test
+    @DisplayName("Test for get all AssignmentSubmissions")
+    public void testGetAllSubmissions()
+    {
+    	when(mockAssignmentSubmitRepository.findAll()).thenReturn(mockAssignmentSubmitList);
+    	List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getAllSubmissions();
+    	assertEquals(assignmentSubmitDTOList.size(),assignmentSubmitDTOList.size());
+    	
+    }
+    
+    @Test
+    @DisplayName("Test for get submissions by Batch")
+    public void testGetSubmissionsByBatch()
+    {
+    	Integer batchId = 11;
+    	when(mockAssignmentSubmitRepository.findAll()).thenReturn(mockAssignmentSubmitList);
+    
+    	List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getSubmissionsByBatch(batchId);
+    	System.out.println(assignmentSubmitDTOList);
+    	assertEquals(assignmentSubmitDTOList.size(),assignmentSubmitDTOList.size());
+    }
+    
+    
+    @Test
+    @DisplayName("Test for get Grades by AssignmentID")
+    public void testGetGradesByAssinmentId()
+    {
+    	Long AssignmentId = 1L;
+    	given(mockAssignmentSubmitRepository.findById(AssignmentId)).willReturn(Optional.of(mockAssignmentSubmit1));
+    	given(mockAssignmentSubmitRepository.getGradesByAssignmentId(AssignmentId)).willReturn(mockAssignmentSubmitList);
+    	given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList))
+         .willReturn(mockAssignmentSubmitDTOList);
+    	List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getGradesByAssinmentId(AssignmentId);
+    	System.out.println(assignmentSubmitDTOList);
+    	assertThat(assignmentSubmitDTOList).isNotNull();
+    	
+    }
+    
+    @DisplayName("test for get grades by assignment id if assignment id is not found ")
+	@Test
+	void testgetGradesByAssinmentIdNotFound() {
+		//given
+    	Long AssignmentId = 1L;
+    	
+		given(mockAssignmentSubmitRepository.findById(AssignmentId)).willReturn(Optional.empty());
+		
+		//when
+		Assertions.assertThrows(ResourceNotFoundException.class,
+				() -> mockAssignmentSubmitService.getGradesByAssinmentId(AssignmentId));
+
+		//then
+		Mockito.verify(assignmentSubmitMapper, never()).toAssignmentSubmitDTOList(any(List.class));
+	}
+    
+    @DisplayName("Test for get grades by student Id")
+    @Test
+    void testGetGradesByStudentId() {
+    	//given 
+    	 String userId = "U01";
+    	
+    	 when(mockUserRepository.existsById(userId)).thenReturn(true);
+    	 
+    	 given(mockAssignmentSubmitRepository.getGradesByStudentID(userId)).willReturn(mockAssignmentSubmitList);
+         given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList))
+                  .willReturn(mockAssignmentSubmitDTOList);
+         
+         List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getGradesByStudentId(userId);
+     	 System.out.println(assignmentSubmitDTOList);
+     	 assertThat(assignmentSubmitDTOList).isNotNull();
+    }
+    
+    
+    @DisplayName("test for get grades by student id if student id is not found ")
+   	@Test
+   	void testGetGradesByStudentIdNotFound() {
+   
+    	String userId = "40";
+       	
+       	when(mockUserRepository.existsById(userId)).thenReturn(false);
+   		
+   		Assertions.assertThrows(ResourceNotFoundException.class,
+   				() -> mockAssignmentSubmitService.getGradesByStudentId(userId));
+
+    	Mockito.verify(assignmentSubmitMapper, never()).toAssignmentSubmitDTOList(any(List.class));
+      	verify(mockUserRepository).existsById(userId);
+          	
+    }
+
 
 }
