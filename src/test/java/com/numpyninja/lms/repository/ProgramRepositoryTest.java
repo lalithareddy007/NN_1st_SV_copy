@@ -1,23 +1,17 @@
 package com.numpyninja.lms.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.numpyninja.lms.entity.Program;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.numpyninja.lms.entity.Batch;
-import com.numpyninja.lms.entity.Program;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -32,7 +26,7 @@ class ProgramRepositoryTest {
 	@Test
 	void givenProgramName_WhenFindPrograms_ReturnProgramObjects() {
 	//given
-		String programName = "Automation";
+		String programName = "SDET";
 		LocalDateTime now= LocalDateTime.now();
 		Timestamp timestamp= Timestamp.valueOf(now);
 		Program program = new Program((long) 1,"SDET"," ", "Active",timestamp, timestamp);
@@ -71,9 +65,18 @@ class ProgramRepositoryTest {
 		
 	}
 
-	
-	
-	
+	@DisplayName("test to get program by Id and Status")
+	@Test
+	public void testFindProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase() {
+		Program program = new Program(1L, "SDET", "SDET Training",
+				"Active", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
+		programRepository.save(program);
+
+		Optional<Program> optionalProgram = programRepository
+				.findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(1L, "active");
+
+		assertThat(optionalProgram).isNotEmpty();
+	}
 }
 
 
