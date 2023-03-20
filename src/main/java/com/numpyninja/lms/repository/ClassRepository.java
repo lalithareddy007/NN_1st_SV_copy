@@ -5,6 +5,7 @@ import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.entity.Batch;
+import com.numpyninja.lms.entity.UserSkill;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -45,9 +46,9 @@ public interface ClassRepository extends JpaRepository<Class,Long>{
 	Optional<Batch> findByCsIdAndBatchInClass_BatchId(Long id, Batch batchobj);
     
    // List<Class> findByRolesIn(List<String> roles);
-    
 
 
-    
+
+    boolean existsByClassTopic(String classTopic);
 
 }
