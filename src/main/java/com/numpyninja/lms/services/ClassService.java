@@ -111,7 +111,7 @@ public class ClassService {
 	public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFoundException
 	{
 // Check for duplicate class Topic
-		if (classRepository.existsByClassTopic(newClassDto.getClassTopic())) {
+		if (classRepository.existsByClassTopicIgnoreCase(newClassDto.getClassTopic())) {
 			throw new DuplicateResourceFoundException("Class", " Class Topic", newClassDto.getClassTopic());
 		}
 

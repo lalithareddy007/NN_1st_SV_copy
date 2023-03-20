@@ -49,6 +49,6 @@ public interface ClassRepository extends JpaRepository<Class,Long>{
 
 
 
-    boolean existsByClassTopic(String classTopic);
+    boolean existsByClassTopicIgnoreCase(String classTopic);
 
 }
