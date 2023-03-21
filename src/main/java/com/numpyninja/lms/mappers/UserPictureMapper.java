@@ -1,5 +1,7 @@
 package com.numpyninja.lms.mappers;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -21,7 +23,7 @@ import com.numpyninja.lms.entity.UserPictureEntity;
 
 		UserPictureMapper INSTANCE = Mappers.getMapper(UserPictureMapper.class);
 	
-		
+		//changes made 
 		@Mapping ( source = "userpicturedto.userId", target = "user.userId" )
 		UserPictureEntity toUserPictureEntity(UserPictureEntityDTO userpicturedto);	
 		

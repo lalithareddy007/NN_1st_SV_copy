@@ -26,8 +26,7 @@ public class AssignmentSubmitDTO {
     private String userId;
 
     /*This should be same as the assignment name and need to come from the front-end.
-    * This shouldn't be editable, or it would be difficult for the user
-    * to identify which assignment he/she has submitted. */
+     */
     @NotNull(message = "Submission description is mandatory")
     private String subDesc;
 
@@ -53,7 +52,7 @@ public class AssignmentSubmitDTO {
 
     private String gradedBy;
 
-    @JsonFormat(pattern="MM-dd-yyyy")
+    @JsonFormat(pattern="MM-dd-yyyy HH:mm:ss")
     private Timestamp gradedDateTime;
 
     /*Defaulting the grade value to -1 inorder to not save 0 as value

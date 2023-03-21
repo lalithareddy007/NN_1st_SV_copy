@@ -272,7 +272,6 @@ public class UserControllerTest {
 				//.andExpect(jsonPath("$.roleId").value("R02"));
 	}
 
-	
 
 
 }

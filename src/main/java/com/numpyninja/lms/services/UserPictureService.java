@@ -1,12 +1,4 @@
 package com.numpyninja.lms.services;
-
-
-
-
-
-
-
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,9 +34,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.StringIdGenerator;
 import com.numpyninja.lms.dto.AssignmentDto;
+import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.dto.UserPictureEntityDTO;
 //import com.numpyninja.lms.dto.UserPictureEntityDto;
 import com.numpyninja.lms.entity.Assignment;
+import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserPictureEntity;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
@@ -67,99 +61,96 @@ public class UserPictureService {
 		@Autowired
 		private UserRepository userRepository;
 		
+
+
 //save files to DB
 public UserPictureEntityDTO uploadtoDB(UserPictureEntityDTO userpicturedto) throws IOException
 {
 	UserPictureEntity savedPicture = userpicturerepo.
-	findByuserAnduserFileType1(userpicturedto.getUserId(),userpicturedto.getUserFileType());
+	findByuserAnduserFileType(userpicturedto.getUserId(),userpicturedto.getUserFileType());
 			System.out.println(savedPicture);
-			
-//	if(savedPicture.getUser()!= null && savedPicture.getUserFileType()!=null)
-//		throw new DuplicateResourceFoundException("UserPictureEntity", "UserId", userpicturedto.getUserId());
-//	
-//	if(savedPicture.getUser()== null && savedPicture.getUserFileType()!="Resume") 
-//		throw new DuplicateResourceFoundException("UserPictureEntity", "UserId", userpicturedto.getUserId());
 	if(savedPicture != null) 
 		throw new DuplicateResourceFoundException("UserPictureEntity", "UserId", userpicturedto.getUserId());
-
-	//if(userpicturedto.getUserFileType()!= "Resume" || userpicturedto.getUserFileType()!="ProfilePic")
-		//throw new DuplicateResourceFoundException("UserPictureEntity", "UserId", userpicturedto.getUserId());
-	
-	 String  filetype = userpicturedto.getUserFileType();
-	 if(!(filetype.equalsIgnoreCase("Resume") || filetype.equalsIgnoreCase("ProfilePic")))
+    String  filetype = userpicturedto.getUserFileType();
+	if(!(filetype.equalsIgnoreCase("Resume") || filetype.equalsIgnoreCase("ProfilePic")))
 	throw new 	ResourceNotFoundException("UserPictureEntity","Userfiletype",userpicturedto.getUserFileType());
 	
-  UserPictureEntity userpicture = userPictureMapper.toUserPictureEntity(userpicturedto);
+    UserPictureEntity userpicture = userPictureMapper.toUserPictureEntity(userpicturedto);
 	UserPictureEntity newpicture = this.userpicturerepo.save(userpicture);
 	return userPictureMapper.toUserPictureEntityDto(newpicture);
 	
 }
 
 
-
+//download file
 public UserPictureEntityDTO download(String userid,String filetype) {
-	//userPictureMapper.toUserPictureEntity(null)
 	
-	//UserPictureEntity savedpicDB = userpicturerepo.findByuserAnduserFileType1(userid, filetype);
-	UserPictureEntity pictureindb =userpicturerepo.findByuserAnduserFileType1(userid, filetype);
-	//if(!(pictureindb.equals(null)))
-		//throw new 	ResourceNotFoundException("UserPictureEntity","Userfiletype",filetype);
-	return userPictureMapper.toUserPictureEntityDto(pictureindb);
+	
+UserPictureEntity pictureindb =userpicturerepo.findByuserAnduserFileType(userid, filetype);
+	
+if(pictureindb== null)
+	throw new ResourceNotFoundException("user Id " + userid+ " not found");
+
+return userPictureMapper.toUserPictureEntityDto(pictureindb);
 	
 }
 
 
+//delete file
 public void DeleteFile(String userid,String filetype) throws IOException
 {
-     UserPictureEntity ToDeletePicture	=	userpicturerepo.findByuserAnduserFileType1(userid, filetype);
-	 System.out.println(ToDeletePicture);
-	// ToDeletePicture.equals(null)
-	  if(ToDeletePicture != null)
-	  {	  
-	 //delete from db
-		 userpicturerepo.deleteById(ToDeletePicture.getUserFileId());
+	User user = userRepository.findById(userid)
+		       .orElseThrow(() -> new ResourceNotFoundException("user Id " + userid + " not found"));
 	
-	  }
+     UserPictureEntity ToDeletePicture	=	userpicturerepo.findByuserAnduserFileType(userid, filetype);
+	 System.out.println(ToDeletePicture);
 
-
-
+	  if(ToDeletePicture == null)
+		  throw new ResourceNotFoundException("user Id " + userid+ " not found");
+	  else
+	 //delete from db
+		userpicturerepo.deleteById(ToDeletePicture.getUserFileId());
+	 // userpicturerepo.deleteByuserAnduserFiletype(userid, filetype);
+	 // userpicturerepo.deleteByuserAnduserFiletype(user, filetype);
 }
 
+  
+//update file
 public UserPictureEntityDTO updateFile( UserPictureEntityDTO userpicturedto , String userid ) throws IOException
-{
+  {
 	
-       UserPictureEntity savedpicture=	userpicturerepo.findByuserAnduserFileType1(userpicturedto.getUserId(), userpicturedto.getUserFileType());
-       System.out.println(savedpicture); 
+      UserPictureEntity savedpicture=	userpicturerepo.findByuserAnduserFileType(userpicturedto.getUserId(), userpicturedto.getUserFileType());
+      System.out.println(savedpicture); 
+      
+//      if(savedpicture==null)
+//    	 throw new ResourceNotFoundException("UserPictureEntity" + userpicturedto.getUserId() + " not found");
 
       User user = userRepository.findById(userpicturedto.getUserId())
        .orElseThrow(() -> new ResourceNotFoundException("user Id " + userpicturedto.getUserId() + " not found"));
+      
+      String  filetype = userpicturedto.getUserFileType();
+  	  if(!(filetype.equalsIgnoreCase("Resume") || filetype.equalsIgnoreCase("ProfilePic")))
+  	  throw new 	ResourceNotFoundException("UserPictureEntity","Userfiletype",userpicturedto.getUserFileType());
+  	
+      UserPictureEntity userpicture = userPictureMapper.toUserPictureEntity(userpicturedto);
 
-
-    
-     UserPictureEntity userpicture = userPictureMapper.toUserPictureEntity(userpicturedto);
-
-     userpicture.setUserFileId(savedpicture.getUserFileId());
-     userpicture.setUser(savedpicture.getUser());
+      userpicture.setUserFileId(savedpicture.getUserFileId());
+      userpicture.setUser(savedpicture.getUser());
      
-
-     
-     if(StringUtils.hasLength(userpicturedto.getUserFileType()))
+      if(StringUtils.hasLength(userpicturedto.getUserFileType()))
     	 userpicture.setUserFileType(userpicturedto.getUserFileType());
-     else 
+      else 
     	 userpicture.setUserFileType(savedpicture.getUserFileType());
 	
-     
-   //  userpicture.setUserFileType(userpicturedto.getUserFileType());
      if(StringUtils.hasLength(userpicturedto.getUserFilePath()))
     	 userpicture.setUserFilePath(userpicturedto.getUserFilePath());
      else 
     	 userpicture.setUserFilePath(savedpicture.getUserFilePath());	
-	
-     //userpicture.setUserFilePath(userpicturedto.getUserFilePath());
+	//userpicture.setUserFilePath(userpicturedto.getUserFilePath());
      UserPictureEntity saveuserpicture  = this.userpicturerepo.save(userpicture);
      UserPictureEntityDTO  userdtoEntity =  userPictureMapper.toUserPictureEntityDto(saveuserpicture);
 
-return userdtoEntity;
+     return userdtoEntity;
      
 
 

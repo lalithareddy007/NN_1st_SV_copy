@@ -2,12 +2,14 @@ package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
+import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.AssignmentSubmitService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -50,18 +52,18 @@ public class AssignmentSubmitControllerTest {
 
             mockAssignmentSubmitDTO1 = new AssignmentSubmitDTO(4L,2L,"U04","Selenium assignment Submission",
                    "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
-                    timestamp1,null,null,-1,timestamp1,timestamp1);
+                    timestamp1,null,null,-1);
             mockAssignmentSubmitDTO2 = new AssignmentSubmitDTO(3L,1L,"U04","SQL assignment Submission",
                     "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
-                    timestamp1,null,null,-1,timestamp1,timestamp1);
+                    timestamp1,null,null,-1);
             mockAssignmentSubmitDTO3 = new AssignmentSubmitDTO(8L,1L,"U05","SQL assignment Submission",
                     "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
-                    timestamp1,null,null,-1,timestamp1,timestamp1);
+                    timestamp1,null,null,-1);
 
 
         }
 
-        @DisplayName("Test to get all submissions for a given student ID")
+        @DisplayName("Test to get All Submissions for a given Student Id")
         @Test
         @SneakyThrows
         public void testGetSubmissionsByUserID(){
@@ -85,5 +87,144 @@ public class AssignmentSubmitControllerTest {
             verify(assignmentSubmitService).getSubmissionsByUserID(userId);
 
         }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test to get Submissions for a Batch")
+        public void testgetSubmissionsByBatch() {
+           	Integer batchId = 1;
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getSubmissionsByBatch(batchId)).thenReturn(assignmentSubmitDTOList);
+        	
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/studentbatch/{batchid}",batchId));
+       	 	resultActions.andExpect(status().isOk())
+			.andDo(print())
+			.andExpect(jsonPath("$", hasSize(assignmentSubmitDTOList.size())));
+        	verify(assignmentSubmitService).getSubmissionsByBatch(batchId);
+
+        }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test for get Submissions if BatchID not found")
+        public void testgetSubmissionsByBatch_notfound(){
+       
+        	Integer batchId = 4;
+        	String message = "Submissions with batch Id not found";
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getSubmissionsByBatch(ArgumentMatchers.any(Integer.class))).thenThrow(new ResourceNotFoundException(message));
+             
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/studentbatch/{batchid}",batchId));
+        	resultActions.andExpectAll(status().isNotFound(),
+                      jsonPath("$.message").value(message))
+              .andDo(print());
+        	verify(assignmentSubmitService).getSubmissionsByBatch(ArgumentMatchers.any(Integer.class));
+        }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test to Get All Submissions list")
+        public void testGetAllSubmissions() {
+            List<AssignmentSubmitDTO> getAllSubmissionsList = new ArrayList<>();
+        	getAllSubmissionsList.add(mockAssignmentSubmitDTO1);
+        	getAllSubmissionsList.add(mockAssignmentSubmitDTO2);
+        	getAllSubmissionsList.add(mockAssignmentSubmitDTO3);
+        	
+        	when(assignmentSubmitService.getAllSubmissions()).thenReturn(getAllSubmissionsList);
+        	
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission"));
+        	resultActions.andExpect(status().isOk())
+			.andDo(print())
+			.andExpect(jsonPath("$", hasSize(getAllSubmissionsList.size())));
+        	verify(assignmentSubmitService).getAllSubmissions();
+        	
+        }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test to Get Grades by AssignmentId")
+        public void testGetGradesByAssignmentId()
+        {
+        	Long assignmentId = 1L;
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getGradesByAssinmentId(assignmentId)).thenReturn(assignmentSubmitDTOList);
+        	
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGrades/{assignmentId}",assignmentId));
+       	 	resultActions.andExpect(status().isOk())
+			.andDo(print())
+			.andExpect(jsonPath("$", hasSize(assignmentSubmitDTOList.size())));
+        	verify(assignmentSubmitService).getGradesByAssinmentId(assignmentId);
+        }
+        
+
+        @Test
+        @SneakyThrows
+        @DisplayName("Test for Get Grades if Assignment Id is not found")
+        public void testGetGradesByAssignmentId_notfound(){
+       
+        	Long assignmentId = 1L;
+        	String message = "Grades for students Assignment Id"+assignmentId+" not found";
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getGradesByAssinmentId(ArgumentMatchers.any(Long.class))).thenThrow(new ResourceNotFoundException(message));
+             
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGrades/{assignmentId}",assignmentId));
+        	resultActions.andExpectAll(status().isNotFound(),
+                      jsonPath("$.message").value(message))
+              .andDo(print());
+        	verify(assignmentSubmitService).getGradesByAssinmentId(ArgumentMatchers.any(Long.class));
+        }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test to Get Grades by Student Id")
+        public void testGetGradesByStudentId() {        
+        	
+        	String studentId= "U04";
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getGradesByStudentId(studentId)).thenReturn(assignmentSubmitDTOList);
+        	
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGradesByStudentId/{studentId}",studentId));
+       	 	resultActions.andExpect(status().isOk())
+			.andDo(print())
+			.andExpect(jsonPath("$", hasSize(assignmentSubmitDTOList.size())));
+        	verify(assignmentSubmitService).getGradesByStudentId(studentId);
+        }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test for Get Grades if Student Id is not found")
+        public void testGetGradesByStudentId_notFound(){
+       
+        	String studentId= "U08";
+        	String message = "Grades for student with "+studentId+" not found";
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getGradesByStudentId(ArgumentMatchers.any(String.class))).thenThrow(new ResourceNotFoundException(message));
+             
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGradesByStudentId/{studentId}",studentId));
+        	resultActions.andExpectAll(status().isNotFound(),
+                      jsonPath("$.message").value(message))
+              .andDo(print());
+        	verify(assignmentSubmitService).getGradesByStudentId(ArgumentMatchers.any(String.class));
+        }
+        
+        
 
 }

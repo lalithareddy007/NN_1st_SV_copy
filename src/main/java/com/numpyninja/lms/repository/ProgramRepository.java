@@ -15,4 +15,6 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
 	
 	List<Program> findByProgramName ( String programName);
 
+	Optional<Program> findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(Long programId, String programStatus);
+
 }

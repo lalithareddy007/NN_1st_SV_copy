@@ -1,29 +1,24 @@
 package com.numpyninja.lms.services;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import com.numpyninja.lms.dto.UserAndRoleDTO;
-import com.numpyninja.lms.dto.UserDto;
-import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
-import com.numpyninja.lms.entity.Role;
-import com.numpyninja.lms.entity.User;
-import com.numpyninja.lms.entity.UserRoleMap;
+import com.numpyninja.lms.dto.*;
+import com.numpyninja.lms.entity.*;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
-import com.numpyninja.lms.repository.RoleRepository;
-import com.numpyninja.lms.repository.UserRepository;
-import com.numpyninja.lms.repository.UserRoleMapRepository;
+import com.numpyninja.lms.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServices {
@@ -39,6 +34,15 @@ public class UserServices {
 
 	@Autowired
 	UserMapper userMapper;
+
+	@Autowired
+	ProgramRepository programRepository;
+
+	@Autowired
+	ProgBatchRepository progBatchRepository;
+
+	@Autowired
+	UserRoleProgramBatchMapRepository userRoleProgramBatchMapRepository;
 
 	public List<UserDto> getAllUsers() {
 		return userMapper.userDtos(userRepository.findAll());
@@ -71,6 +75,7 @@ public class UserServices {
 		}).collect(Collectors.toList());
 	}
 
+	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
 			throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
@@ -183,33 +188,33 @@ public class UserServices {
 					toBeupdatedUser.setUserLinkedinUrl(updateuserDto.getUserLinkedinUrl());
 				else
 					toBeupdatedUser.setUserLinkedinUrl(userById.get().getUserLinkedinUrl());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserLocation()))
 					toBeupdatedUser.setUserLocation(updateuserDto.getUserLocation());
 				else
 					toBeupdatedUser.setUserLocation(userById.get().getUserLocation());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserEduPg()))
 					toBeupdatedUser.setUserEduPg(updateuserDto.getUserEduPg());
 				else
 					toBeupdatedUser.setUserEduPg(userById.get().getUserEduPg());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserEduUg()))
 					toBeupdatedUser.setUserEduUg(updateuserDto.getUserEduUg());
 				else
 					toBeupdatedUser.setUserEduUg(userById.get().getUserEduUg());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserComments()))
 					toBeupdatedUser.setUserComments(updateuserDto.getUserComments());
 				else
 					toBeupdatedUser.setUserComments(userById.get().getUserComments());
-				
+
 				if(StringUtils.hasLength(updateuserDto.getUserMiddleName()))
 					toBeupdatedUser.setUserMiddleName(updateuserDto.getUserMiddleName());
 				else
 					toBeupdatedUser.setUserMiddleName(userById.get().getUserMiddleName());
-				
-				
+
+
 				toBeupdatedUser.setUserId(userId);
 				toBeupdatedUser.setCreationTime(userById.get().getCreationTime());
 				toBeupdatedUser.setLastModTime(new Timestamp(utilDate.getTime()));
@@ -281,6 +286,130 @@ public class UserServices {
 			userRepository.deleteById(userId);
 		}
 		return userId;
+	}
+
+	private void validateUserRoleProgramBatchDtoForUser(UserRoleProgramBatchDto userRoleProgramBatchDto) {
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		Set<ConstraintViolation<UserRoleProgramBatchDto>> violations = validator.validate(userRoleProgramBatchDto);
+		StringBuffer sb = new StringBuffer();
+		violations.forEach(i -> {
+			sb.append(i.getMessage());
+			sb.append(" \n ");
+		});
+
+		if(StringUtils.hasLength(sb)){
+			throw new InvalidDataException(sb.toString());
+		}
+	}
+
+	private void assignUpdateUserRoleProgramBatch(User existingUser, Role existingUserRole, Program existingProgram,
+												  Batch existingBatch, UserRoleProgramBatchSlimDto dto) {
+		UserRoleProgramBatchMap userRoleProgramBatchMap;
+		Optional<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository
+				.findByUser_UserIdAndRoleRoleIdAndAndProgram_ProgramIdAndBatch_BatchId
+						(existingUser.getUserId(), existingUserRole.getRoleId(),
+								existingProgram.getProgramId(), existingBatch.getBatchId());
+		if (optionalMap.isEmpty()) {
+			// assign Program/Batch mapping to user
+			userRoleProgramBatchMap = userMapper.toUserRoleProgramBatchMap(dto);
+			userRoleProgramBatchMap.setUser(existingUser);
+			userRoleProgramBatchMap.setRole(existingUserRole);
+			userRoleProgramBatchMap.setProgram(existingProgram);
+			userRoleProgramBatchMap.setBatch(existingBatch);
+			userRoleProgramBatchMap.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
+			userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+		}
+		else {
+			// update existing Program/Batch mapping of user
+			userRoleProgramBatchMap = optionalMap.get();
+			userRoleProgramBatchMap.setUserRoleProgramBatchStatus(dto.getUserRoleProgramBatchStatus());
+			userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+		}
+		userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
+	}
+
+	public String assignUpdateUserRoleProgramBatchStatus(UserRoleProgramBatchDto userRoleProgramBatchDto,
+														 String userId) {
+
+		Boolean isBatchValid;
+		StringBuffer message = new StringBuffer();
+		String roleId = userRoleProgramBatchDto.getRoleId();
+		Long programId = userRoleProgramBatchDto.getProgramId();
+		List<UserRoleProgramBatchSlimDto> roleProgramBatchList = userRoleProgramBatchDto.getUserRoleProgramBatches();
+
+		validateUserRoleProgramBatchDtoForUser(userRoleProgramBatchDto);
+
+		User existingUser = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		Role existingUserRole = roleRepository.findById(roleId)
+				.orElseThrow(() -> new ResourceNotFoundException("Role", "Id", roleId));
+
+		boolean isPresentUserAndRole = userRoleMapRepository.
+				existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(userId, roleId,
+						"Active");
+		if (!isPresentUserAndRole) // Active User-Role mapping should be present
+			throw new ResourceNotFoundException("User", "Role", roleId);
+
+		// Active Program should be present
+		Program existingProgram = programRepository.findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(
+						programId, "Active")
+				.orElseThrow(() -> new ResourceNotFoundException("Program " + programId, "Program Status", "Active"));
+
+		// User with roleId 'R03' i.e. Student should be assigned to single program/batch
+		if (roleProgramBatchList.size() != 1 && "R03".equals(roleId))
+			throw new InvalidDataException("User with Role " + roleId + " can be assigned to single program/batch");
+
+		for(UserRoleProgramBatchSlimDto dto :  roleProgramBatchList) {
+			String dtoStatus = dto.getUserRoleProgramBatchStatus();
+
+			//Active Program-Batch mapping should be present
+			Integer batchId = dto.getBatchId();
+			Optional<Batch> optionalBatch = progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
+					(batchId, programId, "Active");
+
+			if(optionalBatch.isPresent())
+				isBatchValid = true;
+			else
+				isBatchValid = false;
+
+			if (isBatchValid) {
+				if ("R03".equals(roleId)) { // Validations only for Student users
+					/* Check for existing assigned program/batch with Active status for given user */
+					Optional<UserRoleProgramBatchMap> optionalExistingMap = userRoleProgramBatchMapRepository
+							.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
+									(userId, roleId, "Active");
+
+					if (optionalExistingMap.isPresent()) {
+						UserRoleProgramBatchMap existingMap = optionalExistingMap.get();
+						Long existingProgramId = existingMap.getProgram().getProgramId();
+						Integer existingBatchId = existingMap.getBatch().getBatchId();
+
+						/* Check whether received request for another program OR same program with another batch with Active status */
+						if ((existingProgramId != programId) || (existingBatchId != batchId && "Active".equalsIgnoreCase(dtoStatus)))
+							throw new InvalidDataException
+									("Please deactivate User from existing program/batch and then activate for another program/batch");
+						else
+							assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
+					}
+					else
+						assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
+				}
+				else
+					assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
+			}
+			else {
+				message.append(String.format("%s not found with %s : %s ","Batch " + batchId, "Batch Status", "Active"));
+				message.append(" \n ");
+			}
+		}
+		if (StringUtils.hasLength(message.toString())) {
+			if ("R03".equals(roleId))
+				throw new InvalidDataException(message.toString());
+			return "Partial Success for User with ID " + userId + " - " + message;
+		}
+
+		return "Success for User with ID " + userId;
 	}
 
 	/** Check for already existing phone number **/
@@ -454,6 +583,20 @@ public class UserServices {
 		}
 
 	}
+	
+	public List<Object> getAllStaff()
+	{
+		List<Object> result=userRepository.getAllStaffList();
+		if(!(result.size()<=0))
+		{
+			//return (userMapper.toUserStaffDTO(result));
+			return result;
+		}else
+		{
+			throw new ResourceNotFoundException("No staff data is available in database");
+		}
+	}
+
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {

@@ -1,5 +1,6 @@
 package com.numpyninja.lms.controller;
 
+import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.entity.AssignmentSubmit;
 import com.numpyninja.lms.services.AssignmentSubmitService;
@@ -16,7 +17,6 @@ import java.util.Map;
 @RequestMapping("/assignmentsubmission")
 public class AssignmentSubmitController {
 
-    //@Autowired
     private AssignmentSubmitService assignmentSubmitService;
 
     public AssignmentSubmitController(AssignmentSubmitService assignmentSubmitService) {
@@ -31,12 +31,12 @@ public class AssignmentSubmitController {
     }
 
     @PostMapping(path="", consumes="application/json", produces="application/json")
-    public ResponseEntity<AssignmentSubmitDTO> createSubmissions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
+    public ResponseEntity<AssignmentSubmitDTO> submitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
     {
-        AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.createSubmissions(assignmentSubmitDTO);
+        AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.submitAssignment(assignmentSubmitDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAssignSubmitDTO);
     }
-//<<<<<<< HEAD
+
     
    @GetMapping("/studentbatch/{batchid}")
     public ResponseEntity<List<AssignmentSubmitDTO>> getSubmissionsByBatch(@PathVariable Integer batchid) {
@@ -45,23 +45,48 @@ public class AssignmentSubmitController {
         return ResponseEntity.ok(submissionsListDTO);
     }
     
-    @GetMapping("/student")
+    @GetMapping("")
     public ResponseEntity<List<AssignmentSubmitDTO>> getAllSubmissions() {
        
     	List<AssignmentSubmitDTO> submissionsListDTO = assignmentSubmitService.getAllSubmissions();
         return ResponseEntity.ok(submissionsListDTO);
     }
-    
-//=======
+
 
     @PutMapping(path="/{id}", consumes="application/json", produces="application/json")
-    public ResponseEntity<AssignmentSubmitDTO> updateSubmissions( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
+    public ResponseEntity<AssignmentSubmitDTO> resubmitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                   @PathVariable Long id)
     {
-        AssignmentSubmitDTO updatedAssignSubmitDTO = assignmentSubmitService.updateSubmissions(assignmentSubmitDTO,id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(updatedAssignSubmitDTO);
+        AssignmentSubmitDTO updatedAssignSubmitDTO = assignmentSubmitService.resubmitAssignment(assignmentSubmitDTO,id);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedAssignSubmitDTO);
     }
-//>>>>>>> 1dc3168166591ef2fc65f4444209a622ec0900a0
+
+    @DeleteMapping(path="/{id}")
+    public ResponseEntity<ApiResponse> deleteSubmission(@PathVariable Long id)
+    {
+        assignmentSubmitService.deleteSubmissions(id);
+        return new ResponseEntity(new ApiResponse("Submission deleted successfully", true),HttpStatus.OK);
+    }
+    
+    @GetMapping("/getGrades/{assignmentId}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByAssignmentId(@PathVariable Long assignmentId)
+    {
+        List<AssignmentSubmitDTO> getListGradesAssignmentDTO = assignmentSubmitService.getGradesByAssinmentId((assignmentId));
+        return ResponseEntity.ok(getListGradesAssignmentDTO);
+    }
+    
+    @GetMapping("/getGradesByStudentId/{studentId}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByStudentId(@PathVariable String studentId){
+    	 List<AssignmentSubmitDTO> getListGradesAssignmentByStudentIdDTO = assignmentSubmitService.getGradesByStudentId(studentId);
+         return ResponseEntity.ok(getListGradesAssignmentByStudentIdDTO);
+    }
+
+    @PutMapping(path="/gradesubmission/{submissionId}",consumes="application/json", produces="application/json" )
+    public ResponseEntity<AssignmentSubmitDTO> gradeAssignmentSubmission(@RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
+                                                                     @PathVariable Long submissionId){
+        AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitService.gradeAssignmentSubmission(assignmentSubmitDTO,submissionId);
+        return ResponseEntity.status(HttpStatus.OK).body(gradedSubmissionDTO);
+    }
 
 
    @GetMapping("/grades/{batchId}")
@@ -70,6 +95,7 @@ public class AssignmentSubmitController {
         return ResponseEntity.ok(assignmentSubmitDTOs);
     }
     
+
 }
 
 
