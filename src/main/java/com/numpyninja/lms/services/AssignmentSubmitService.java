@@ -287,7 +287,31 @@ public class AssignmentSubmitService {
         AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitMapper.toAssignmentSubmitDTO(updatedAssignmentSubmit);
         return gradedSubmissionDTO;
     }
-    	
 
+
+    public List<AssignmentSubmitDTO> getGradesByBatchId(Integer batchId) {
+        List<AssignmentSubmit> assignmentSubmits = assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchId);
+        List<AssignmentSubmitDTO> assignmentSubmitDTOs = new ArrayList<>();
+
+        for (AssignmentSubmit assignmentSubmit : assignmentSubmits) {
+            AssignmentSubmitDTO assignmentSubmitDTO = new AssignmentSubmitDTO();
+            assignmentSubmitDTO.setSubmissionId(assignmentSubmit.getSubmissionId());
+            assignmentSubmitDTO.setAssignmentId(assignmentSubmit.getAssignment().getAssignmentId());
+            assignmentSubmitDTO.setUserId(assignmentSubmit.getUser().getUserId());
+            assignmentSubmitDTO.setGrade(assignmentSubmit.getGrade());
+            assignmentSubmitDTO.setGradedDateTime(assignmentSubmit.getGradedDateTime());
+            assignmentSubmitDTO.setSubComments(assignmentSubmit.getSubComments());
+            assignmentSubmitDTO.setSubDesc(assignmentSubmit.getSubDesc());
+            assignmentSubmitDTO.setSubDateTime(assignmentSubmit.getSubDateTime());
+            assignmentSubmitDTO.setGradedBy(assignmentSubmit.getGradedBy());
+
+            assignmentSubmitDTOs.add(assignmentSubmitDTO);
+        }
+
+        return assignmentSubmitDTOs;
+
+
+
+    }
     
 }
