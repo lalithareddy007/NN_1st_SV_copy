@@ -17,8 +17,10 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AssignmentSubmitService {
@@ -33,7 +35,6 @@ public class AssignmentSubmitService {
 
     public AssignmentSubmitMapper assignmentSubmitMapper;
 
-
     private final int DEFAULT_GRADE = -1;
     
    // @Autowired
@@ -43,8 +44,6 @@ public class AssignmentSubmitService {
                                    AssignmentRepository assignmentRepository,
                                    UserRepository userRepository,
                                    AssignmentSubmitMapper assignmentSubmitMapper,
-
-
                                   ProgBatchRepository batchRepository,
                                    UserRoleMapRepository userRoleMapRepository
                                   ){
@@ -52,16 +51,14 @@ public class AssignmentSubmitService {
         this.assignmentRepository = assignmentRepository;
         this.userRepository = userRepository;
         this.assignmentSubmitMapper = assignmentSubmitMapper;
-
        this.batchRepository = batchRepository;
        this.userRoleMapRepository = userRoleMapRepository;
-
     }
 
-    public List<AssignmentSubmitDTO> getSubmissionsByUserID(String userId) {
+    public List<AssignmentSubmitDTO> getSubmissionsByUserID(String userId){
 
         if (!userRepository.existsById(userId))
-            throw new ResourceNotFoundException("User", "UserID", userId);
+            throw new ResourceNotFoundException("User","UserID",userId);
 
         List<AssignmentSubmit> assignmentSubmitList = assignmentSubmitRepository.findByUser_userId(userId);
         List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
@@ -73,12 +70,11 @@ public class AssignmentSubmitService {
         validateAssignmentSubmitDTO(assignmentSubmitDTO);
 
         String studentId = assignmentSubmitDTO.getUserId();
-        if (!userRepository.existsById(studentId))
-            throw (new ResourceNotFoundException("Student", "ID", studentId));
+        if(!userRepository.existsById(studentId))
+                throw (new ResourceNotFoundException("Student","ID",studentId));
 
         Long assignmentId = assignmentSubmitDTO.getAssignmentId();
 
-    
         /**
          * Assignment cannot be submitted post assignment due date
          */
@@ -93,7 +89,6 @@ public class AssignmentSubmitService {
                                     .findByStudentIdAndAssignmentId(studentId,assignmentId)).get();
 
         if(!assignmentSubmitList.get().isEmpty()) {
-
             throw (new DuplicateResourceFoundException("Assignment with ID " + assignmentId + " already submitted by student " + studentId
                     + ". Please visit 'Submissions' to resubmit assignment!"));
         }
@@ -116,54 +111,18 @@ public class AssignmentSubmitService {
         return createdAssignmentSubmitDTO;
     }
 
-    private void validateAssignmentSubmitDTO(AssignmentSubmitDTO assignmentSubmitDTO) {
+    private void validateAssignmentSubmitDTO(AssignmentSubmitDTO assignmentSubmitDTO){
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<AssignmentSubmitDTO>> violationSet = validator.validate(assignmentSubmitDTO);
         StringBuffer sb = new StringBuffer();
-        violationSet.forEach(a -> {
+        violationSet.forEach(a->{
             sb.append(a.getMessage());
             sb.append("\n ");
         });
-        if (StringUtils.hasLength(sb)) {
+        if(StringUtils.hasLength(sb)){
             throw new InvalidDataException(sb.toString());
         }
     }
-
-    public List<AssignmentSubmitDTO> getAllSubmissions() {
-
-        List<AssignmentSubmit> assignmentSubmit = this.assignmentSubmitRepository.findAll();
-
-        List<AssignmentSubmitDTO> assignmentSubmitDto = assignmentSubmitMapper.toAssignmentSubmitDTOList(assignmentSubmit);
-        return assignmentSubmitDto;
-
-    }
-
-    //get submissions by batchid
-    public List<AssignmentSubmitDTO> getSubmissionsByBatch(Integer batchid) {
-
-        List<AssignmentSubmit> assignmentsubmitList = new ArrayList<AssignmentSubmit>();
-
-        List<AssignmentSubmit> assignmentsubmits = this.assignmentSubmitRepository.findAll();
-
-        assignmentsubmits.forEach((as) -> {
-            Assignment assignment2 = as.getAssignment();
-            Integer bid = assignment2.getBatch().getBatchId();
-            if (bid == batchid)
-                assignmentsubmitList.add(as);
-        });
-
-        List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
-                .toAssignmentSubmitDTOList(assignmentsubmitList);
-        return assignmentSubmitDTOs;
-
-    }
-
-
-
-    public AssignmentSubmitDTO updateSubmissions(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId) {
-        AssignmentSubmit savedAssignmentSubmit = assignmentSubmitRepository.findById(submissionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Submission", "Submission ID", submissionId));
-
 
     
     public List<AssignmentSubmitDTO> getAllSubmissions(){
@@ -208,18 +167,16 @@ public class AssignmentSubmitService {
         /**
         Assignment should only be resubmitted by the same student
          */
-        if (!studentId.equals(savedAssignmentSubmit.getUser().getUserId()))
-            throw new InvalidDataException("Student with given ID " + studentId + " cannot submit this assignment");
-
+        if(!studentId.equals(savedAssignmentSubmit.getUser().getUserId()))
+            throw new InvalidDataException("Student with given ID "+studentId+ " cannot submit this assignment");
 
         Long assignmentId = assignmentSubmitDTO.getAssignmentId();
 
         /**
         Assignment ID should not change during resubmission
          */
-        if (assignmentId != savedAssignmentSubmit.getAssignment().getAssignmentId())
-            throw new InvalidDataException("Assignment with ID " + assignmentId + " is not part of this submission");
-
+        if(assignmentId!=savedAssignmentSubmit.getAssignment().getAssignmentId())
+            throw new InvalidDataException("Assignment with ID " +assignmentId+" is not part of this submission");
 
         /**
          * Assignment cannot be resubmitted post assignment due date
@@ -236,7 +193,7 @@ public class AssignmentSubmitService {
         Submission description should not change during resubmission
 
         String submissionDesc = assignmentSubmitDTO.getSubDesc();
-        if (!submissionDesc.equals(savedAssignmentSubmit.getSubDesc()))
+        if(!submissionDesc.equals(savedAssignmentSubmit.getSubDesc()))
             throw new InvalidDataException("Submission Descrition does not match!");
         */
         AssignmentSubmit assignmentSubmit = assignmentSubmitMapper.toAssignmentSubmit(assignmentSubmitDTO);
@@ -257,34 +214,6 @@ public class AssignmentSubmitService {
         AssignmentSubmitDTO updatedAssignmentSubmitDTO = assignmentSubmitMapper.toAssignmentSubmitDTO(updatedAssignmentSubmit);
         return updatedAssignmentSubmitDTO;
     }
-
-
-
-    public List<AssignmentSubmitDTO> getGradesByBatchId(Integer batchId) {
-         List<AssignmentSubmit> assignmentSubmits = assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchId);
-         List<AssignmentSubmitDTO> assignmentSubmitDTOs = new ArrayList<>();
-
-         for (AssignmentSubmit assignmentSubmit : assignmentSubmits) {
-             AssignmentSubmitDTO assignmentSubmitDTO = new AssignmentSubmitDTO();
-             assignmentSubmitDTO.setSubmissionId(assignmentSubmit.getSubmissionId());
-             assignmentSubmitDTO.setAssignmentId(assignmentSubmit.getAssignment().getAssignmentId());
-             assignmentSubmitDTO.setUserId(assignmentSubmit.getUser().getUserId());
-             assignmentSubmitDTO.setGrade(assignmentSubmit.getGrade());
-             assignmentSubmitDTO.setGradedDateTime(assignmentSubmit.getGradedDateTime());
-             assignmentSubmitDTO.setSubComments(assignmentSubmit.getSubComments());
-             assignmentSubmitDTO.setSubDesc(assignmentSubmit.getSubDesc());
-             assignmentSubmitDTO.setSubDateTime(assignmentSubmit.getSubDateTime());
-             assignmentSubmitDTO.setGradedBy(assignmentSubmit.getGradedBy());
-
-            assignmentSubmitDTOs.add(assignmentSubmitDTO);
-         }
-
-         return assignmentSubmitDTOs;
-
-
-
-     }}
-
 
     public void deleteSubmissions(Long submissionID){
         if(assignmentSubmitRepository.existsById(submissionID))
@@ -362,4 +291,3 @@ public class AssignmentSubmitService {
 
     
 }
-
