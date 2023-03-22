@@ -156,8 +156,4 @@ public class AssignmentService {
 			throw new ResourceNotFoundException("Assignments", "BatchId", batchId);
 		return assignmentMapper.toAssignmentDtoList(assignments);
 	}
-
 }
-
-
-

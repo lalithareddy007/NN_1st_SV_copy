@@ -18,7 +18,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 	public Optional<Assignment> findByAssignmentName(String assignmentName);
 	
 	public List<Assignment> findByBatch(Batch batch);
-
-
+	
 	
 }
