@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface ProgramRepository extends JpaRepository<Program, Long> {
 
-    //List<Program> findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(String programName);
+    List<Program> findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(String programName);
 	
 	List<Program> findByProgramName ( String programName);
 

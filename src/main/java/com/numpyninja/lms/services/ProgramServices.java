@@ -69,7 +69,7 @@ public class ProgramServices {
 		newProgramEntity.setCreationTime(timestamp);
 		newProgramEntity.setLastModTime(timestamp);
 
-		List<Program>result= programRepository.findByProgramName(newProgramEntity.getProgramName());
+		List<Program>result= programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(newProgramEntity.getProgramName());
 		if(result.size()>0) {
 			throw new DuplicateResourceFoundException("cannot create program , since already exists");
 		}else {

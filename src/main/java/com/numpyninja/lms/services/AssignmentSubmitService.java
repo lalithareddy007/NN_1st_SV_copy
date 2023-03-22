@@ -3,16 +3,12 @@ package com.numpyninja.lms.services;
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.AssignmentSubmit;
-import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
-import com.numpyninja.lms.repository.AssignmentRepository;
-import com.numpyninja.lms.repository.AssignmentSubmitRepository;
-import com.numpyninja.lms.repository.ProgBatchRepository;
-import com.numpyninja.lms.repository.UserRepository;
+import com.numpyninja.lms.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -33,6 +29,8 @@ public class AssignmentSubmitService {
 
     public UserRepository userRepository;
 
+    public UserRoleMapRepository userRoleMapRepository;
+
     public AssignmentRepository assignmentRepository;
 
     public AssignmentSubmitMapper assignmentSubmitMapper;
@@ -46,13 +44,15 @@ public class AssignmentSubmitService {
                                    AssignmentRepository assignmentRepository,
                                    UserRepository userRepository,
                                    AssignmentSubmitMapper assignmentSubmitMapper,
-                                  ProgBatchRepository batchRepository
+                                  ProgBatchRepository batchRepository,
+                                   UserRoleMapRepository userRoleMapRepository
                                   ){
         this.assignmentSubmitRepository = assignmentSubmitRepository;
         this.assignmentRepository = assignmentRepository;
         this.userRepository = userRepository;
         this.assignmentSubmitMapper = assignmentSubmitMapper;
        this.batchRepository = batchRepository;
+       this.userRoleMapRepository = userRoleMapRepository;
     }
 
     public List<AssignmentSubmitDTO> getSubmissionsByUserID(String userId){
@@ -66,7 +66,7 @@ public class AssignmentSubmitService {
         return assignmentSubmitDTOs;
     }
 
-    public AssignmentSubmitDTO createSubmissions(AssignmentSubmitDTO assignmentSubmitDTO) {
+    public AssignmentSubmitDTO submitAssignment(AssignmentSubmitDTO assignmentSubmitDTO) {
         validateAssignmentSubmitDTO(assignmentSubmitDTO);
 
         String studentId = assignmentSubmitDTO.getUserId();
@@ -76,7 +76,7 @@ public class AssignmentSubmitService {
         Long assignmentId = assignmentSubmitDTO.getAssignmentId();
 
         /**
-         * Assignment cannot be resubmitted post assignment due date
+         * Assignment cannot be submitted post assignment due date
          */
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Assignment", "ID", assignmentId));
@@ -157,9 +157,9 @@ public class AssignmentSubmitService {
     } 
 
 
-    public AssignmentSubmitDTO updateSubmissions(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId) {
-        AssignmentSubmit savedAssignmentSubmit = assignmentSubmitRepository.findById(submissionId)
-                        .orElseThrow(() ->new ResourceNotFoundException("Submission","Submission ID",submissionId));
+    public AssignmentSubmitDTO resubmitAssignment(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId) {
+        AssignmentSubmit savedAssignmentSubmit = this.assignmentSubmitRepository.findById(submissionId)
+                        .orElseThrow(() ->new ResourceNotFoundException("Submission","ID",submissionId));
 
         validateAssignmentSubmitDTO(assignmentSubmitDTO);
 
@@ -244,7 +244,74 @@ public class AssignmentSubmitService {
      		throw new ResourceNotFoundException("Assignments with grades are not available for Student ID : "+studentId);
      	}
     }
-    	
-    	
+
+    public AssignmentSubmitDTO gradeAssignmentSubmission(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId){
+        AssignmentSubmit savedAssignmentSubmit = this.assignmentSubmitRepository.findById(submissionId)
+                        .orElseThrow(() ->new ResourceNotFoundException("Submission", "ID", submissionId));
+
+        int gradeValue = assignmentSubmitDTO.getGrade();
+        if( gradeValue < 0 )
+            throw new InvalidDataException("Valid Grade value is mandatory!");
+
+        String gradedBy = assignmentSubmitDTO.getGradedBy();
+        if(gradedBy==null || gradedBy.isEmpty())
+            throw new InvalidDataException("Grader information mandatory!");
+        else if(!userRepository.existsById(gradedBy))
+            throw new ResourceNotFoundException("Grader", "ID", gradedBy);
+        else if(userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase(
+                gradedBy,"R03","Active").isEmpty())
+            throw new InvalidDataException("User "+gradedBy+" is not allowed to grade the submission");
+
+        /**
+         * Front-end should not allow grading user to change the following info
+         * assignment,user/student Id, submission desc or the submitted assignments
+         */
+
+
+        /**
+         *  if grader provides comments, keep them or else, save the user comments.
+         */
+        String subComments = assignmentSubmitDTO.getSubComments();
+        if(subComments!=null && !subComments.trim().isEmpty())
+            savedAssignmentSubmit.setSubComments(subComments);
+
+        savedAssignmentSubmit.setGrade(gradeValue);
+        savedAssignmentSubmit.setGradedBy(gradedBy);
+
+        Timestamp presentDateTime = Timestamp.valueOf(LocalDateTime.now());
+        savedAssignmentSubmit.setLastModTime(presentDateTime);
+        savedAssignmentSubmit.setGradedDateTime(presentDateTime);
+
+        AssignmentSubmit updatedAssignmentSubmit = assignmentSubmitRepository.save(savedAssignmentSubmit);
+
+        AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitMapper.toAssignmentSubmitDTO(updatedAssignmentSubmit);
+        return gradedSubmissionDTO;
+    }
+
+
+    public List<AssignmentSubmitDTO> getGradesByBatchId(Integer batchId) {
+        List<AssignmentSubmit> assignmentSubmits = assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchId);
+        List<AssignmentSubmitDTO> assignmentSubmitDTOs = new ArrayList<>();
+
+        for (AssignmentSubmit assignmentSubmit : assignmentSubmits) {
+            AssignmentSubmitDTO assignmentSubmitDTO = new AssignmentSubmitDTO();
+            assignmentSubmitDTO.setSubmissionId(assignmentSubmit.getSubmissionId());
+            assignmentSubmitDTO.setAssignmentId(assignmentSubmit.getAssignment().getAssignmentId());
+            assignmentSubmitDTO.setUserId(assignmentSubmit.getUser().getUserId());
+            assignmentSubmitDTO.setGrade(assignmentSubmit.getGrade());
+            assignmentSubmitDTO.setGradedDateTime(assignmentSubmit.getGradedDateTime());
+            assignmentSubmitDTO.setSubComments(assignmentSubmit.getSubComments());
+            assignmentSubmitDTO.setSubDesc(assignmentSubmit.getSubDesc());
+            assignmentSubmitDTO.setSubDateTime(assignmentSubmit.getSubDateTime());
+            assignmentSubmitDTO.setGradedBy(assignmentSubmit.getGradedBy());
+
+            assignmentSubmitDTOs.add(assignmentSubmitDTO);
+        }
+
+        return assignmentSubmitDTOs;
+
+
+
+    }
     
 }

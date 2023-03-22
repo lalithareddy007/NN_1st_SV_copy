@@ -110,7 +110,10 @@ public class ClassService {
 
 	public ClassDto createClass(ClassDto newClassDto) throws DuplicateResourceFoundException
 	{
-
+// Check for duplicate class Topic
+		if (classRepository.existsByClassTopicIgnoreCase(newClassDto.getClassTopic())) {
+			throw new DuplicateResourceFoundException("Class", " Class Topic", newClassDto.getClassTopic());
+		}
 
 		int batchId = newClassDto.getBatchId();
 		String staffId = newClassDto.getClassStaffId();
