@@ -86,4 +86,10 @@ public class AssignmentSubmitController {
         AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitService.gradeAssignmentSubmission(assignmentSubmitDTO,submissionId);
         return ResponseEntity.status(HttpStatus.OK).body(gradedSubmissionDTO);
     }
+    @GetMapping("/grades/{batchId}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByBatchId(@PathVariable Integer batchId) {
+        List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitService.getGradesByBatchId(batchId);
+        return ResponseEntity.ok(assignmentSubmitDTOs);
+    }
+
 }
