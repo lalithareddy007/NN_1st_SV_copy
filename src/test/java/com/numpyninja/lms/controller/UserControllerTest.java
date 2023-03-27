@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.sql.Timestamp;
@@ -27,6 +28,9 @@ import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -96,7 +100,7 @@ public class UserControllerTest {
 				List.of(new UserRoleProgramBatchSlimDto(2, "Active"),
 						new UserRoleProgramBatchSlimDto(5, "Active"));
 		mockUserRoleProgramBatchDto2 = UserRoleProgramBatchDto.builder().roleId("R02").programId(2L)
-				.userRoleProgramBatches(mockUserRoleProgramBatches).build();
+				.userRoleProgramBatches(mockUserRoleProgramBatches2).build();
 
 	}
 
@@ -166,7 +170,7 @@ public class UserControllerTest {
 				"www.linkedin.com/Ramanujan1234", "MCA", "MBA", "Indian scientist", "H1B");
 
 		//given
-		given(userService.createUserWithRole(ArgumentMatchers.any(UserAndRoleDTO.class))).willReturn(mockUserDto1);
+		given(userService.createUserWithRole(any(UserAndRoleDTO.class))).willReturn(mockUserDto1);
 
 		//when
 		ResultActions response = mockMvc.perform(post("/users/roleStatus")
@@ -189,8 +193,8 @@ public class UserControllerTest {
 		UserDto updatedUserDTO = mockUserDto;
 		updatedUserDTO.setUserTimeZone("EST");
 		updatedUserDTO.setUserMiddleName("J");
-		given(userService.updateUser(ArgumentMatchers.any(UserDto.class),
-				ArgumentMatchers.any(String.class)))
+		given(userService.updateUser(any(UserDto.class),
+				any(String.class)))
 				.willReturn(updatedUserDTO);
 
 		ResultActions  response = mockMvc.perform(put("/users/{userId}",userId)
@@ -216,8 +220,8 @@ public class UserControllerTest {
 		UserDto updatedUserDTO = mockUserDto;
 		updatedUserDTO.setUserTimeZone("EST");
 		updatedUserDTO.setUserMiddleName("J");
-		given(userService.updateUser(ArgumentMatchers.any(UserDto.class),
-				ArgumentMatchers.any(String.class)))
+		given(userService.updateUser(any(UserDto.class),
+				any(String.class)))
 				.willThrow(new ResourceNotFoundException(message));
 
 		ResultActions  response = mockMvc.perform(put("/users/{userId}",userId)
@@ -254,8 +258,8 @@ public class UserControllerTest {
 		updatedUserRoleMapSLimDto.setRoleId("RO2");
 		updatedUserRoleMapSLimDto.setUserRoleStatus("InActive");
 
-		given(userService.updateUserRoleStatus(ArgumentMatchers.any(UserRoleMapSlimDTO.class),
-				ArgumentMatchers.any(String.class))).willReturn(userId);
+		given(userService.updateUserRoleStatus(any(UserRoleMapSlimDTO.class),
+				any(String.class))).willReturn(userId);
 
 		ResultActions response = mockMvc.perform(put("/users/roleStatus/{userId}",userId)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -270,33 +274,39 @@ public class UserControllerTest {
 	@Test
 	public void testAssignUpdateUserRoleProgramBatchStatusForStudent() {
 		String userId = "U07";
-		String response = "Success for User with ID " + userId;
+		String expectedResponse = "User " + userId + " has been successfully assigned to Program/Batch(es)";
 
-		when(userService.assignUpdateUserRoleProgramBatchStatus(mockUserRoleProgramBatchDto, userId))
-				.thenReturn(response);
+		when(userService.assignUpdateUserRoleProgramBatchStatus(any(UserRoleProgramBatchDto.class), eq(userId)))
+				.thenReturn(expectedResponse);
 
 		ResultActions resultActions = mockMvc.perform((put("/users/roleProgramBatchStatus/{userId}", userId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(mockUserRoleProgramBatchDto))));
 
-		resultActions.andExpect(status().isOk()).andDo(print());
+		MvcResult result = resultActions.andExpect(status().isOk()).andDo(print()).andReturn();
+		String response = result.getResponse().getContentAsString();
+
+		assertEquals(expectedResponse, response);
 	}
 
 	@DisplayName("test to assign/update program/batches to Staff")
 	@SneakyThrows
 	@Test
 	public void testAssignUpdateUserRoleProgramBatchStatusForStaff() {
-		String userId = "U02";
-		String response = "Success for User with ID " + userId;
+		String userId = "U09";
+		String expectedResponse = "User " + userId + " has been successfully assigned to Program/Batch(es)";
 
-		when(userService.assignUpdateUserRoleProgramBatchStatus(mockUserRoleProgramBatchDto2, userId))
-				.thenReturn(response);
+		when(userService.assignUpdateUserRoleProgramBatchStatus(any(UserRoleProgramBatchDto.class), eq(userId)))
+				.thenReturn(expectedResponse);
 
 		ResultActions resultActions = mockMvc.perform((put("/users/roleProgramBatchStatus/{userId}", userId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(mockUserRoleProgramBatchDto2))));
 
-		resultActions.andExpect(status().isOk()).andDo(print());
+		MvcResult result = resultActions.andExpect(status().isOk()).andDo(print()).andReturn();
+		String response = result.getResponse().getContentAsString();
+
+		assertEquals(expectedResponse, response);
 	}
 
 }

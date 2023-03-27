@@ -24,6 +24,7 @@ class ProgramRepositoryTest {
     
 	@DisplayName("JUnit test for get Programs by ProgramName ") 
 	@Test
+	@Order(2)
 	void givenProgramName_WhenFindPrograms_ReturnProgramObjects() {
 	//given
 		String programName = "SDET";
@@ -67,13 +68,14 @@ class ProgramRepositoryTest {
 
 	@DisplayName("test to get program by Id and Status")
 	@Test
+	@Order(3)
 	public void testFindProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase() {
 		Program program = new Program(1L, "SDET", "SDET Training",
 				"Active", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
 		programRepository.save(program);
 
 		Optional<Program> optionalProgram = programRepository
-				.findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(1L, "active");
+				.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(1L, "active");
 
 		assertThat(optionalProgram).isNotEmpty();
 	}

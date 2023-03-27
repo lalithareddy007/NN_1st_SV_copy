@@ -60,7 +60,7 @@ public class UserRoleProgramBatchMapRepositoryTest {
         userRoleProgramBatchMapRepository.save(mockUserRoleProgramBatchMap);
 
         Optional<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository
-                .findByUser_UserIdAndRoleRoleIdAndAndProgram_ProgramIdAndBatch_BatchId
+                .findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId
                         ("U07", "R03", 1L, 1);
 
         assertThat(optionalMap).isNotEmpty();

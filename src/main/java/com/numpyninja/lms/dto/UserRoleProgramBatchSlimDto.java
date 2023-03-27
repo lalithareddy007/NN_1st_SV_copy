@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
@@ -22,6 +23,8 @@ public class UserRoleProgramBatchSlimDto {
     private Integer batchId;
 
     @NotEmpty(message = "User-Role-Program-Batch Status is Mandatory")
+    @Pattern(regexp = "active|inactive", flags = Pattern.Flag.CASE_INSENSITIVE,
+            message = "User-Role-Program-Batch Status can be Active or Inactive")
     @JsonProperty("userRoleProgramBatchStatus")
     private String userRoleProgramBatchStatus;
 
