@@ -89,7 +89,8 @@ public class ProgramServiceTest {
     public void testForCreatingProgram(){
     //given
         when(programMapper.toProgramEntity(programDto1)).thenReturn(program1);
-    when(programRepository.findByProgramName(program1.getProgramName())).thenReturn(Collections.emptyList());
+    when(programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(program1.getProgramName()))
+            .thenReturn(Collections.emptyList());
     when(programRepository.save(program1)).thenReturn(program1);
     //when
     ProgramDTO savedProgramDTO=programServices.createAndSaveProgram(programDto1);
@@ -104,13 +105,14 @@ public class ProgramServiceTest {
         //given
         String message="cannot create program , since already exists";
         when(programMapper.toProgramEntity(programDto1)).thenReturn(program1);
-        when(programRepository.findByProgramName(program1.getProgramName())).thenReturn(programList);
+        when(programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(program1.getProgramName()))
+                .thenReturn(programList);
         //when
         Exception e = assertThrows(DuplicateResourceFoundException.class, () -> programServices.createAndSaveProgram(programDto1));
         //then
         assertEquals(message, e.getMessage());
         verify(programMapper).toProgramEntity(programDto1);
-        verify(programRepository).findByProgramName(program1.getProgramName());
+        verify(programRepository).findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(program1.getProgramName());
 
     }
 

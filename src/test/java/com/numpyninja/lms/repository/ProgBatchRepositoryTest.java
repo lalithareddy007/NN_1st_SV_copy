@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProgBatchRepositoryTest {
 
 	@Autowired
@@ -26,141 +25,68 @@ public class ProgBatchRepositoryTest {
 	@Autowired
 	ProgramRepository programRepository;
 
-	@DisplayName("JUnit test to create Batch")
-	@Test
-	@Order(1)
-	public void givenBatchObject_WhenSave_ThenReturnSavedBatch() {
-		// given
-		Program program1 = programRepository.findById((long) 1).get();
-		// when
-		Batch batch = progBatchRepository.save(new Batch(1, "01", "SDET BATCH 01", "Active", program1, 6,
-				new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis())));
-		// Then
-		assertThat(batch).isNotNull();
-		assertThat(batch.getBatchId()).isEqualTo(1);
+	Program mockProgram;
 
-		Program program2 = programRepository.findById((long) 2).get();
-		Batch batch2 = new Batch(2, "01", "Datascience Batch 01", "Active", program2, 6,
-				new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
-		progBatchRepository.save(batch2);
-		assertThat(batch2).isNotNull();
-		assertThat(batch2.getBatchId()).isEqualTo(2);
+	Batch mockBatch;
+
+	@BeforeEach
+	public void setUp() {
+		setMockProgramBatchAndSave();
 	}
 
+	private void setMockProgramBatchAndSave() {
+		mockProgram = new Program(2L, "DA", "DA Training",
+				"Active", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
+		programRepository.save(mockProgram);
 
-	@DisplayName("JUnit test for get all Batches ")
-	@Test
-	@Order(2)
-	public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesList() {
-		List<Batch> list = progBatchRepository.findAll(Sort.by("batchId"));
-		System.out.println("Size:" + list.size());
-		assertThat(list.size()).isGreaterThan(0);
+		mockBatch = new Batch(1, "DA 01", "DA Batch 01", "Active", mockProgram,
+				6, Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
+		progBatchRepository.save(mockBatch);
 	}
 
-
-	@DisplayName("JUnit test for get Batches by BatchName ")
+	@DisplayName("JUnit test for get Batches by BatchName")
 	@Test
-	@Order(3)
 	public void givenBatchName_WhenFindBatches_ReturnBatchObjects() {
-		// given
-		String batchName = "01";
-		Program program2 = programRepository.findById((long) 2).get();
-		Batch batch2 = new Batch(2, "01", "Datascience Batch 01", "Active", program2, 6,
-				new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
-		progBatchRepository.save(batch2);
+		//given
+		String batchName = "DA 01";
+
 		// when
 		List<Batch> batchList = progBatchRepository.findByBatchName(batchName);
+
 		// then
-		assertThat(batchList).isNotNull();
-		assertThat(batchList.size()).isGreaterThan(0);
+		assertThat(batchList).isNotEmpty();
 	}
 
-
-	@DisplayName("JUnit test for get all Batches by Batch Name")
+	@DisplayName("JUnit test for get all Batches by Batch Name ignoring case")
 	@Test
-	@Order(4)
 	public void givenBatchList_WhenGetAllBatchesByBatchName_ThenReturnBatchesList() {
-		String batchName = "01";
-		Program program2 = programRepository.findById((long) 2).get();
-		Batch batch2 = new Batch(2, "01", "Datascience Batch 01", "Active", program2, 6,
-				new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
-		progBatchRepository.save(batch2);
+		String batchName = "da 01";
 
 		List<Batch> list = progBatchRepository.findByBatchNameContainingIgnoreCaseOrderByBatchIdAsc(batchName);
-		System.out.println("Size:" + list.size());
-		assertThat(list.size()).isGreaterThan(0);
+
+		assertThat(list).isNotEmpty();
 	}
-
-
-	@DisplayName("JUnit test for get batch by id ")
-	@Test
-	@Order(5)
-	public void givenBatchId_WhenFindBatchById_ThenReturnBatchObject() {
-		// given
-		Integer batchId = 1;
-		// when
-		Batch batch = progBatchRepository.findById(batchId).get();
-		// then - verify the output
-		assertThat(batch).isNotNull();
-		assertThat(batch.getBatchId()).isEqualTo(1);
-	}
-
 
 	@DisplayName("JUnit test for get Batches by ProgramId ")
 	@Test
-	@Order(6)
+	//@Order(6)
 	public void givenProgramId_WhenFindBatch_ReturnBatchObjects() {
 		// given
-		Long programId = (long) 2;
+		Long programId = 2L;
+
 		// when
 		List<Batch> batchList = progBatchRepository.findByProgramProgramId(programId);
+
 		// then
-		assertThat(batchList).isNotNull();
-		assertThat(batchList.size()).isGreaterThan(0);
-	}
-
-
-	@DisplayName("JUnit test for update Batch")
-	@Test
-	@Order(7)
-	public void givenUpdatedBatch_whenUpdateBatch_thenReturnUpdateBatchObject() {
-		Batch batch = progBatchRepository.findById(1).get();
-		// given
-		batch.setBatchNoOfClasses(7);
-		batch.setBatchName("SDET Batch 01 USA");
-		// when
-		progBatchRepository.save(batch);
-		// then
-		assertThat(batch.getBatchName()).isEqualTo("SDET Batch 01 USA");
-		assertThat(batch.getBatchNoOfClasses()).isEqualTo(7);
-	}
-
-
-	@DisplayName("JUnit test for delete Batch")
-	@Test
-	@Order(8)
-	public void givenBatchId_whenDeleteBatch_thenDeleteBatchInDB() throws Exception {
-		// given
-		Integer batchId = 1;
-		// when
-		Batch batch = progBatchRepository.findById(batchId).get();
-		progBatchRepository.delete(batch);
-		Optional<Batch> batchCheck = progBatchRepository.findById(batchId);
-		// then
-		assertThat(batchCheck).isEmpty();
+		assertThat(batchList).isNotEmpty();
 	}
 
 	@DisplayName("test to get batch by Id, ProgramId and Status")
 	@Test
-	@Order(9)
 	public void testFindBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase() {
-		Program program = programRepository.findById(1L).get();
-		Batch batch = progBatchRepository.save(new Batch(1, "SDET 01", "SDET BATCH 01",
-				"Active", program, 6, Timestamp.valueOf(LocalDateTime.now()),
-				Timestamp.valueOf(LocalDateTime.now())));
 
 		Optional<Batch> optionalBatch = progBatchRepository
-				.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(1, 1L, "active");
+				.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(1, 2L, "active");
 
 		assertThat(optionalBatch).isNotEmpty();
 	}

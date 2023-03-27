@@ -16,64 +16,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProgramRepositoryTest {
 	
 	@Autowired
 	ProgramRepository programRepository;
-    
-	@DisplayName("JUnit test for get Programs by ProgramName ") 
-	@Test
-	@Order(2)
-	void givenProgramName_WhenFindPrograms_ReturnProgramObjects() {
-	//given
-		String programName = "SDET";
-		LocalDateTime now= LocalDateTime.now();
-		Timestamp timestamp= Timestamp.valueOf(now);
-		Program program = new Program((long) 1,"SDET"," ", "Active",timestamp, timestamp);
-		programRepository.save(program);
-		
-	//when
-		List<Program> programList= programRepository.findByProgramName(programName);
-		
-	//then
-		
-		assertThat(programList).isNotNull();
-		assertThat(programList.size()).isGreaterThan(0);
+
+	Program mockProgram;
+
+	@BeforeEach
+	public void setUp() {
+		setMockProgramAndSave();
 	}
 
-	
-	
-	@DisplayName("JUnit test to create Program")
+	private void setMockProgramAndSave() {
+		mockProgram = new Program(1L,"SDET"," ", "Active",
+				Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
+		programRepository.save(mockProgram);
+	}
+
+	@DisplayName("JUnit test for get Programs by ProgramName ") 
 	@Test
-	@Order(1)
-	public void givenProgramObject_WhenSave_ThenReturnSavedProgram() {
-		// given
-		LocalDateTime now= LocalDateTime.now();
-		Timestamp timestamp= Timestamp.valueOf(now);
-		Program program1 = new Program((long) 1,"SDET"," ", "Active",timestamp, timestamp);
-		programRepository.save(program1);
+	void givenProgramName_WhenFindPrograms_ReturnProgramObjects() {
+		//given
+		String programName = "SDET";
+
+		//when
+		List<Program> programList= programRepository.findByProgramName(programName);
 		
-		assertThat(program1).isNotNull();
-		assertThat(program1.getProgramId()).isEqualTo(1);
-		
-		Program program2 = new Program((long) 1,"SDET"," ", "Active",timestamp, timestamp);
-		programRepository.save(program2);
-	//then	
-		assertThat(program1).isNotNull();
-		assertThat(program1.getProgramId()).isEqualTo(1);
-		
-		
+		//then
+		assertThat(programList).isNotEmpty();
+	}
+
+	@DisplayName("JUnit test for get Programs by ProgramName ignoring case ")
+	@Test
+	void givenProgramName_WhenFindPrograms_ReturnProgramsList() {
+		//given
+		String programName = "sdet";
+
+		//when
+		List<Program> programList= programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(programName);
+
+		//then
+		assertThat(programList).isNotEmpty();
 	}
 
 	@DisplayName("test to get program by Id and Status")
 	@Test
-	@Order(3)
 	public void testFindProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase() {
-		Program program = new Program(1L, "SDET", "SDET Training",
-				"Active", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
-		programRepository.save(program);
-
 		Optional<Program> optionalProgram = programRepository
 				.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(1L, "active");
 
