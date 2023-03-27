@@ -141,8 +141,8 @@ public class AssignmentSubmitService {
     	
     List<AssignmentSubmit> assignmentsubmitList = new ArrayList<AssignmentSubmit>();
     	
-    List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findAll();
-    	
+   // List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findAll();
+    List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchid);
     assignmentsubmits.forEach((as)->{
     Assignment 	assignment2 =   as.getAssignment();
     Integer bid = assignment2.getBatch().getBatchId(); 	

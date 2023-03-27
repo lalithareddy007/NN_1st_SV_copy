@@ -110,8 +110,7 @@ public void DeleteFile(String userid,String filetype) throws IOException
 	  else
 	 //delete from db
 		userpicturerepo.deleteById(ToDeletePicture.getUserFileId());
-	 // userpicturerepo.deleteByuserAnduserFiletype(userid, filetype);
-	 // userpicturerepo.deleteByuserAnduserFiletype(user, filetype);
+	 
 }
 
   
@@ -135,8 +134,8 @@ public UserPictureEntityDTO updateFile( UserPictureEntityDTO userpicturedto , St
       UserPictureEntity userpicture = userPictureMapper.toUserPictureEntity(userpicturedto);
 
       userpicture.setUserFileId(savedpicture.getUserFileId());
-      userpicture.setUser(savedpicture.getUser());
-     
+    //  userpicture.setUser(savedpicture.getUser());
+     userpicture.setUser(user);
       if(StringUtils.hasLength(userpicturedto.getUserFileType()))
     	 userpicture.setUserFileType(userpicturedto.getUserFileType());
       else 

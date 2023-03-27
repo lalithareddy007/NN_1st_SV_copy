@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"> 
+<head>
+<meta charset="ISO-8859-1">
+<title>LMS Error</title>
+<style type="text/css">
+    span {
+        display: inline-block;
+        width: 200px;
+        text-align: left;
+    }
+    heading {
+        display: inline-block;
+        width: 400px;
+        text-align: center;
+    }
+    .table-bordered th, .table-bordered td { border: 1px solid #ddd!important }
+</style>
+</head>
+<body>
+<div align="center">
+<p class="heading">Error Encountered!</p><br/>
+<span>Error Code:</span><span th:text="${error.errorCode}"></span><br/>
+<span>Error Message:</span><span th:text="${error.errorMessage}"></span><br/>
+</div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AttendanceMapper;
 import com.numpyninja.lms.repository.AttendanceRepository;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AttendanceServices {
@@ -99,6 +101,13 @@ public class AttendanceServices {
 		User user = userRepository.findById(studentId)
 				.orElseThrow(() -> new ResourceNotFoundException("Student Id " + studentId + " not found"));
 
+		List<Attendance> attendanceRecord = this.attendanceRepository.findByObjClassAndUser(objClass, user);
+
+		 // Check if an attendance record already exists for the given classId and studentId
+		 if(!attendanceRecord.isEmpty() ) {
+		  throw new DuplicateResourceFoundException("Attendance record already exists for class " + classId + " and student " + studentId);
+		 }
+		
 		Attendance attendance = attendanceMapper.toAttendance(attendanceDto);
 		LocalDateTime now = LocalDateTime.now();
 		Timestamp timestamp = Timestamp.valueOf(now);
@@ -119,7 +128,7 @@ public class AttendanceServices {
 				.orElseThrow(() -> new ResourceNotFoundException("Student Id " + studentId + " not found"));
 		Attendance attendanceById = this.attendanceRepository.findById(attendanceId)
 				.orElseThrow(() -> new ResourceNotFoundException("Attendance", "Id", attendanceId));
-		Attendance updateAttendance = attendanceMapper.toAttendance(attendanceDto);
+        Attendance updateAttendance = attendanceMapper.toAttendance(attendanceDto);
 
 		updateAttendance.setAttId(attendanceId);
 		updateAttendance.setObjClass(objClass);
