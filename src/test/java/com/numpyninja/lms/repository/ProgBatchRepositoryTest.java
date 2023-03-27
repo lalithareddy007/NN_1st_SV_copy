@@ -1,25 +1,19 @@
 package com.numpyninja.lms.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.numpyninja.lms.entity.Batch;
+import com.numpyninja.lms.entity.Program;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Sort;
 
-import com.numpyninja.lms.entity.Batch;
-import com.numpyninja.lms.entity.Program;
-import com.numpyninja.lms.repository.ProgBatchRepository;
-import com.numpyninja.lms.repository.ProgramRepository;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
@@ -53,7 +47,7 @@ public class ProgBatchRepositoryTest {
 		assertThat(batch2.getBatchId()).isEqualTo(2);
 	}
 
-	
+
 	@DisplayName("JUnit test for get all Batches ")
 	@Test
 	@Order(2)
@@ -63,8 +57,8 @@ public class ProgBatchRepositoryTest {
 		assertThat(list.size()).isGreaterThan(0);
 	}
 
-	
-	@DisplayName("JUnit test for get Batches by BatchName ") 
+
+	@DisplayName("JUnit test for get Batches by BatchName ")
 	@Test
 	@Order(3)
 	public void givenBatchName_WhenFindBatches_ReturnBatchObjects() {
@@ -81,8 +75,8 @@ public class ProgBatchRepositoryTest {
 		assertThat(batchList.size()).isGreaterThan(0);
 	}
 
-	
-	@DisplayName("JUnit test for get all Batches by Batch Name") 
+
+	@DisplayName("JUnit test for get all Batches by Batch Name")
 	@Test
 	@Order(4)
 	public void givenBatchList_WhenGetAllBatchesByBatchName_ThenReturnBatchesList() {
@@ -91,13 +85,13 @@ public class ProgBatchRepositoryTest {
 		Batch batch2 = new Batch(2, "01", "Datascience Batch 01", "Active", program2, 6,
 				new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
 		progBatchRepository.save(batch2);
-		
+
 		List<Batch> list = progBatchRepository.findByBatchNameContainingIgnoreCaseOrderByBatchIdAsc(batchName);
 		System.out.println("Size:" + list.size());
 		assertThat(list.size()).isGreaterThan(0);
 	}
 
-	
+
 	@DisplayName("JUnit test for get batch by id ")
 	@Test
 	@Order(5)
@@ -111,7 +105,7 @@ public class ProgBatchRepositoryTest {
 		assertThat(batch.getBatchId()).isEqualTo(1);
 	}
 
-	
+
 	@DisplayName("JUnit test for get Batches by ProgramId ")
 	@Test
 	@Order(6)
@@ -125,7 +119,7 @@ public class ProgBatchRepositoryTest {
 		assertThat(batchList.size()).isGreaterThan(0);
 	}
 
-	
+
 	@DisplayName("JUnit test for update Batch")
 	@Test
 	@Order(7)
@@ -141,7 +135,7 @@ public class ProgBatchRepositoryTest {
 		assertThat(batch.getBatchNoOfClasses()).isEqualTo(7);
 	}
 
-	
+
 	@DisplayName("JUnit test for delete Batch")
 	@Test
 	@Order(8)
@@ -154,5 +148,20 @@ public class ProgBatchRepositoryTest {
 		Optional<Batch> batchCheck = progBatchRepository.findById(batchId);
 		// then
 		assertThat(batchCheck).isEmpty();
+	}
+
+	@DisplayName("test to get batch by Id, ProgramId and Status")
+	@Test
+	@Order(9)
+	public void testFindBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase() {
+		Program program = programRepository.findById(1L).get();
+		Batch batch = progBatchRepository.save(new Batch(1, "SDET 01", "SDET BATCH 01",
+				"Active", program, 6, Timestamp.valueOf(LocalDateTime.now()),
+				Timestamp.valueOf(LocalDateTime.now())));
+
+		Optional<Batch> optionalBatch = progBatchRepository
+				.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(1, 1L, "active");
+
+		assertThat(optionalBatch).isNotEmpty();
 	}
 }

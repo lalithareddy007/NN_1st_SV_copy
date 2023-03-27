@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface UserRoleProgramBatchMapRepository extends JpaRepository<UserRoleProgramBatchMap, Long> {
 
-    Optional<UserRoleProgramBatchMap> findByUser_UserIdAndRoleRoleIdAndAndProgram_ProgramIdAndBatch_BatchId
+    Optional<UserRoleProgramBatchMap> findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId
             (String userId, String roleId, Long programId, Integer batchId);
 
     Optional<UserRoleProgramBatchMap> findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase

@@ -44,6 +44,8 @@ public class UserServices {
 	@Autowired
 	UserRoleProgramBatchMapRepository userRoleProgramBatchMapRepository;
 
+	private static final String ROLE_STUDENT = "R03";
+
 	public List<UserDto> getAllUsers() {
 		return userMapper.userDtos(userRepository.findAll());
 		// return userRepository.findAll();
@@ -306,7 +308,7 @@ public class UserServices {
 												  Batch existingBatch, UserRoleProgramBatchSlimDto dto) {
 		UserRoleProgramBatchMap userRoleProgramBatchMap;
 		Optional<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository
-				.findByUser_UserIdAndRoleRoleIdAndAndProgram_ProgramIdAndBatch_BatchId
+				.findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId
 						(existingUser.getUserId(), existingUserRole.getRoleId(),
 								existingProgram.getProgramId(), existingBatch.getBatchId());
 		if (optionalMap.isEmpty()) {
@@ -325,7 +327,7 @@ public class UserServices {
 			userRoleProgramBatchMap.setUserRoleProgramBatchStatus(dto.getUserRoleProgramBatchStatus());
 			userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
 		}
-		userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
+		userRoleProgramBatchMap = userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
 	}
 
 	public String assignUpdateUserRoleProgramBatchStatus(UserRoleProgramBatchDto userRoleProgramBatchDto,
@@ -352,16 +354,16 @@ public class UserServices {
 			throw new ResourceNotFoundException("User", "Role", roleId);
 
 		// Active Program should be present
-		Program existingProgram = programRepository.findProgramByProgramIdAndAndProgramStatusEqualsIgnoreCase(
+		Program existingProgram = programRepository.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(
 						programId, "Active")
 				.orElseThrow(() -> new ResourceNotFoundException("Program " + programId, "Program Status", "Active"));
 
 		// User with roleId 'R03' i.e. Student should be assigned to single program/batch
-		if (roleProgramBatchList.size() != 1 && "R03".equals(roleId))
+		if (roleProgramBatchList.size() != 1 && ROLE_STUDENT.equals(roleId))
 			throw new InvalidDataException("User with Role " + roleId + " can be assigned to single program/batch");
 
-		for(UserRoleProgramBatchSlimDto dto :  roleProgramBatchList) {
-			String dtoStatus = dto.getUserRoleProgramBatchStatus();
+		int msgCount = 0;
+		for(UserRoleProgramBatchSlimDto dto : roleProgramBatchList) {
 
 			//Active Program-Batch mapping should be present
 			Integer batchId = dto.getBatchId();
@@ -374,7 +376,7 @@ public class UserServices {
 				isBatchValid = false;
 
 			if (isBatchValid) {
-				if ("R03".equals(roleId)) { // Validations only for Student users
+				if (ROLE_STUDENT.equals(roleId)) { // Validations only for Student users
 					/* Check for existing assigned program/batch with Active status for given user */
 					Optional<UserRoleProgramBatchMap> optionalExistingMap = userRoleProgramBatchMapRepository
 							.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
@@ -385,8 +387,8 @@ public class UserServices {
 						Long existingProgramId = existingMap.getProgram().getProgramId();
 						Integer existingBatchId = existingMap.getBatch().getBatchId();
 
-						/* Check whether received request for another program OR same program with another batch with Active status */
-						if ((existingProgramId != programId) || (existingBatchId != batchId && "Active".equalsIgnoreCase(dtoStatus)))
+						/* Check whether received request for another program OR same program with another batch */
+						if ((existingProgramId != programId) || (existingBatchId != batchId))
 							throw new InvalidDataException
 									("Please deactivate User from existing program/batch and then activate for another program/batch");
 						else
@@ -399,17 +401,24 @@ public class UserServices {
 					assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
 			}
 			else {
-				message.append(String.format("%s not found with %s : %s ","Batch " + batchId, "Batch Status", "Active"));
+				message.append(String.format("%s not found with %s for %s ","Batch " + batchId, "Status as Active",
+						"Program " + programId));
 				message.append(" \n ");
+				msgCount++;
 			}
 		}
 		if (StringUtils.hasLength(message.toString())) {
-			if ("R03".equals(roleId))
+			if (ROLE_STUDENT.equals(roleId))
 				throw new InvalidDataException(message.toString());
-			return "Partial Success for User with ID " + userId + " - " + message;
+			else {
+				if (msgCount < roleProgramBatchList.size())
+					return "User " + userId + " has failed for" + " - " + message;
+				else
+					throw new InvalidDataException(message.toString());
+			}
 		}
 
-		return "Success for User with ID " + userId;
+		return "User " + userId + " has been successfully assigned to Program/Batch(es)";
 	}
 
 	/** Check for already existing phone number **/
@@ -583,7 +592,7 @@ public class UserServices {
 		}
 
 	}
-	
+
 	public List<Object> getAllStaff()
 	{
 		List<Object> result=userRepository.getAllStaffList();
