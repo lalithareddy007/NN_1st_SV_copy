@@ -145,7 +145,7 @@ public class AssignmentSubmitServiceTest {
         verify(mockAssignmentSubmitRepository).findByUser_userId(userId);
 
     }
-
+///
     @Test
     @DisplayName("Test get all submissions by student ID when student exists but no submissions- Service Test ")
     public void testGetSubmissionsByUserID_whenUserIdExists_withNoSubmissions(){
@@ -190,11 +190,12 @@ public class AssignmentSubmitServiceTest {
     @DisplayName("Test for get submissions by Batch")
     public void testGetSubmissionsByBatch()
     {
-    	Integer batchId = 11;
-    	when(mockAssignmentSubmitRepository.findAll()).thenReturn(mockAssignmentSubmitList);
+    	Integer batchId =mockAssignment.getBatch().getBatchId();
+    	when(mockAssignmentSubmitRepository.findByAssignment_Batch_BatchId(batchId)).thenReturn(mockAssignmentSubmitList);
+    	given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList))
+         .willReturn(mockAssignmentSubmitDTOList);
 
     	List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getSubmissionsByBatch(batchId);
-    	System.out.println(assignmentSubmitDTOList);
     	assertEquals(assignmentSubmitDTOList.size(),assignmentSubmitDTOList.size());
     }
 
@@ -209,7 +210,6 @@ public class AssignmentSubmitServiceTest {
     	given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList))
          .willReturn(mockAssignmentSubmitDTOList);
     	List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getGradesByAssinmentId(AssignmentId);
-    	System.out.println(assignmentSubmitDTOList);
     	assertThat(assignmentSubmitDTOList).isNotNull();
 
     }
@@ -234,7 +234,7 @@ public class AssignmentSubmitServiceTest {
     @Test
     void testGetGradesByStudentId() {
     	//given
-    	 String userId = "U01";
+    	 String userId = mockUser.getUserId();
 
     	 when(mockUserRepository.existsById(userId)).thenReturn(true);
 
@@ -243,7 +243,7 @@ public class AssignmentSubmitServiceTest {
                   .willReturn(mockAssignmentSubmitDTOList);
 
          List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getGradesByStudentId(userId);
-     	 System.out.println(assignmentSubmitDTOList);
+         
      	 assertThat(assignmentSubmitDTOList).isNotNull();
     }
 
