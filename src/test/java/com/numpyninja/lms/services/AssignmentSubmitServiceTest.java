@@ -205,7 +205,7 @@ public class AssignmentSubmitServiceTest {
     public void testGetGradesByAssinmentId()
     {
     	Long AssignmentId = 1L;
-    	given(mockAssignmentSubmitRepository.findById(AssignmentId)).willReturn(Optional.of(mockAssignmentSubmit1));
+    	given(mockAssignmentRepository.findById(AssignmentId)).willReturn(Optional.of(mockAssignment));
     	given(mockAssignmentSubmitRepository.getGradesByAssignmentId(AssignmentId)).willReturn(mockAssignmentSubmitList);
     	given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList))
          .willReturn(mockAssignmentSubmitDTOList);
@@ -220,7 +220,7 @@ public class AssignmentSubmitServiceTest {
 		//given
     	Long AssignmentId = 1L;
 
-		given(mockAssignmentSubmitRepository.findById(AssignmentId)).willReturn(Optional.empty());
+		given(mockAssignmentRepository.findById(AssignmentId)).willReturn(Optional.empty());
 
 		//when
 		Assertions.assertThrows(ResourceNotFoundException.class,
