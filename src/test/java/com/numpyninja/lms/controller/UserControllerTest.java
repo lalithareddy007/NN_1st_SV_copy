@@ -126,10 +126,10 @@ public class UserControllerTest {
 	@DisplayName("test to get user Info for a given user ID")
 	void testgetUserInfoById() throws Exception {
 
-		/*ArrayList<UserRoleMap> userRoleMapList = new ArrayList();
+		ArrayList<UserRoleMap> userRoleMapList = new ArrayList();
 		userRoleMapList.add(mockUserRoleMap);
 		String userId = "U02";
-		given(userService.getUserInfoById(userId)).willReturn(userRoleMapList);
+		//given(userService.getUserInfoById(userId)).willReturn(userRoleMapList);
 
 		ResultActions response = mockMvc.perform(get("/users/{id}", userId));
 
@@ -142,7 +142,7 @@ public class UserControllerTest {
 				.andExpect(jsonPath("$..role.roleId")
 						.value("R03"))
 				.andExpect(jsonPath("$..user.userFirstName").value("Abdul"))
-				.andExpect(jsonPath("$", hasSize(userRoleMapList.size())));*/
+				.andExpect(jsonPath("$", hasSize(userRoleMapList.size())));
 	}
 
 
