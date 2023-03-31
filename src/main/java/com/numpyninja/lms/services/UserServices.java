@@ -5,9 +5,7 @@ import com.numpyninja.lms.entity.*;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
-import com.numpyninja.lms.mappers.BatchMapper;
-import com.numpyninja.lms.mappers.ProgramMapper;
-import com.numpyninja.lms.mappers.UserMapper;
+import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +50,18 @@ public class UserServices {
 	@Autowired
 	BatchMapper batchMapper;
 
+	@Autowired
+	UserSkillRepository userSkillRepository;
+
+	@Autowired
+	UserSkillMapper userSkillMapper;
+
+	@Autowired
+	UserPictureRepository userPictureRepository;
+
+	@Autowired
+	UserPictureMapper userPictureMapper;
+
 	private static final String ROLE_STUDENT = "R03";
 
 	public List<UserDto> getAllUsers() {
@@ -85,6 +95,14 @@ public class UserServices {
 			}
 			userAllDto.setUserProgramBatchSlimDtos(userProgramBatchSlimDtoList);
 		}
+
+		List<UserSkill> userSkills = userSkillRepository.findByUserId(userId);
+		if(!userSkills.isEmpty())
+			userAllDto.setUserSkillSlimDtos(userSkillMapper.toUserSkillSlimDtoList(userSkills));
+
+		List<UserPictureEntity> userPictureEntityList = userPictureRepository.findByUser_UserId(userId);
+		if(!userPictureEntityList.isEmpty())
+			userAllDto.setUserPictureSlimDtos(userPictureMapper.toUserPictureSlimDtoList(userPictureEntityList));
 
 		return userAllDto;
 	}

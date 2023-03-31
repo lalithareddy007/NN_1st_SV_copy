@@ -22,4 +22,12 @@ public class UserAllDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("programBatches")
     private List<UserProgramBatchSlimDto> userProgramBatchSlimDtos;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("skills")
+    private List<UserSkillSlimDto> userSkillSlimDtos;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("documents")
+    private List<UserPictureSlimDto> userPictureSlimDtos;
 }
