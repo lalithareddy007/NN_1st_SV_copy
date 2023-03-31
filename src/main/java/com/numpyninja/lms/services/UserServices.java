@@ -71,13 +71,10 @@ public class UserServices {
 				.build();
 
 		List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository.findByUser_UserId(userId);
-
 		if(!userRoleProgramBatchMaps.isEmpty()) {
 			List<UserProgramBatchSlimDto> userProgramBatchSlimDtoList = new ArrayList<>();
-
 			Map<Program,List<UserRoleProgramBatchMap>> convertedMap = userRoleProgramBatchMaps.stream()
 					.collect(Collectors.groupingBy(UserRoleProgramBatchMap::getProgram));
-
 			for (Map.Entry<Program,List<UserRoleProgramBatchMap>> entrySet : convertedMap.entrySet()) {
 				UserProgramBatchSlimDto userProgramBatchSlimDto = UserProgramBatchSlimDto.builder()
 						.programId(entrySet.getKey().getProgramId())
@@ -86,27 +83,11 @@ public class UserServices {
 						.build();
 				userProgramBatchSlimDtoList.add(userProgramBatchSlimDto);
 			}
-
 			userAllDto.setUserProgramBatchSlimDtos(userProgramBatchSlimDtoList);
 		}
 
 		return userAllDto;
 	}
-
-	// Displays Users Info with their user status, role, batch and program info
-	public List<UserRoleMap> getAllUsersWithRoles() {
-		// List<UserRoleMap> list = userRoleMapRepository.findAll();
-		return userRoleMapRepository.findAll();
-	}
-
-	/*public List<UserRoleMap> getUsersForProgram(Long programId) {
-		List<UserRoleMap> list = userRoleMapRepository.findUserRoleMapsByBatchesProgramProgramId(programId);
-
-		return list.stream().map(userRoleMap -> {
-			userRoleMap.getBatches().removeIf(batch -> batch.getProgram().getProgramId() == programId);
-			return userRoleMap;
-		}).collect(Collectors.toList());
-	}*/
 
 	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
@@ -491,10 +472,31 @@ public class UserServices {
 		return isVisaStatusValid;
 	}
 
+	public List<Object> getAllStaff()
+	{
+		List<Object> result=userRepository.getAllStaffList();
+		if(!(result.size()<=0))
+		{
+			//return (userMapper.toUserStaffDTO(result));
+			return result;
+		}else
+		{
+			throw new ResourceNotFoundException("No staff data is available in database");
+		}
+	}
+
 	/**
 	 * Check if the code below this comment are needed or not from front end. - The
 	 * controller endpoints for these are commented out for now.
 	 */
+
+/*
+
+	// Displays Users Info with their user status, role
+	public List<UserRoleMap> getAllUsersWithRoles() {
+		// List<UserRoleMap> list = userRoleMapRepository.findAll();
+		return userRoleMapRepository.findAll();
+	}
 
 	public UserDto createUser(UserDto newUserDto) throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
@@ -502,7 +504,6 @@ public class UserServices {
 
 		if (newUserDto != null) {
 
-			/** Checking phone number to prevent duplicate entry **/
 			List<User> userList = userRepository.findAll();
 			if (userList.size() > 0) {
 				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserDto.getUserPhoneNumber());
@@ -511,11 +512,11 @@ public class UserServices {
 							+ newUserDto.getUserPhoneNumber() + " already exists !!");
 				}
 			}
-			/** Checking for valid TimeZone **/
+
 			if (!isTimeZoneValid(newUserDto.getUserTimeZone())) {
 				throw new InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
 			}
-			/** Checking for valid Visa Status **/
+
 			if (!isVisaStatusValid(newUserDto.getUserVisaStatus())) {
 				throw new InvalidDataException("Failed to create user, as 'Visa Status' is invalid !! ");
 			}
@@ -623,26 +624,6 @@ public class UserServices {
 		}
 
 	}
-
-	public List<Object> getAllStaff()
-	{
-		List<Object> result=userRepository.getAllStaffList();
-		if(!(result.size()<=0))
-		{
-			//return (userMapper.toUserStaffDTO(result));
-			return result;
-		}else
-		{
-			throw new ResourceNotFoundException("No staff data is available in database");
-		}
-	}
-
-
-	/*
-	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
-	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
-	 * { throw new ResourceNotFoundException("User Id " + Id +" not found"); } else
-	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
-	 */
+*/
 
 }

@@ -59,8 +59,6 @@ class UserServicesTest {
 
 	private UserDto mockUserDto;
 
-	private UserMapper userMapper1 ;
-
 	private UserRoleMap mockUserRoleMap;
 	private UserRoleMap mockUserRoleMap1;
 
@@ -156,28 +154,6 @@ class UserServicesTest {
 		return mockUserDto;
 	}
 
-	@DisplayName("test for createUser method")
-	@Test
-		//@Order(2)
-	void createUserTest() throws InvalidDataException, DuplicateResourceFoundException {
-
-		//given(userMapper.user(org.mockito.ArgumentMatchers.any())).willReturn(mockUser);
-
-		//given(userRepo.findByUserPhoneNumber(mockUserDto.getUserPhoneNumber()))
-		//	.willReturn(Optional.empty());
-		given(userMapper.user(mockUserDto)).willReturn(mockUser);
-		given(userRepo.save(mockUser)).willReturn(mockUser);
-		given(userMapper.userDto(mockUser)).willReturn(mockUserDto)	;
-
-		//when
-		UserDto userDto = userService.createUser(mockUserDto);
-
-		//then
-		assertThat(userDto).isNotNull();
-
-	}
-
-
 	@DisplayName("test for creating user with Role info")
 	@Test
 		//@Order(2)
@@ -203,28 +179,6 @@ class UserServicesTest {
 		assertThat(userDto).isNotNull();
 
 	}
-
-
-	@DisplayName("test for creating a new user with duplicate phone number - throws exception")
-		//@Test
-		//@Order(3)
-	void testCreateUserWithDuplicatePhoneNumber()  {
-
-		long userPhoneNum = 2222222222L;
-		//mockUserDto.getUserPhoneNumber()
-		given(userRepo.findByUserPhoneNumber(userPhoneNum))
-				.willReturn(Optional.empty());
-
-		//System.out.println("mockUserDto...... " +mockUserDto.getUserLastName() + mockUserDto.getUserPhoneNumber());
-		// when
-		assertThrows(DuplicateResourceFoundException.class, ()->userService.createUser(mockUserDto));
-
-		Mockito.verify(userMapper, never()).user(any(UserDto.class));
-
-		verify(userRepo, never()).save(any(User.class));
-		verify(userMapper,never()).userDto(any(User.class));
-	}
-
 
 	@DisplayName("test for getAllUsers method")
 	@Test
@@ -278,67 +232,24 @@ class UserServicesTest {
 
 	}
 
-	@DisplayName("test for getting User Info for a given userId")
+	@DisplayName("test for getting User Info for a given userId - When User not found")
 	@Test
-	void getUserInfoByIdTest() {
-		/*userRoleMapList = new ArrayList<>();
-		userRoleMapList.add(mockUserRoleMap);
-		userRoleMapList.add(mockUserRoleMap);
+	void testGetUserInfoByIdWhenUserNotFound() {
 
-		given(userRepo.findById(mockUser.getUserId())).willReturn(Optional.of(mockUser));
-		given(userRoleMapRepository.findUserRoleMapsByUserUserId(mockUser.getUserId())).willReturn(userRoleMapList);
-
-		//when
-		List<UserRoleMap> userRoleMapListOut = userService.getUserInfoById(mockUser.getUserId());
-
-		//then
-		assertThat(userRoleMapListOut).isNotNull();
-		assertThat(userRoleMapListOut.size()).isGreaterThan(0);*/
 
 	}
 
-	@DisplayName("test for getting list of all Users - with all their info - user,role,batch")
+	@DisplayName("test for getting User Info for a given userId with role Student")
 	@Test
-	void getAllUsersWithRolesTest() {
-
-		Date utilDate = new Date();
-		Timestamp Timestamp = new Timestamp(utilDate.getTime());
-
-		Long userRoleId = 1L;
-		String userRoleStatus = "Active";
-		Role userRole3= new Role("R02","User","LMS_User",Timestamp,Timestamp);
-
-		Program program = new Program((long) 7, "Python", "new Prog", "Active", Timestamp, Timestamp);
-		Batch batch2 = new Batch(1, "Python 1", "Python Batch 1", "Active", program, 5, Timestamp, Timestamp);
-
-		User mockUser2 = new User("U03", "Mary", "Poppins", " ", 9562867512L, "USA", "EST", "www.linkedin.com/Poppins1234",
-				"MCA", "MBA", "Actor", "H4", new Timestamp(utilDate.getTime()),
-				new Timestamp(utilDate.getTime()));
-
-		User mockUser3 = new User("U04", "Stephen", "Hawking", " ", 1111111111L, "UK", "CST", "www.linkedin.com/Hawking1234",
-				"MCA", "MBA", "Physicist", "H4", new Timestamp(utilDate.getTime()),
-				new Timestamp(utilDate.getTime()));
-
-		UserRoleMap mockUserRoleMap2 = new UserRoleMap(userRoleId,mockUser2,userRole3,userRoleStatus,Timestamp,Timestamp);
-		UserRoleMap mockUserRoleMap3 = new UserRoleMap(userRoleId,mockUser3,userRole3,userRoleStatus,Timestamp,Timestamp);
-
-		userRoleMapList = new ArrayList<>();
-		userRoleMapList.add(mockUserRoleMap);
-		userRoleMapList.add(mockUserRoleMap);
-		userRoleMapList.add(mockUserRoleMap2);
-		userRoleMapList.add(mockUserRoleMap3);
-
-		//given
-		given(userRoleMapRepository.findAll()).willReturn(userRoleMapList);
+	void testGetUserInfoByIdForStudent() {
 
 
-		//when
-		List<UserRoleMap> allUsersRoleMapList = userService.getAllUsersWithRoles();
+	}
 
-		//then
-		assertThat(allUsersRoleMapList).isNotNull();
-		assertThat(allUsersRoleMapList.size()).isGreaterThan(0);
-		assertThat(allUsersRoleMapList.size()).isEqualTo(4);
+	@DisplayName("test for getting User Info for a given userId with role Staff")
+	@Test
+	void testGetUserInfoByIdForStaff() {
+
 
 	}
 
