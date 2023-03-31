@@ -17,7 +17,7 @@ import com.numpyninja.lms.entity.UserRoleMap;
 public interface UserRoleMapRepository  extends JpaRepository <UserRoleMap, Long>{
 	List<UserRoleMap> findUserRoleMapsByRoleRoleName( String roleName );
 
-	List<UserRoleMap> findUserRoleMapsByBatchesProgramProgramId( Long programId ) ;
+	//List<UserRoleMap> findUserRoleMapsByBatchesProgramProgramId( Long programId ) ;
 
 	List<UserRoleMap> findUserRoleMapsByUserUserId(String userId );
 

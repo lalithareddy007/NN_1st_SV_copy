@@ -5,6 +5,8 @@ import com.numpyninja.lms.entity.*;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
+import com.numpyninja.lms.mappers.BatchMapper;
+import com.numpyninja.lms.mappers.ProgramMapper;
 import com.numpyninja.lms.mappers.UserMapper;
 import com.numpyninja.lms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,12 @@ public class UserServices {
 	@Autowired
 	UserRoleProgramBatchMapRepository userRoleProgramBatchMapRepository;
 
+	@Autowired
+	ProgramMapper programMapper;
+
+	@Autowired
+	BatchMapper batchMapper;
+
 	private static final String ROLE_STUDENT = "R03";
 
 	public List<UserDto> getAllUsers() {
@@ -51,15 +59,38 @@ public class UserServices {
 		// return userRepository.findAll();
 	}
 
-	public List<UserRoleMap> getUserInfoById(String Id) throws ResourceNotFoundException {
-		Optional<User> userById = userRepository.findById(Id);
-		if (userById.isEmpty()) {
-			throw new ResourceNotFoundException("User Id " + Id + " not found");
-		} else {
-			List<UserRoleMap> userroleMap = userRoleMapRepository.findUserRoleMapsByUserUserId(Id);
-			// System.out.println("userroleMap " + userroleMap);
-			return userroleMap;
+	public UserAllDto getUserInfoById(String userId){
+		User existingUser = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
+
+		UserAllDto userAllDto = UserAllDto.builder()
+				.userDto(userMapper.userDto(existingUser))
+				.userRoleMaps(userMapper.toUserRoleMapSlimDtos(userRoleMaps))
+				.build();
+
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository.findByUser_UserId(userId);
+
+		if(!userRoleProgramBatchMaps.isEmpty()) {
+			List<UserProgramBatchSlimDto> userProgramBatchSlimDtoList = new ArrayList<>();
+
+			Map<Program,List<UserRoleProgramBatchMap>> convertedMap = userRoleProgramBatchMaps.stream()
+					.collect(Collectors.groupingBy(UserRoleProgramBatchMap::getProgram));
+
+			for (Map.Entry<Program,List<UserRoleProgramBatchMap>> entrySet : convertedMap.entrySet()) {
+				UserProgramBatchSlimDto userProgramBatchSlimDto = UserProgramBatchSlimDto.builder()
+						.programId(entrySet.getKey().getProgramId())
+						.programName(entrySet.getKey().getProgramName())
+						.batchSlimDto(batchMapper.toBatchSlimDtoList(entrySet.getValue()))
+						.build();
+				userProgramBatchSlimDtoList.add(userProgramBatchSlimDto);
+			}
+
+			userAllDto.setUserProgramBatchSlimDtos(userProgramBatchSlimDtoList);
 		}
+
+		return userAllDto;
 	}
 
 	// Displays Users Info with their user status, role, batch and program info
@@ -68,14 +99,14 @@ public class UserServices {
 		return userRoleMapRepository.findAll();
 	}
 
-	public List<UserRoleMap> getUsersForProgram(Long programId) {
+	/*public List<UserRoleMap> getUsersForProgram(Long programId) {
 		List<UserRoleMap> list = userRoleMapRepository.findUserRoleMapsByBatchesProgramProgramId(programId);
 
 		return list.stream().map(userRoleMap -> {
 			userRoleMap.getBatches().removeIf(batch -> batch.getProgram().getProgramId() == programId);
 			return userRoleMap;
 		}).collect(Collectors.toList());
-	}
+	}*/
 
 	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)

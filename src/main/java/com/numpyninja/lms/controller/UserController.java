@@ -49,14 +49,14 @@ public class UserController {
 	}
 
 
-	//get user by ID - information on role, user, batch and details displayed
+	//get user by ID - information on user details, role, program, batch
 	@GetMapping("/users/{id}")
-	public ResponseEntity<?> getUserInfoById(@PathVariable String id) throws ResourceNotFoundException {
-		List<?> userInfo = userServices.getUserInfoById(id);
-		return ResponseEntity.status(200).body(userInfo);
+	public ResponseEntity getUserInfoById(@PathVariable String id) {
+		UserAllDto userInfo = userServices.getUserInfoById(id);
+		return ResponseEntity.ok(userInfo);
 	}
 
-	//Get all users with all their info - Role, status, Program, Batch
+	//Get all users with all their info - Role, status
 	@GetMapping("/users/roles")
 	protected List<?> getAllUsersWithRoles() {
 		return userServices.getAllUsersWithRoles() ;
