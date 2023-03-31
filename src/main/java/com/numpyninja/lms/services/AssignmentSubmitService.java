@@ -222,7 +222,7 @@ public class AssignmentSubmitService {
     }
     
     public List<AssignmentSubmitDTO> getGradesByAssinmentId(Long assignmentId){
-        AssignmentSubmit assSub = this.assignmentSubmitRepository.findById(assignmentId)
+        Assignment assSub = this.assignmentRepository.findById(assignmentId)
     				.orElseThrow(() -> new ResourceNotFoundException("Assignment", "Id", assignmentId));
         List<AssignmentSubmit> assSubListForGrades = assignmentSubmitRepository.getGradesByAssignmentId(assignmentId);
     	  List<AssignmentSubmitDTO> assSubmDtoListForGrades = assignmentSubmitMapper.toAssignmentSubmitDTOList(assSubListForGrades);
@@ -292,7 +292,32 @@ public class AssignmentSubmitService {
         return assignmentSubmitDTOs;
     }
 
+    public List<AssignmentSubmitDTO> getSubmissionsByAssignment(Long assignmentId) {
+    	
+   	 Assignment savedAssignment = this.assignmentRepository.findById(assignmentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Assignment", "Id", assignmentId));
 
+   	 List<AssignmentSubmit> assignmentSubmitList= assignmentSubmitRepository.findByAssignment_assignmentId(savedAssignment.getAssignmentId());
+   	 List<AssignmentSubmitDTO> assignmentSubmitDTOs = new ArrayList<>();
+
+        for (AssignmentSubmit assignmentSubmit : assignmentSubmitList) {
+            AssignmentSubmitDTO assignmentSubmitDTO = new AssignmentSubmitDTO();
+            assignmentSubmitDTO.setSubmissionId(assignmentSubmit.getSubmissionId());
+            assignmentSubmitDTO.setAssignmentId(assignmentSubmit.getAssignment().getAssignmentId());
+            assignmentSubmitDTO.setUserId(assignmentSubmit.getUser().getUserId());
+            assignmentSubmitDTO.setGrade(assignmentSubmit.getGrade());
+            assignmentSubmitDTO.setGradedDateTime(assignmentSubmit.getGradedDateTime());
+            assignmentSubmitDTO.setSubComments(assignmentSubmit.getSubComments());
+            assignmentSubmitDTO.setSubDesc(assignmentSubmit.getSubDesc());
+            assignmentSubmitDTO.setSubDateTime(assignmentSubmit.getSubDateTime());
+            assignmentSubmitDTO.setGradedBy(assignmentSubmit.getGradedBy());
+
+           assignmentSubmitDTOs.add(assignmentSubmitDTO);
+        }
+
+        return assignmentSubmitDTOs;
+
+   }
      	
 
 }
