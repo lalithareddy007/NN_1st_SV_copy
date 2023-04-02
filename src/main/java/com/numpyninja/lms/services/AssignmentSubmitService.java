@@ -258,8 +258,8 @@ public class AssignmentSubmitService {
             throw new InvalidDataException("Grader information mandatory!");
         else if(!userRepository.existsById(gradedBy))
             throw new ResourceNotFoundException("Grader", "ID", gradedBy);
-        else if(userRoleMapRepository.findUserRoleMapByUser_UserIdAndRole_RoleIdNotAndUserRoleStatusEqualsIgnoreCase(
-                gradedBy,"R03","Active").isEmpty())
+        else if(!userRoleMapRepository.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
+                gradedBy,"R03","Active"))//.isEmpty())
             throw new InvalidDataException("User "+gradedBy+" is not allowed to grade the submission");
 
         /**
@@ -269,7 +269,7 @@ public class AssignmentSubmitService {
 
 
         /**
-         *  if grader provides comments, keep them or else, save the user comments.
+         *  if grader provides comments, save them or else, keep the user comments.
          */
         String subComments = assignmentSubmitDTO.getSubComments();
         if(subComments!=null && !subComments.trim().isEmpty())

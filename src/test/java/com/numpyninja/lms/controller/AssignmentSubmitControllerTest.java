@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -46,7 +48,8 @@ public class AssignmentSubmitControllerTest {
 	@MockBean
 	private AssignmentSubmitService assignmentSubmitService;
 
-	private AssignmentSubmitDTO mockAssignmentSubmitDTO1, mockAssignmentSubmitDTO2, mockAssignmentSubmitDTO3;
+	private AssignmentSubmitDTO mockAssignmentSubmitDTO1, mockAssignmentSubmitDTO2,
+			mockAssignmentSubmitDTO3, mockAssignmentSubmitDTO4;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -65,6 +68,9 @@ public class AssignmentSubmitControllerTest {
 		mockAssignmentSubmitDTO3 = new AssignmentSubmitDTO(8L, 1L, "U05", "SQL assignment Submission",
 				"First submission", "Filepath1", "Filepath2", "Filepath3", "Filepath4", "Filepath5",
 				timestamp1, "U04", null, -1);
+		mockAssignmentSubmitDTO4 = new AssignmentSubmitDTO(8L, 1L, "U05", "SQL assignment Submission",
+				"Submission graded", "Filepath1", "Filepath2", "Filepath3", "Filepath4", "Filepath5",
+				timestamp1, "U04", timestamp1, 80);
 
 
 	}
@@ -255,6 +261,26 @@ public class AssignmentSubmitControllerTest {
 				andExpect(jsonPath("$.*", hasSize(14)));
 
 		verify(assignmentSubmitService, times(1)).resubmitAssignment(any(AssignmentSubmitDTO.class), eq(submissionId));
+
+	}
+
+	@Test
+	@SneakyThrows
+	@DisplayName("Test to grade submissions")
+	public void testGradeSubmissions(){
+		long submissionId = 8L;
+		given(assignmentSubmitService.gradeAssignmentSubmission(any(AssignmentSubmitDTO.class),eq(submissionId)))
+				.willReturn(mockAssignmentSubmitDTO4);
+		ResultActions resultActions = mockMvc.perform(put("/assignmentsubmission/gradesubmission/{submissionId}",submissionId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(mockAssignmentSubmitDTO4)));
+		resultActions.andExpect(status().isOk()).andDo(print())
+				.andExpect(jsonPath("$.assignmentId").value(mockAssignmentSubmitDTO4.getAssignmentId()))
+				.andExpect((jsonPath("$.userId").value(mockAssignmentSubmitDTO4.getUserId())))
+				.andExpect(jsonPath("$.grade").value(mockAssignmentSubmitDTO4.getGrade()))
+				.andExpect(jsonPath("$.gradedBy").value(mockAssignmentSubmitDTO4.getGradedBy()));
+
+		verify(assignmentSubmitService).gradeAssignmentSubmission(any(AssignmentSubmitDTO.class),eq(submissionId));
 
 	}
 }

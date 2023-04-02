@@ -2,12 +2,15 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
 import com.numpyninja.lms.repository.AssignmentRepository;
 import com.numpyninja.lms.repository.AssignmentSubmitRepository;
 import com.numpyninja.lms.repository.UserRepository;
 
+import com.numpyninja.lms.repository.UserRoleMapRepository;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,11 +47,16 @@ public class AssignmentSubmitServiceTest {
     private UserRepository mockUserRepository;
 
     @Mock
+    private UserRoleMapRepository mockUserRoleMapRepository;
+
+    @Mock
     private AssignmentRepository mockAssignmentRepository;
 
-    private AssignmentSubmit mockAssignmentSubmit1, mockAssignmentSubmit2, mockAssignmentSubmit3;
+    private AssignmentSubmit mockAssignmentSubmit1, mockAssignmentSubmit2, mockAssignmentSubmit3,
+                        mockAssignmentSubmit4;
 
-    private AssignmentSubmitDTO mockAssignmentSubmitDTO1, mockAssignmentSubmitDTO2, mockAssignmentSubmitDTO3;
+    private AssignmentSubmitDTO mockAssignmentSubmitDTO1, mockAssignmentSubmitDTO2, mockAssignmentSubmitDTO3,
+                        mockAssignmentSubmitDTO4;
 
     private Assignment mockAssignment;
 
@@ -66,6 +74,7 @@ public class AssignmentSubmitServiceTest {
 
         Timestamp timestamp1 = Timestamp.valueOf("2023-01-02 09:30:00");
         Timestamp timestamp2 = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp timestamp3 = Timestamp.valueOf(LocalDateTime.now().plusDays(3));
 
         mockAssignmentSubmitDTO1 = new AssignmentSubmitDTO(4L,2L,"U03","Selenium assignment Submission",
                 "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
@@ -76,6 +85,9 @@ public class AssignmentSubmitServiceTest {
         mockAssignmentSubmitDTO3 = new AssignmentSubmitDTO(8L,1L,"U05","SQL assignment Submission",
                 "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
                 timestamp1,null,null,-1);
+        mockAssignmentSubmitDTO4 = new AssignmentSubmitDTO(8L,1L,"U05","SQL assignment Submission",
+                "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
+                timestamp2,"U03",timestamp3,80);
 
         Batch batch = setMockBatch();
 
@@ -99,6 +111,8 @@ public class AssignmentSubmitServiceTest {
         mockAssignmentSubmit3 = new AssignmentSubmit(8L,mockAssignment,mockUser1,"SQL assignment Submission",
                 "First submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
                 timestamp1,null,null,-1,timestamp1,timestamp2);
+        mockAssignmentSubmit4 = new AssignmentSubmit(8L,mockAssignment,mockUser1,"second Submission", "Second submission","Filepath1", "Filepath2","Filepath3", "Filepath4","Filepath5",
+                timestamp3,"U03",timestamp2,80, timestamp1, timestamp2);
 
         mockAssignmentSubmitList = new ArrayList<>();
         mockAssignmentSubmitList.add(mockAssignmentSubmit1);
@@ -295,6 +309,83 @@ public class AssignmentSubmitServiceTest {
         //then
         assertNotNull(result);
         assertThat(result).isNotNull();
+
+    }
+
+    @Test
+    @DisplayName("Test to grade submissions")
+    @SneakyThrows
+    public void testGradeSubmissions() {
+        Long submissionId = 8L;
+        String gradedBy = "U03";
+
+        given(mockAssignmentSubmitRepository.findById(submissionId)).willReturn(Optional.of(mockAssignmentSubmit4));
+        given(mockAssignmentSubmitRepository.save(mockAssignmentSubmit4)).willReturn(mockAssignmentSubmit4);
+        given(assignmentSubmitMapper.toAssignmentSubmitDTO(mockAssignmentSubmit4)).willReturn(mockAssignmentSubmitDTO4);
+        when(mockUserRepository.existsById(gradedBy)).thenReturn(true);
+        when(mockUserRoleMapRepository.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
+                gradedBy,"R03","Active")).thenReturn(true);
+
+        mockAssignmentSubmit4.setSubComments("second Submission");
+        mockAssignmentSubmit4.setGrade(80);
+        mockAssignmentSubmit4.setGradedBy(gradedBy);
+
+        AssignmentSubmitDTO savedAssignmentSubmitDTO = mockAssignmentSubmitService.gradeAssignmentSubmission(mockAssignmentSubmitDTO4, submissionId);
+
+        assertNotNull(savedAssignmentSubmitDTO);
+        verify(mockUserRepository).existsById(gradedBy);
+        verify(mockUserRoleMapRepository).existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
+                gradedBy,"R03","Active");
+    }
+
+    @Test
+    @DisplayName("Test to grade assignment when submission doesn't exist")
+    public void testGradeSubmission_WhenSubmission_DoesNotExist(){
+        Long submissionId = 8L;
+        given(mockAssignmentSubmitRepository.findById(submissionId)).willReturn(Optional.empty());
+        Assertions.assertThrows(ResourceNotFoundException.class,
+                ()->mockAssignmentSubmitService.gradeAssignmentSubmission(mockAssignmentSubmitDTO4,submissionId));
+
+        verify(mockUserRepository,never()).existsById(any(String.class));
+        verify(mockAssignmentSubmitRepository, never()).save(any(AssignmentSubmit.class));
+        verify(assignmentSubmitMapper,never()).toAssignmentSubmitDTO(any(AssignmentSubmit.class));
+        verifyNoInteractions(mockUserRoleMapRepository);
+    }
+
+    @Test
+    @DisplayName("Test to grade assignment when Grader with given ID doesn't exist")
+    @SneakyThrows
+    public void testGradeSubmission_WhenGrader_DoesNotExist(){
+        Long submissionId = 8L;
+        given(mockAssignmentSubmitRepository.findById(submissionId)).willReturn(Optional.of(mockAssignmentSubmit4));
+        when(mockUserRepository.existsById(mockAssignmentSubmit4.getGradedBy())).thenReturn(false);
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                ()->mockAssignmentSubmitService.gradeAssignmentSubmission(mockAssignmentSubmitDTO4,submissionId));
+
+        verifyNoInteractions(mockUserRoleMapRepository);
+        verify(mockAssignmentSubmitRepository, never()).save(any(AssignmentSubmit.class));
+        verify(assignmentSubmitMapper,never()).toAssignmentSubmitDTO(any(AssignmentSubmit.class));
+
+    }
+
+    @Test
+    @DisplayName("Test to grade assignment when Grader isn't admin/staff ")
+    @SneakyThrows
+    public void testGradeSubmission_WhenGrader_NotAllowedToGrade(){
+        Long submissionId = 8L;
+        String gradedBy = "U03";
+        String message = "User "+gradedBy+" is not allowed to grade the submission";
+        given(mockAssignmentSubmitRepository.findById(submissionId)).willReturn(Optional.of(mockAssignmentSubmit4));
+        when(mockUserRepository.existsById(mockAssignmentSubmit4.getGradedBy())).thenReturn(true);
+        lenient().when(mockUserRoleMapRepository.
+                existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
+                        gradedBy,"R03","Active")).thenReturn(false);
+        InvalidDataException e = Assertions.assertThrows(InvalidDataException.class,
+                ()->mockAssignmentSubmitService.gradeAssignmentSubmission(mockAssignmentSubmitDTO4,submissionId));
+
+        assertNotNull(e.getMessage(),message);
+        verify(mockAssignmentSubmitRepository, never()).save(any(AssignmentSubmit.class));
+        verify(assignmentSubmitMapper,never()).toAssignmentSubmitDTO(any(AssignmentSubmit.class));
 
     }
 }
