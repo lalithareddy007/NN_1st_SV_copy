@@ -117,7 +117,67 @@ public class AssignmentSubmitControllerTest {
 				.andExpect(jsonPath("$", hasSize(assignmentSubmitDTOList.size())));
 		verify(assignmentSubmitService).getSubmissionsByBatch(batchId);
 
-	}
+}
+        @Test
+        @SneakyThrows
+        @DisplayName("Test for Get Grades if Assignment Id is not found")
+        public void testGetGradesByAssignmentId_notfound(){
+       
+        	Long assignmentId = 1L;
+        	String message = "Grades for students Assignment Id"+assignmentId+" not found";
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getGradesByAssinmentId(ArgumentMatchers.any(Long.class))).thenThrow(new ResourceNotFoundException(message));
+             
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGrades/{assignmentId}",assignmentId));
+        	resultActions.andExpectAll(status().isNotFound(),
+                      jsonPath("$.message").value(message))
+              .andDo(print());
+        	verify(assignmentSubmitService).getGradesByAssinmentId(ArgumentMatchers.any(Long.class));
+        }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test to Get Grades by Student Id")
+        public void testGetGradesByStudentId() {        
+        	
+        	String studentId= "U04";
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getGradesByStudentId(studentId)).thenReturn(assignmentSubmitDTOList);
+        	
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/grades/student/{studentId}",studentId));
+       	 	resultActions.andExpect(status().isOk())
+			.andDo(print())
+			.andExpect(jsonPath("$", hasSize(assignmentSubmitDTOList.size())));
+        	verify(assignmentSubmitService).getGradesByStudentId(studentId);
+        }
+        
+        @Test
+        @SneakyThrows
+        @DisplayName("Test for Get Grades if Student Id is not found")
+        public void testGetGradesByStudentId_notFound(){
+       
+        	String studentId= "U08";
+        	String message = "Grades for student with "+studentId+" not found";
+        	List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
+        	assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
+        	when(assignmentSubmitService.getGradesByStudentId(ArgumentMatchers.any(String.class))).thenThrow(new ResourceNotFoundException(message));
+             
+        	ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/grades/student/{studentId}",studentId));
+        	resultActions.andExpectAll(status().isNotFound(),
+                      jsonPath("$.message").value(message))
+              .andDo(print());
+        	verify(assignmentSubmitService).getGradesByStudentId(ArgumentMatchers.any(String.class));
+        }
+        
+        
 
 	@Test
 	@SneakyThrows
@@ -176,65 +236,6 @@ public class AssignmentSubmitControllerTest {
 		verify(assignmentSubmitService).getGradesByAssinmentId(assignmentId);
 	}
 
-
-	@Test
-	@SneakyThrows
-	@DisplayName("Test for Get Grades if Assignment Id is not found")
-	public void testGetGradesByAssignmentId_notfound() {
-
-		Long assignmentId = 1L;
-		String message = "Grades for students Assignment Id" + assignmentId + " not found";
-		List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
-		when(assignmentSubmitService.getGradesByAssinmentId(ArgumentMatchers.any(Long.class))).thenThrow(new ResourceNotFoundException(message));
-
-		ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGrades/{assignmentId}", assignmentId));
-		resultActions.andExpectAll(status().isNotFound(),
-						jsonPath("$.message").value(message))
-				.andDo(print());
-		verify(assignmentSubmitService).getGradesByAssinmentId(ArgumentMatchers.any(Long.class));
-	}
-
-	@Test
-	@SneakyThrows
-	@DisplayName("Test to Get Grades by Student Id")
-	public void testGetGradesByStudentId() {
-
-		String studentId = "U04";
-		List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
-		when(assignmentSubmitService.getGradesByStudentId(studentId)).thenReturn(assignmentSubmitDTOList);
-
-		ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGradesByStudentId/{studentId}", studentId));
-		resultActions.andExpect(status().isOk())
-				.andDo(print())
-				.andExpect(jsonPath("$", hasSize(assignmentSubmitDTOList.size())));
-		verify(assignmentSubmitService).getGradesByStudentId(studentId);
-	}
-
-	@Test
-	@SneakyThrows
-	@DisplayName("Test for Get Grades if Student Id is not found")
-	public void testGetGradesByStudentId_notFound() {
-
-		String studentId = "U08";
-		String message = "Grades for student with " + studentId + " not found";
-		List<AssignmentSubmitDTO> assignmentSubmitDTOList = new ArrayList<>();
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO1);
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO2);
-		assignmentSubmitDTOList.add(mockAssignmentSubmitDTO3);
-		when(assignmentSubmitService.getGradesByStudentId(ArgumentMatchers.any(String.class))).thenThrow(new ResourceNotFoundException(message));
-
-		ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission/getGradesByStudentId/{studentId}", studentId));
-		resultActions.andExpectAll(status().isNotFound(),
-						jsonPath("$.message").value(message))
-				.andDo(print());
-		verify(assignmentSubmitService).getGradesByStudentId(ArgumentMatchers.any(String.class));
-	}
 
 	@Test
 	@SneakyThrows

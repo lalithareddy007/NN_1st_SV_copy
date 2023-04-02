@@ -37,3 +37,4 @@ build/
 *.gz
 lmsservice.log
 *.DS_Store
+bin/
