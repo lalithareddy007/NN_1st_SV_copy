@@ -1,5 +1,8 @@
 server:
-  port: 1234
+#local
+  #port: 1234
+#heroku
+  port: $PORT
   servlet:
     context-path: /lms
 spring:
