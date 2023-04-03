@@ -108,7 +108,10 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-
+	@GetMapping("/users/programs/{programId}")
+	protected List<?> getUsersForProgram(@PathVariable(value="programId")Long programId) {
+		return userServices.getUsersForProgram(programId);
+	}
 	/** Check if the below end points are required or not for the future**/
     /*
 	//Check if this is needed form front end or not??

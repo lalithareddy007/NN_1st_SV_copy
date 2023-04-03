@@ -68,13 +68,37 @@ public class UserServices {
 		return userRoleMapRepository.findAll();
 	}
 
-	public List<UserRoleMap> getUsersForProgram(Long programId) {
+	/*public List<UserRoleMap> getUsersForProgram(Long programId) {
 		List<UserRoleMap> list = userRoleMapRepository.findUserRoleMapsByBatchesProgramProgramId(programId);
 
 		return list.stream().map(userRoleMap -> {
 			userRoleMap.getBatches().removeIf(batch -> batch.getProgram().getProgramId() == programId);
 			return userRoleMap;
 		}).collect(Collectors.toList());
+	}*/
+	public List<UserRoleProgramBatchDto> getUsersForProgram(Long programId) {
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId);
+		if (userRoleProgramBatchMapList.isEmpty()) {
+			throw new ResourceNotFoundException("No Users found for the given program ID: " + programId);
+		}
+		List<UserRoleProgramBatchDto> userRoleProgramBatchDtoList = new ArrayList<>();
+		for (UserRoleProgramBatchMap userRoleProgramBatchMap : userRoleProgramBatchMapList) {
+
+			UserRoleProgramBatchDto userRoleProgramBatchDto = new UserRoleProgramBatchDto();
+			userRoleProgramBatchDto.setRoleId(userRoleProgramBatchMap.getRole().getRoleId());
+			userRoleProgramBatchDto.setUserId(userRoleProgramBatchMap.getUser().getUserId());
+
+			UserRoleProgramBatchSlimDto userRoleProgramBatchSlimDto = new UserRoleProgramBatchSlimDto();
+			userRoleProgramBatchSlimDto.setBatchId(userRoleProgramBatchMap.getBatch().getBatchId());
+			userRoleProgramBatchSlimDto.setUserRoleProgramBatchStatus(userRoleProgramBatchMap.getUserRoleProgramBatchStatus());
+
+			List<UserRoleProgramBatchSlimDto> userRoleProgramBatchSlimDtoList = new ArrayList<>();
+			userRoleProgramBatchSlimDtoList.add(userRoleProgramBatchSlimDto);
+			userRoleProgramBatchDto.setUserRoleProgramBatches(userRoleProgramBatchSlimDtoList);
+
+			userRoleProgramBatchDtoList.add(userRoleProgramBatchDto);
+		}
+		return userRoleProgramBatchDtoList;
 	}
 
 	@Transactional
