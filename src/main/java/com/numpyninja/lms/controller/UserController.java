@@ -5,6 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.numpyninja.lms.dto.*;
+import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -154,5 +156,11 @@ public class UserController {
     	UserDto responseDto = userServices.updateUserWithRole(updateUserRoleDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }*/
-
+	
+	//USER - GET USER BY PROGRAM-Batch
+	@GetMapping("/users/programBatch/{batchId}")
+	public ResponseEntity<List<UserRoleProgramBatchDto>> getUserByProgramBatches(@PathVariable Integer batchId) throws ResourceNotFoundException
+	{
+		return ResponseEntity.ok(this.userServices.getUserByProgramBatch(batchId));
+	}
 }

@@ -88,6 +88,20 @@ public class ProgBatchRepositoryTest {
 		Optional<Batch> optionalBatch = progBatchRepository
 				.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(1, 2L, "active");
 
-		assertThat(optionalBatch).isNotEmpty();
+		assertThat(optionalBatch).isNotEqualTo(0);
 	}
+	
+	
+	@DisplayName("test to get batchName and Program by programId")
+	@Test
+	public void testFindByBatchNameAndProgram_ProgramId() {
+		
+		String batchName = "SDET";
+		Long ProgramID = 2L;
+		Batch optionalBatch = progBatchRepository
+				.findByBatchNameAndProgram_ProgramId(batchName, ProgramID);
+		assertThat(optionalBatch).isNotEqualTo(0);
+		
+	}
+	
 }

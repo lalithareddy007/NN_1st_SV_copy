@@ -1,7 +1,9 @@
 package com.numpyninja.lms.services;
 
+import com.numpyninja.lms.config.UserIDGenerator;
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
@@ -605,7 +607,46 @@ public class UserServices {
 			throw new ResourceNotFoundException("No staff data is available in database");
 		}
 	}
+	
+	
 
+	public List<UserRoleProgramBatchDto> getUserByProgramBatch(Integer batchid) {
+		
+	List<UserRoleProgramBatchMap> UserProgBatch = userRoleProgramBatchMapRepository.findByBatch_BatchId(batchid);
+	List<UserRoleProgramBatchDto>	UserProgBatchDtoList = new ArrayList<UserRoleProgramBatchDto>();
+	
+	if(UserProgBatch.isEmpty())
+	throw new ResourceNotFoundException("User PRogBatch not found with batchId :" + batchid);
+
+	
+	
+      UserProgBatch.forEach((x) -> {
+		UserRoleProgramBatchDto pBDto = new UserRoleProgramBatchDto();
+	   Integer	bid = x.getBatch().getBatchId();
+	   
+	   if(bid==batchid)
+	   {
+		pBDto.setUserId(x.getUser().getUserId());
+		UserProgBatchDtoList.add(pBDto);
+	   }
+			
+			
+	});
+return UserProgBatchDtoList;
+	
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
