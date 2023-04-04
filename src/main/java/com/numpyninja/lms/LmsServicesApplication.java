@@ -1,6 +1,7 @@
 package com.numpyninja.lms;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -18,7 +19,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 //@ComponentScan(basePackages="com.ninja.lms")
 @Configuration
 public class LmsServicesApplication {
+	
+    @Value("${app.frontend.url}")
+    private String frontEndURL;
 
+	
     public static void main(String[] args) {
         SpringApplication.run(LmsServicesApplication.class, args);
     }
@@ -40,7 +45,7 @@ public class LmsServicesApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("https://lms-frontend.herokuapp.com");
+				registry.addMapping("/**").allowedOrigins(frontEndURL);
 			}
 		};
 	}
