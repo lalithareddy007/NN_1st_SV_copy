@@ -128,7 +128,7 @@ public class UserControllerTest {
 
 	@Test
 	@DisplayName("test to get all the users")
-	void testgetAllUsers() throws Exception {
+	void testGetAllUsers() throws Exception {
 
 		UserDto mockUserDto2 = new UserDto("U02", "Abdul", "Kalam", " ", 2222222222L, "India", "IST",
 				"www.linkedin.com/Kalam1234", "MCA", "MBA", "Indian scientist", "H4");

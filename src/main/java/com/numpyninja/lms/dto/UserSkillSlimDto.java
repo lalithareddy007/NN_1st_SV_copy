@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class UserSkillSlimDto {
 
-    private int skillId;
+    private Long skillId;
 
     private String skillName;
 
