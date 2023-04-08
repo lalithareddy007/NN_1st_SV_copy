@@ -7,6 +7,9 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
 import com.numpyninja.lms.repository.*;
+import lombok.SneakyThrows;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.assertj.core.api.BDDAssumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +24,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -59,7 +61,7 @@ class UserServicesTest {
 
 	private UserDto mockUserDto;
 
-	private UserMapper userMapper1 ;
+	private UserMapper userMapper1;
 
 	private UserRoleMap mockUserRoleMap;
 	private UserRoleMap mockUserRoleMap1;
@@ -107,17 +109,17 @@ class UserServicesTest {
 
 		Program program = new Program((long) 7, "Django", "new Prog", "nonActive", Timestamp, Timestamp);
 		Batch batch = new Batch(1, "SDET 1", "SDET Batch 1", "Active", program, 5, Timestamp, Timestamp);
-		Role userRole1 = new Role("R01","Staff","LMS_Staff",Timestamp,Timestamp);
-		Role userRole2= new Role("R02","User","LMS_User",Timestamp,Timestamp);
-		mockRole = new Role("R01","Staff","LMS_Staff",Timestamp,Timestamp);
+		Role userRole1 = new Role("R01", "Staff", "LMS_Staff", Timestamp, Timestamp);
+		Role userRole2 = new Role("R02", "User", "LMS_User", Timestamp, Timestamp);
+		mockRole = new Role("R01", "Staff", "LMS_Staff", Timestamp, Timestamp);
 
 		Set<Batch> batchSet = new HashSet<Batch>();
 		batchSet.add(batch);
 
-		mockUserRoleMap = new UserRoleMap(userRoleId,mockUser,userRole2,batchSet,userRoleStatus,Timestamp,Timestamp);
+		mockUserRoleMap = new UserRoleMap(userRoleId, mockUser, userRole2, batchSet, userRoleStatus, Timestamp, Timestamp);
 
 
-		mockUserRoleMap1 = new UserRoleMap(userRoleId,mockUser,userRole1,batchSet,userRoleStatus,Timestamp,Timestamp);
+		mockUserRoleMap1 = new UserRoleMap(userRoleId, mockUser, userRole1, batchSet, userRoleStatus, Timestamp, Timestamp);
 
 		userRoleMapsSlimList = new ArrayList<>();
 
@@ -132,7 +134,7 @@ class UserServicesTest {
 				"BCA", "MBA", "", "H4", Timestamp.valueOf(LocalDateTime.now()),
 				Timestamp.valueOf(LocalDateTime.now()));
 
-		mockRole2 = new Role("R03","Student","LMS_User",Timestamp.valueOf(LocalDateTime.now()),
+		mockRole2 = new Role("R03", "Student", "LMS_User", Timestamp.valueOf(LocalDateTime.now()),
 				Timestamp.valueOf(LocalDateTime.now()));
 
 		List<UserRoleProgramBatchSlimDto> mockUserRoleProgramBatches =
@@ -153,7 +155,7 @@ class UserServicesTest {
 				5, Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
 
 		mockUserRoleProgramBatchMap = new UserRoleProgramBatchMap(1L, mockUser2, mockRole2,
-				mockProgram, mockBatch, "Active",  Timestamp.valueOf(LocalDateTime.now()),
+				mockProgram, mockBatch, "Active", Timestamp.valueOf(LocalDateTime.now()),
 				Timestamp.valueOf(LocalDateTime.now()));
 
 		return mockUserDto;
@@ -170,7 +172,7 @@ class UserServicesTest {
 		//	.willReturn(Optional.empty());
 		given(userMapper.user(mockUserDto)).willReturn(mockUser);
 		given(userRepo.save(mockUser)).willReturn(mockUser);
-		given(userMapper.userDto(mockUser)).willReturn(mockUserDto)	;
+		given(userMapper.userDto(mockUser)).willReturn(mockUserDto);
 
 		//when
 		UserDto userDto = userService.createUser(mockUserDto);
@@ -201,7 +203,7 @@ class UserServicesTest {
 		given(userMapper.userDto(mockUser)).willReturn(mockUserDto);
 
 		//when
-		UserDto userDto  = userService.createUserWithRole(mockUserAndRoleDto);
+		UserDto userDto = userService.createUserWithRole(mockUserAndRoleDto);
 		//then
 		assertThat(userDto).isNotNull();
 
@@ -211,7 +213,7 @@ class UserServicesTest {
 	@DisplayName("test for creating a new user with duplicate phone number - throws exception")
 		//@Test
 		//@Order(3)
-	void testCreateUserWithDuplicatePhoneNumber()  {
+	void testCreateUserWithDuplicatePhoneNumber() {
 
 		long userPhoneNum = 2222222222L;
 		//mockUserDto.getUserPhoneNumber()
@@ -220,12 +222,12 @@ class UserServicesTest {
 
 		//System.out.println("mockUserDto...... " +mockUserDto.getUserLastName() + mockUserDto.getUserPhoneNumber());
 		// when
-		assertThrows(DuplicateResourceFoundException.class, ()->userService.createUser(mockUserDto));
+		assertThrows(DuplicateResourceFoundException.class, () -> userService.createUser(mockUserDto));
 
 		Mockito.verify(userMapper, never()).user(any(UserDto.class));
 
 		verify(userRepo, never()).save(any(User.class));
-		verify(userMapper,never()).userDto(any(User.class));
+		verify(userMapper, never()).userDto(any(User.class));
 	}
 
 
@@ -241,13 +243,13 @@ class UserServicesTest {
 		mockuser2.setUserPhoneNumber(1122112211L);
 
 
-		List<User>  userList = new ArrayList<>();
+		List<User> userList = new ArrayList<>();
 		userList.add(mockUser);
 		userList.add(mockuser2);
 
 		UserDto mockUserMapper = userMapper.userDto(mockUser);
 		UserDto mockUserMapper1 = userMapper.userDto(mockuser2);
-		List<UserDto>  userMapperDtoList = new ArrayList<>();
+		List<UserDto> userMapperDtoList = new ArrayList<>();
 		userMapperDtoList.add(mockUserMapper);
 		userMapperDtoList.add(mockUserMapper1);
 
@@ -309,7 +311,7 @@ class UserServicesTest {
 
 		Long userRoleId = 1L;
 		String userRoleStatus = "Active";
-		Role userRole3= new Role("R02","User","LMS_User",Timestamp,Timestamp);
+		Role userRole3 = new Role("R02", "User", "LMS_User", Timestamp, Timestamp);
 		Set<Batch> batchSet1 = new HashSet<Batch>();
 
 
@@ -326,8 +328,8 @@ class UserServicesTest {
 				"MCA", "MBA", "Physicist", "H4", new Timestamp(utilDate.getTime()),
 				new Timestamp(utilDate.getTime()));
 
-		UserRoleMap mockUserRoleMap2 = new UserRoleMap(userRoleId,mockUser2,userRole3,batchSet1,userRoleStatus,Timestamp,Timestamp);
-		UserRoleMap mockUserRoleMap3 = new UserRoleMap(userRoleId,mockUser3,userRole3,batchSet1,userRoleStatus,Timestamp,Timestamp);
+		UserRoleMap mockUserRoleMap2 = new UserRoleMap(userRoleId, mockUser2, userRole3, batchSet1, userRoleStatus, Timestamp, Timestamp);
+		UserRoleMap mockUserRoleMap3 = new UserRoleMap(userRoleId, mockUser3, userRole3, batchSet1, userRoleStatus, Timestamp, Timestamp);
 
 		userRoleMapList = new ArrayList<>();
 		userRoleMapList.add(mockUserRoleMap);
@@ -368,7 +370,9 @@ class UserServicesTest {
 
 	}
 
-	/** JUnit test cases for mapping program/batch(es) to Student/Staff : START **/
+	/**
+	 * JUnit test cases for mapping program/batch(es) to Student/Staff : START
+	 **/
 	@DisplayName("test - assignUpdateUserRoleProgramBatchStatus - Validate ProgramId")
 	@Test
 	void testAssignUpdateUserRoleProgramBatchStatus_ValidateProgramId() {
@@ -738,8 +742,8 @@ class UserServicesTest {
 		when(progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
 				(anyInt(), anyLong(), anyString())).thenReturn(Optional.of(mockBatch));
 		lenient().when(userRoleProgramBatchMapRepository
-				.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
-						(anyString(), anyString(), anyString()))
+						.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
+								(anyString(), anyString(), anyString()))
 				.thenReturn(Optional.empty());
 		when(userRoleProgramBatchMapRepository
 				.findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId(anyString(), anyString(),
@@ -773,8 +777,8 @@ class UserServicesTest {
 		when(progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
 				(anyInt(), anyLong(), anyString())).thenReturn(Optional.of(mockBatch));
 		lenient().when(userRoleProgramBatchMapRepository
-				.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
-						(anyString(), anyString(), anyString()))
+						.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
+								(anyString(), anyString(), anyString()))
 				.thenReturn(Optional.of(mockUserRoleProgramBatchMap));
 		when(userRoleProgramBatchMapRepository
 				.findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId(anyString(), anyString(),
@@ -878,5 +882,51 @@ class UserServicesTest {
 
 		assertEquals(message, response);
 	}
-	/** JUnit test cases for mapping program/batch(es) to Student/Staff : END **/
+
+	/**
+	 * JUnit test cases for mapping program/batch(es) to Student/Staff : END
+	 **/
+
+
+	@DisplayName("test for getting List of Users for a given Program - ProgramId")
+	@Test
+	void getUsersByProgram_returnsUsers_whenProgramExists() {
+		// Given
+		long programId = 7;
+
+		when(programRepository.findById(programId)).thenReturn(Optional.of(mockProgram));
+		when(programRepository.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(anyLong(), anyString())).thenReturn(Optional.of(mockProgram));
+
+		UserRoleProgramBatchMap mockUserRoleProgramBatchMap = new UserRoleProgramBatchMap();
+
+		mockUserRoleProgramBatchMap.setUserRoleProgramBatchStatus("Active");
+		mockUserRoleProgramBatchMap.setUser(mockUser2);
+
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMaplist = new ArrayList<UserRoleProgramBatchMap>();
+		userRoleProgramBatchMaplist.add(mockUserRoleProgramBatchMap);
+		when(userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId)).thenReturn(userRoleProgramBatchMaplist);
+
+	// When
+		List<UserDto> result = userService.getUsersByProgram(programId);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.size()).isGreaterThan(0);
+	}
+
+	@DisplayName("Test getUsersByProgram_returnsEmptyList_whenProgramDoesNotExist()")
+	@Test
+	void getUsersByProgram_returnsEmptyList_whenProgramDoesNotExist() {
+		// Given
+		long programId = 30;
+	when(programRepository.findById(programId)).thenReturn(Optional.empty());
+
+		// When
+		assertThrows(ResourceNotFoundException.class, () -> userService.getUsersByProgram(programId));
+
+		// Then
+		Mockito.verify(programRepository).findById(programId);
+	}
+
+
 }
