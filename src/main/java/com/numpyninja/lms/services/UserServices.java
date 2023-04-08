@@ -83,7 +83,6 @@ public class UserServices {
 
 		Program program = programRepository.findById(programId)
 				.orElseThrow(() -> new ResourceNotFoundException("programId " + programId + " not found"));
-
 		// Check if the program is active
 		Optional<Program> optProgram = programRepository.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(programId,program.getProgramStatus());
 
@@ -93,14 +92,12 @@ public class UserServices {
 
 		// Retrieve the user-role-program-batch mapping for the given program ID
 		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId);
-
 		if (userRoleProgramBatchMapList.isEmpty()) {
 			throw new ResourceNotFoundException("No Users found for the given program ID: " + programId);
 		}
 
 			// Map the user-role-program-batch mapping to UserDto objects
 			List<UserDto> userDtoList = new ArrayList<>();
-
 		for (UserRoleProgramBatchMap userRoleProgramBatchMap : userRoleProgramBatchMapList) {
 			if (userRoleProgramBatchMap.getUserRoleProgramBatchStatus().equals("Active")) {
 				UserDto userDto = new UserDto();

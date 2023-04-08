@@ -111,7 +111,8 @@ public class UserController {
 	@GetMapping("/users/programs/{programId}")
 	public ResponseEntity<List<UserDto>> getUsersForProgram(@PathVariable Long programId) throws ResourceNotFoundException {
 		{
-			return ResponseEntity.ok(this.userServices.getUsersByProgram(programId));
+			List<UserDto> list = userServices.getUsersByProgram(programId);
+			return ResponseEntity.status(HttpStatus.OK).body(list);
 		}
 		/** Check if the below end points are required or not for the future**/
     /*
