@@ -894,8 +894,8 @@ class UserServicesTest {
 		// Given
 		long programId = 7;
 
+
 		when(programRepository.findById(programId)).thenReturn(Optional.of(mockProgram));
-		when(programRepository.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(anyLong(), anyString())).thenReturn(Optional.of(mockProgram));
 
 		UserRoleProgramBatchMap mockUserRoleProgramBatchMap = new UserRoleProgramBatchMap();
 
@@ -906,12 +906,17 @@ class UserServicesTest {
 		userRoleProgramBatchMaplist.add(mockUserRoleProgramBatchMap);
 		when(userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId)).thenReturn(userRoleProgramBatchMaplist);
 
-	// When
+		List<UserDto> mockUserDtoList = new ArrayList<>();
+		mockUserDtoList.add(mockUserDto);
+		when(userMapper.userDtos(anyList())).thenReturn(mockUserDtoList);
+
+		// When
 		List<UserDto> result = userService.getUsersByProgram(programId);
 
 		// Then
 		assertThat(result).isNotNull();
-		assertThat(result.size()).isGreaterThan(0);
+		assertThat(result.size()).isEqualTo(1);
+		assertThat(result.get(0)).isEqualTo(mockUserDto);
 	}
 
 	@DisplayName("Test getUsersByProgram_returnsEmptyList_whenProgramDoesNotExist()")

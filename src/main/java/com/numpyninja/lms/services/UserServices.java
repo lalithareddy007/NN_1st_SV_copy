@@ -79,49 +79,6 @@ public class UserServices {
 		}).collect(Collectors.toList());
 	}*/
 
-	public List<UserDto> getUsersByProgram(Long programId) {
-
-		Program program = programRepository.findById(programId)
-				.orElseThrow(() -> new ResourceNotFoundException("programId " + programId + " not found"));
-		// Check if the program is active
-		Optional<Program> optProgram = programRepository.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(programId,program.getProgramStatus());
-
-		if(optProgram==null){
-			new ResourceNotFoundException("Program not found or inactive for the given program ID: " + programId);
-		}
-
-		// Retrieve the user-role-program-batch mapping for the given program ID
-		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId);
-		if (userRoleProgramBatchMapList.isEmpty()) {
-			throw new ResourceNotFoundException("No Users found for the given program ID: " + programId);
-		}
-
-			// Map the user-role-program-batch mapping to UserDto objects
-			List<UserDto> userDtoList = new ArrayList<>();
-		for (UserRoleProgramBatchMap userRoleProgramBatchMap : userRoleProgramBatchMapList) {
-			if (userRoleProgramBatchMap.getUserRoleProgramBatchStatus().equals("Active")) {
-				UserDto userDto = new UserDto();
-				userDto.setUserId(userRoleProgramBatchMap.getUser().getUserId());
-				userDto.setUserFirstName(userRoleProgramBatchMap.getUser().getUserFirstName());
-				userDto.setUserLastName(userRoleProgramBatchMap.getUser().getUserLastName());
-				userDto.setUserMiddleName(userRoleProgramBatchMap.getUser().getUserMiddleName());
-				userDto.setUserComments(userRoleProgramBatchMap.getUser().getUserComments());
-				userDto.setUserLocation(userRoleProgramBatchMap.getUser().getUserLocation());
-				userDto.setUserEduPg(userRoleProgramBatchMap.getUser().getUserEduPg());
-				userDto.setUserEduUg(userRoleProgramBatchMap.getUser().getUserEduUg());
-				userDto.setUserTimeZone(userRoleProgramBatchMap.getUser().getUserTimeZone());
-				userDto.setUserLinkedinUrl(userRoleProgramBatchMap.getUser().getUserLinkedinUrl());
-				userDto.setUserVisaStatus(userRoleProgramBatchMap.getUser().getUserVisaStatus());
-			userDto.setUserPhoneNumber(userRoleProgramBatchMap.getUser().getUserPhoneNumber());
-				userDtoList.add(userDto);
-			}}
-			if (userDtoList.isEmpty()) {
-				throw new ResourceNotFoundException("No active Users found for the given program ID: " + programId);
-			}
-
-			return userDtoList;
-		}
-
 	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
 			throws InvalidDataException, DuplicateResourceFoundException {
@@ -651,7 +608,26 @@ public class UserServices {
 		}
 	}
 
+	public List<UserDto> getUsersByProgram(Long programId) {
 
+		Program program = programRepository.findById(programId)
+				.orElseThrow(() -> new ResourceNotFoundException("programId " + programId + " not found"));
+
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId);
+
+		if (userRoleProgramBatchMapList.isEmpty()) {
+			throw new ResourceNotFoundException("No Users found for the given program ID: " + programId);
+		}
+
+		// Use the UserMapper to directly map each User object to its corresponding UserDto object
+		List<UserDto> userDtoList = userRoleProgramBatchMapList.stream()
+				.map(UserRoleProgramBatchMap::getUser)
+				.map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
+				.collect(Collectors.toList());
+
+		return userDtoList;
+	}
+}
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
 	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
@@ -659,4 +635,4 @@ public class UserServices {
 	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
 	 */
 
-}
+
