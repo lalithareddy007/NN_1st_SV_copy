@@ -58,11 +58,9 @@ public class UserRoleMapRepositoryTest {
 		Role role = new Role("R03", "User", "LMS_User", new Timestamp(utilDate.getTime()),
 				new Timestamp(utilDate.getTime()));
 
-		Set<Batch> batches = new HashSet<Batch>();
-
 		String userRoleStatus = "Active";
 
-		mockUserRoleMap = new UserRoleMap(userRoleId, user, role, batches, userRoleStatus,
+		mockUserRoleMap = new UserRoleMap(userRoleId, user, role, userRoleStatus,
 				new Timestamp(utilDate.getTime()), new Timestamp(utilDate.getTime()));
 				
 		return mockUserRoleMap;

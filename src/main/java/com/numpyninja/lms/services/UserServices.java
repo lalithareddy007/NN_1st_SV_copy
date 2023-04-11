@@ -5,7 +5,7 @@ import com.numpyninja.lms.entity.*;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
-import com.numpyninja.lms.mappers.UserMapper;
+import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +46,24 @@ public class UserServices {
 	@Autowired
 	UserRoleProgramBatchMapRepository userRoleProgramBatchMapRepository;
 
+	@Autowired
+	ProgramMapper programMapper;
+
+	@Autowired
+	BatchMapper batchMapper;
+
+	@Autowired
+	UserSkillRepository userSkillRepository;
+
+	@Autowired
+	UserSkillMapper userSkillMapper;
+
+	@Autowired
+	UserPictureRepository userPictureRepository;
+
+	@Autowired
+	UserPictureMapper userPictureMapper;
+
 	private static final String ROLE_STUDENT = "R03";
 
 	public List<UserDto> getAllUsers() {
@@ -53,22 +71,37 @@ public class UserServices {
 		// return userRepository.findAll();
 	}
 
-	public List<UserRoleMap> getUserInfoById(String Id) throws ResourceNotFoundException {
-		Optional<User> userById = userRepository.findById(Id);
-		if (userById.isEmpty()) {
-			throw new ResourceNotFoundException("User Id " + Id + " not found");
-		} else {
-			List<UserRoleMap> userroleMap = userRoleMapRepository.findUserRoleMapsByUserUserId(Id);
-			// System.out.println("userroleMap " + userroleMap);
-			return userroleMap;
-		}
-	}
+	public UserAllDto getUserInfoById(String userId){
+		User existingUser = userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-	// Displays Users Info with their user status, role, batch and program info
-	public List<UserRoleMap> getAllUsersWithRoles() {
-		// List<UserRoleMap> list = userRoleMapRepository.findAll();
-		return userRoleMapRepository.findAll();
-	}
+		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
+
+		UserAllDto userAllDto = UserAllDto.builder()
+				.userDto(userMapper.userDto(existingUser))
+				.userRoleMaps(userMapper.toUserRoleMapSlimDtos(userRoleMaps))
+				.build();
+
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository.findByUser_UserId(userId);
+		if(!userRoleProgramBatchMaps.isEmpty()) {
+			List<UserProgramBatchSlimDto> userProgramBatchSlimDtoList = new ArrayList<>();
+			Map<Program,List<UserRoleProgramBatchMap>> convertedMap = userRoleProgramBatchMaps.stream()
+					.collect(Collectors.groupingBy(UserRoleProgramBatchMap::getProgram));
+			for (Map.Entry<Program,List<UserRoleProgramBatchMap>> entrySet : convertedMap.entrySet()) {
+				UserProgramBatchSlimDto userProgramBatchSlimDto = UserProgramBatchSlimDto.builder()
+						.programId(entrySet.getKey().getProgramId())
+						.programName(entrySet.getKey().getProgramName())
+						.batchSlimDto(batchMapper.toBatchSlimDtoList(entrySet.getValue()))
+						.build();
+				userProgramBatchSlimDtoList.add(userProgramBatchSlimDto);
+			}
+			userAllDto.setUserProgramBatchSlimDtos(userProgramBatchSlimDtoList);
+		}
+
+		List<UserSkill> userSkills = userSkillRepository.findByUserId(userId);
+		if(!userSkills.isEmpty())
+			userAllDto.setUserSkillSlimDtos(userSkillMapper.toUserSkillSlimDtoList(userSkills));
+
 
 	/*public List<UserRoleMap> getUsersForProgram(Long programId) {
 		List<UserRoleMap> list = userRoleMapRepository.findUserRoleMapsByBatchesProgramProgramId(programId);
@@ -78,6 +111,14 @@ public class UserServices {
 			return userRoleMap;
 		}).collect(Collectors.toList());
 	}*/
+
+		List<UserPictureEntity> userPictureEntityList = userPictureRepository.findByUser_UserId(userId);
+		if(!userPictureEntityList.isEmpty())
+			userAllDto.setUserPictureSlimDtos(userPictureMapper.toUserPictureSlimDtoList(userPictureEntityList));
+
+		return userAllDto;
+	}
+
 
 	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
@@ -462,10 +503,31 @@ public class UserServices {
 		return isVisaStatusValid;
 	}
 
+	public List<Object> getAllStaff()
+	{
+		List<Object> result=userRepository.getAllStaffList();
+		if(!(result.size()<=0))
+		{
+			//return (userMapper.toUserStaffDTO(result));
+			return result;
+		}else
+		{
+			throw new ResourceNotFoundException("No staff data is available in database");
+		}
+	}
+
 	/**
 	 * Check if the code below this comment are needed or not from front end. - The
 	 * controller endpoints for these are commented out for now.
 	 */
+
+/*
+
+	// Displays Users Info with their user status, role
+	public List<UserRoleMap> getAllUsersWithRoles() {
+		// List<UserRoleMap> list = userRoleMapRepository.findAll();
+		return userRoleMapRepository.findAll();
+	}
 
 	public UserDto createUser(UserDto newUserDto) throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
@@ -473,7 +535,6 @@ public class UserServices {
 
 		if (newUserDto != null) {
 
-			/** Checking phone number to prevent duplicate entry **/
 			List<User> userList = userRepository.findAll();
 			if (userList.size() > 0) {
 				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserDto.getUserPhoneNumber());
@@ -482,11 +543,11 @@ public class UserServices {
 							+ newUserDto.getUserPhoneNumber() + " already exists !!");
 				}
 			}
-			/** Checking for valid TimeZone **/
+
 			if (!isTimeZoneValid(newUserDto.getUserTimeZone())) {
 				throw new InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
 			}
-			/** Checking for valid Visa Status **/
+
 			if (!isVisaStatusValid(newUserDto.getUserVisaStatus())) {
 				throw new InvalidDataException("Failed to create user, as 'Visa Status' is invalid !! ");
 			}
@@ -595,6 +656,7 @@ public class UserServices {
 
 	}
 
+
 	public List<Object> getAllStaff()
 	{
 		List<Object> result=userRepository.getAllStaffList();
@@ -634,5 +696,8 @@ public class UserServices {
 	 * { throw new ResourceNotFoundException("User Id " + Id +" not found"); } else
 	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
 	 */
+
+*/
+
 
 

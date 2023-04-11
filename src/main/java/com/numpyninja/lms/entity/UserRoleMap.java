@@ -47,11 +47,11 @@ public class UserRoleMap {
     @JoinColumn ( name = "role_id", nullable = false )
 	private Role role;
 	
-	@ManyToMany   //  defualt fetch is FetchType.LAZY ; so we dont need to specify expilcitly
+	/*@ManyToMany   //  defualt fetch is FetchType.LAZY ; so we dont need to specify expilcitly
 	@JoinTable(name="tbl_lms_userbatch_map",
                joinColumns={@JoinColumn(name="user_role_id")},
                inverseJoinColumns={@JoinColumn(name="batch_id")})
-	private Set<Batch> batches;
+	private Set<Batch> batches;*/
 	
 	@Column( name ="user_role_status")
 	private String userRoleStatus;
