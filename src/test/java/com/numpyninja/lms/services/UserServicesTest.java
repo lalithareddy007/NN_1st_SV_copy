@@ -883,49 +883,35 @@ class UserServicesTest {
 	/** JUnit test cases for mapping program/batch(es) to Student/Staff : END **/
 	
 	
-	
-	
-	
-	
-	
 	@DisplayName("test for getting List of Users for a given Program/batch batchid")
 	@Test
 	void GetUserByProgramBatches() {
-
-
-	 //Integer bidInteger =1;
-	 Batch batch = mockBatch;
+     Batch batch = mockBatch;
 	 given(progBatchRepository.findById(mockBatch.getBatchId())).willReturn(Optional.of(mockBatch));
 
-	 UserRoleProgramBatchMap userRoleProgramBatchMap = mockUserRoleProgramBatchMap;
+	 UserRoleProgramBatchMap userRoleProgramBatchMap = new UserRoleProgramBatchMap();
 	 userRoleProgramBatchMap.setUserRoleProgramBatchStatus("active");
-	 //userRoleProgramBatchMap.setUser(mockUser.getUserId());
-
-	 UserDto userDto = mockUserDto;
-	 userDto.setUserId("U02");
-
-
-	 List<UserRoleProgramBatchMap> userRoleProgramBatchMaplist = new ArrayList<UserRoleProgramBatchMap>();
-	 userRoleProgramBatchMaplist.add(userRoleProgramBatchMap);
-
-	 List<UserDto> userdtoList = new ArrayList<UserDto>();
-	 userdtoList.add(userDto);
-
-	 when(userRoleProgramBatchMapRepository.findByBatch_BatchId(batch.getBatchId())).thenReturn(userRoleProgramBatchMaplist);
-	 when(progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
-	   (anyInt(), anyLong(), anyString())).thenReturn(Optional.of(mockBatch));
-
-	 //when
-	 List<UserDto> userDtos = userService.getUserByProgramBatch(batch.getBatchId());
-	
+	 mockUserRoleProgramBatchMap.setUser(mockUser2);
 	 
-	 //then
-	 assertThat(userDtos).isNotNull();
-	 assertThat(userDtos.size()).isGreaterThan(0);
-	}
-	
-	
+	 List<UserRoleProgramBatchMap> userRoleProgramBatchMaplist = new ArrayList<UserRoleProgramBatchMap>();
+	 userRoleProgramBatchMaplist.add(mockUserRoleProgramBatchMap);
+	 when(userRoleProgramBatchMapRepository.findByBatch_BatchId(batch.getBatchId()))
+	     .thenReturn(userRoleProgramBatchMaplist);
 
+	 List<UserDto> mockUserDtoList = new ArrayList<>();
+	 mockUserDtoList.add(mockUserDto);
+	 when(userMapper.userDtos(anyList())).thenReturn(mockUserDtoList);
+	 
+	 // When
+	 List<UserDto> result = userService.getUserByProgramBatch(batch.getBatchId());
+
+	 // Then
+	 assertThat(result).isNotNull();
+	 assertThat(result.size()).isEqualTo(1);
+	 assertThat(result.get(0)).isEqualTo(mockUserDto);
+
+	 
 	}
+}
 
 

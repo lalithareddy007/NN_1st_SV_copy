@@ -609,67 +609,28 @@ public class UserServices {
 	}
 	
 	
-
+//get users by batchid
 	public List<UserDto> getUserByProgramBatch(Integer batchid) {
 	
 	Batch batch= progBatchRepository.findById(batchid)
 				.orElseThrow(() -> new ResourceNotFoundException("batchid " + batchid + " not found"));
-	 
-    Optional<Batch> progOptional =	progBatchRepository .findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(
-			batch.getBatchId(),batch.getProgram().getProgramId(),batch.getBatchStatus());
-    
-    if(progOptional==null)
-    		throw new ResourceNotFoundException("Program with " + batchid + " not active/found");
 	
-	List<UserRoleProgramBatchMap> UserProgBatch = userRoleProgramBatchMapRepository.findByBatch_BatchId(batchid);
-	System.out.println(UserProgBatch);
-	//List<UserRoleProgramBatchDto>	UserProgBatchDtoList = new ArrayList<UserRoleProgramBatchDto>();
+	List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByBatch_BatchId(batchid);
 	
-	List<UserDto> userDtoList = new ArrayList<UserDto>();
-	if(UserProgBatch.isEmpty())
-	throw new ResourceNotFoundException("User PRogBatch not found with batchId :" + batchid);
-
-	UserProgBatch.forEach((x) -> {
-		//UserRoleProgramBatchDto pBDto = new UserRoleProgramBatchDto();
-    	  UserDto userDto = new UserDto();
-    	  Integer	bid = x.getBatch().getBatchId();
-	   
-	   if(bid==batchid)
-	   {
-		   userDto.setUserComments(x.getUser().getUserComments());
-		   userDto.setUserEduPg(x.getUser().getUserEduPg());
-		   userDto.setUserEduUg(x.getUser().getUserEduUg());
-		   userDto.setUserFirstName(x.getUser().getUserFirstName());
-		   userDto.setUserId(x.getUser().getUserId());
-		   userDto.setUserLastName(x.getUser().getUserLastName());
-		   userDto.setUserLinkedinUrl(x.getUser().getUserLinkedinUrl());
-		   userDto.setUserLocation(x.getUser().getUserLocation());
-		   userDto.setUserMiddleName(x.getUser().getUserMiddleName());
-		   userDto.setUserPhoneNumber(x.getUser().getUserPhoneNumber());
-		   userDto.setUserTimeZone(x.getUser().getUserTimeZone());
-		   userDto.setUserVisaStatus(x.getUser().getUserVisaStatus());
-	
-		   userDtoList.add(userDto);
-	   }
-			
-			
-	});
-return userDtoList;
-	
-	
+	if (userRoleProgramBatchMapList.isEmpty()) 
+	{
+		   throw new ResourceNotFoundException("No Users found for the given Batch ID: " + batchid);
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	  List<UserDto> userDtoList = userRoleProgramBatchMapList.stream()
+	    .map(UserRoleProgramBatchMap::getUser)
+	    .map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
+	    .collect(Collectors.toList());
 
+	  return userDtoList;
 	
+}
 	
-
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
 	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
