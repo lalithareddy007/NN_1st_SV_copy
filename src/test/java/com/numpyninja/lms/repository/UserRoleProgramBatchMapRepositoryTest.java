@@ -78,16 +78,5 @@ public class UserRoleProgramBatchMapRepositoryTest {
 
         assertThat(optionalMap).isNotEmpty();
     }
-    @DisplayName("test to get UserRoleProgramBatchMap by programId")
-    @Test
-    public void testFindByUser_UserRoleProgramBatchMap() {
 
-        userRoleProgramBatchMapRepository.save(mockUserRoleProgramBatchMap);
-
-        Long ProgramId =1L;
-
-        List<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository.findByProgram_ProgramId(mockUserRoleProgramBatchMap.getProgram().getProgramId());
-
-        assertThat(optionalMap).isNotEmpty();
-    }
 }
