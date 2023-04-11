@@ -3,8 +3,6 @@ package com.numpyninja.lms.repository;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserPictureEntity;
 
-import lombok.SneakyThrows;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,9 +37,7 @@ public class UserPictureRepositoryTest {
         mockUser = new User("U03", "John1", "K", " ", 1234123457L, "USA", "EST", "www.linkedin.com/John",
                 "MS", "MBA", "Professor", "GC", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
         UserPictureEntity  userPictureEntity= new UserPictureEntity(2L, "Resume", mockUser, "/path/to/picture1.jpg");
-
-     return userPictureEntity ;
-
+        return userPictureEntity ;
     }
 
     @Test
