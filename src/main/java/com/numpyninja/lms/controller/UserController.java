@@ -51,9 +51,17 @@ public class UserController {
 
 	//get user by ID - user, role, program, batch, skill and other details
 	@GetMapping("/users/{id}")
-	public ResponseEntity getUserInfoById(@PathVariable String id) {
-		UserAllDto userInfo = userServices.getUserInfoById(id);
-		return ResponseEntity.ok(userInfo);
+
+	public ResponseEntity<?> getUserInfoById(@PathVariable String id) throws ResourceNotFoundException {
+		List<?> userInfo = userServices.getUserInfoById(id);
+		return ResponseEntity.status(200).body(userInfo);
+	}
+
+	//Get all users with all their info - Role, status, Program, Batch
+	@GetMapping("/users/roles")
+	protected List<?> getAllUsersWithRoles() {
+		return userServices.getAllUsersWithRoles();
+
 	}
 
 	//create user with Role
@@ -65,7 +73,7 @@ public class UserController {
 
 	//update user info in User Table
 	@PutMapping("/users/{userId}")
-	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto updateuserDto, @PathVariable(value="userId") String userId) throws ResourceNotFoundException, InvalidDataException {
+	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto updateuserDto, @PathVariable(value = "userId") String userId) throws ResourceNotFoundException, InvalidDataException {
 		UserDto responseDto = userServices.updateUser(updateuserDto, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(responseDto);
 	}
@@ -73,22 +81,22 @@ public class UserController {
 	//Ask front end to include a separate link to update role status for user
 	//update User role - (Active/inactive) for a given user id and role id
 	@PutMapping("/users/roleStatus/{userId}")
-	public ResponseEntity<String> updateUserRoleStatus(@Valid @PathVariable(value="userId") String userId, @Valid @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
+	public ResponseEntity<String> updateUserRoleStatus(@Valid @PathVariable(value = "userId") String userId, @Valid @RequestBody UserRoleMapSlimDTO updateUserRoleStatus) throws InvalidDataException {
 		//String UserRole, String UserStatus
-		String responseDto = userServices.updateUserRoleStatus(updateUserRoleStatus,userId);
-		return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " +userId);
+		String responseDto = userServices.updateUserRoleStatus(updateUserRoleStatus, userId);
+		return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " + userId);
 	}
 
 	//cascade deletes users and User roles
 	@DeleteMapping("/users/{userId}")
-	public ResponseEntity<String> deleteUser(@PathVariable(value="userId") String userId) throws ResourceNotFoundException{
+	public ResponseEntity<String> deleteUser(@PathVariable(value = "userId") String userId) throws ResourceNotFoundException {
 		String deletedUserId = userServices.deleteUser(userId);
-		return ResponseEntity.status(HttpStatus.OK).body("Deleted User ID:  "+deletedUserId);
+		return ResponseEntity.status(HttpStatus.OK).body("Deleted User ID:  " + deletedUserId);
 		//return deletedUserId;
 	}
 
 	@GetMapping("/users/getAllStaff")
-	public ResponseEntity<List<Object>> getAllStaff(){
+	public ResponseEntity<List<Object>> getAllStaff() {
 		List<Object> list = userServices.getAllStaff();
 		return ResponseEntity.status(HttpStatus.OK).body(list);
 	}
@@ -97,13 +105,18 @@ public class UserController {
 	// Update existing user to assign program and its corresponding batch
 	@PutMapping("/users/roleProgramBatchStatus/{userId}")
 	public ResponseEntity<String> assignUpdateUserRoleProgramBatchStatus(@PathVariable String userId,
-																   @RequestBody UserRoleProgramBatchDto userRoleProgramBatchDto) {
+																		 @RequestBody UserRoleProgramBatchDto userRoleProgramBatchDto) {
 		String response = userServices.assignUpdateUserRoleProgramBatchStatus(userRoleProgramBatchDto, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-
-	/** Check if the below end points are required or not for the future**/
+	@GetMapping("/users/programs/{programId}")
+	public ResponseEntity<List<UserDto>> getUsersForProgram(@PathVariable Long programId) throws ResourceNotFoundException {
+		{
+			List<UserDto> list = userServices.getUsersByProgram(programId);
+			return ResponseEntity.status(HttpStatus.OK).body(list);
+		}
+		/** Check if the below end points are required or not for the future**/
     /*
 	//Check if this is needed form front end or not??
 
@@ -138,4 +151,5 @@ public class UserController {
     }
     */
 
+	}
 }
