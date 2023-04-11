@@ -110,7 +110,14 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-
+	//USER - GET USER BY PROGRAM-Batch
+	@GetMapping("/users/programBatch/{batchId}")
+	public ResponseEntity<List<UserDto>> getUserByProgramBatches(@PathVariable Integer batchId) throws ResourceNotFoundException
+	{
+			return ResponseEntity.ok(this.userServices.getUserByProgramBatch(batchId));
+	}
+	
+	
 	/** Check if the below end points are required or not for the future**/
     /*
 	//Check if this is needed form front end or not??
@@ -157,10 +164,5 @@ public class UserController {
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
     }*/
 	
-	//USER - GET USER BY PROGRAM-Batch
-	@GetMapping("/users/programBatch/{batchId}")
-	public ResponseEntity<List<UserRoleProgramBatchDto>> getUserByProgramBatches(@PathVariable Integer batchId) throws ResourceNotFoundException
-	{
-		return ResponseEntity.ok(this.userServices.getUserByProgramBatch(batchId));
-	}
+	
 }

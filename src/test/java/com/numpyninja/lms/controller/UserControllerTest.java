@@ -29,6 +29,7 @@ import java.util.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -309,4 +310,34 @@ public class UserControllerTest {
 		assertEquals(expectedResponse, response);
 	}
 
+	
+	
+	@DisplayName("test to get user by program/batches batchid ")
+	@SneakyThrows
+	@Test
+	void testGetUserByProgramBatches() {
+		
+		List<UserDto> userDtoList = new ArrayList<UserDto>();
+		userDtoList.add(mockUserDto);
+		
+		Integer batchid = 1;
+		when(userService.getUserByProgramBatch(batchid)).thenReturn(userDtoList);
+		
+		
+		ResultActions response = mockMvc.perform(get("/users/programBatch/{batchId}", batchid));
+
+		response.andExpect(status().isOk())
+		.andExpect(jsonPath("$..userId")
+		.value("U01"))
+	    .andExpect(jsonPath("$", hasSize(userDtoList.size())));
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 }

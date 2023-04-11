@@ -44,6 +44,14 @@ public class AssignmentSubmitController {
         return ResponseEntity.ok(submissionsListDTO);
     }
     
+   ////writing another controller with different method name to check if this works on heroku
+   @GetMapping("/studentbatch1/{batchid}")
+   public ResponseEntity<List<AssignmentSubmitDTO>> getSubmissionsByBatchHeroku(@PathVariable Integer batchid) {
+      
+   	List<AssignmentSubmitDTO> submissionsListDTO = assignmentSubmitService.getSubmissionsByBatchHeroku(batchid);
+       return ResponseEntity.ok(submissionsListDTO);
+   }
+   
     @GetMapping("")
     public ResponseEntity<List<AssignmentSubmitDTO>> getAllSubmissions() {
        

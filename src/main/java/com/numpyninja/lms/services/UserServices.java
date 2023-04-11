@@ -610,29 +610,51 @@ public class UserServices {
 	
 	
 
-	public List<UserRoleProgramBatchDto> getUserByProgramBatch(Integer batchid) {
-		
-	List<UserRoleProgramBatchMap> UserProgBatch = userRoleProgramBatchMapRepository.findByBatch_BatchId(batchid);
-	List<UserRoleProgramBatchDto>	UserProgBatchDtoList = new ArrayList<UserRoleProgramBatchDto>();
+	public List<UserDto> getUserByProgramBatch(Integer batchid) {
 	
+	Batch batch= progBatchRepository.findById(batchid)
+				.orElseThrow(() -> new ResourceNotFoundException("batchid " + batchid + " not found"));
+	 
+    Optional<Batch> progOptional =	progBatchRepository .findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(
+			batch.getBatchId(),batch.getProgram().getProgramId(),batch.getBatchStatus());
+    
+    if(progOptional==null)
+    		throw new ResourceNotFoundException("Program with " + batchid + " not active/found");
+	
+	List<UserRoleProgramBatchMap> UserProgBatch = userRoleProgramBatchMapRepository.findByBatch_BatchId(batchid);
+	System.out.println(UserProgBatch);
+	//List<UserRoleProgramBatchDto>	UserProgBatchDtoList = new ArrayList<UserRoleProgramBatchDto>();
+	
+	List<UserDto> userDtoList = new ArrayList<UserDto>();
 	if(UserProgBatch.isEmpty())
 	throw new ResourceNotFoundException("User PRogBatch not found with batchId :" + batchid);
 
-	
-	
-      UserProgBatch.forEach((x) -> {
-		UserRoleProgramBatchDto pBDto = new UserRoleProgramBatchDto();
-	   Integer	bid = x.getBatch().getBatchId();
+	UserProgBatch.forEach((x) -> {
+		//UserRoleProgramBatchDto pBDto = new UserRoleProgramBatchDto();
+    	  UserDto userDto = new UserDto();
+    	  Integer	bid = x.getBatch().getBatchId();
 	   
 	   if(bid==batchid)
 	   {
-		pBDto.setUserId(x.getUser().getUserId());
-		UserProgBatchDtoList.add(pBDto);
+		   userDto.setUserComments(x.getUser().getUserComments());
+		   userDto.setUserEduPg(x.getUser().getUserEduPg());
+		   userDto.setUserEduUg(x.getUser().getUserEduUg());
+		   userDto.setUserFirstName(x.getUser().getUserFirstName());
+		   userDto.setUserId(x.getUser().getUserId());
+		   userDto.setUserLastName(x.getUser().getUserLastName());
+		   userDto.setUserLinkedinUrl(x.getUser().getUserLinkedinUrl());
+		   userDto.setUserLocation(x.getUser().getUserLocation());
+		   userDto.setUserMiddleName(x.getUser().getUserMiddleName());
+		   userDto.setUserPhoneNumber(x.getUser().getUserPhoneNumber());
+		   userDto.setUserTimeZone(x.getUser().getUserTimeZone());
+		   userDto.setUserVisaStatus(x.getUser().getUserVisaStatus());
+	
+		   userDtoList.add(userDto);
 	   }
 			
 			
 	});
-return UserProgBatchDtoList;
+return userDtoList;
 	
 	
 	}

@@ -82,7 +82,9 @@ class UserServicesTest {
 	private UserRoleProgramBatchDto mockUserRoleProgramBatchDtoWithBatch, mockUserRoleProgramBatchDtoWithBatches;
 
 
-	private UserRoleProgramBatchMap mockUserRoleProgramBatchMap;
+	private UserRoleProgramBatchMap mockUserRoleProgramBatchMap; 
+	
+	private List<UserRoleProgramBatchMap> mockUserRoleProgramBatchMapList;
 
 	@BeforeEach
 	void setUp() {
@@ -879,4 +881,51 @@ class UserServicesTest {
 		assertEquals(message, response);
 	}
 	/** JUnit test cases for mapping program/batch(es) to Student/Staff : END **/
-}
+	
+	
+	
+	
+	
+	
+	
+	@DisplayName("test for getting List of Users for a given Program/batch batchid")
+	@Test
+	void GetUserByProgramBatches() {
+
+
+	 //Integer bidInteger =1;
+	 Batch batch = mockBatch;
+	 given(progBatchRepository.findById(mockBatch.getBatchId())).willReturn(Optional.of(mockBatch));
+
+	 UserRoleProgramBatchMap userRoleProgramBatchMap = mockUserRoleProgramBatchMap;
+	 userRoleProgramBatchMap.setUserRoleProgramBatchStatus("active");
+	 //userRoleProgramBatchMap.setUser(mockUser.getUserId());
+
+	 UserDto userDto = mockUserDto;
+	 userDto.setUserId("U02");
+
+
+	 List<UserRoleProgramBatchMap> userRoleProgramBatchMaplist = new ArrayList<UserRoleProgramBatchMap>();
+	 userRoleProgramBatchMaplist.add(userRoleProgramBatchMap);
+
+	 List<UserDto> userdtoList = new ArrayList<UserDto>();
+	 userdtoList.add(userDto);
+
+	 when(userRoleProgramBatchMapRepository.findByBatch_BatchId(batch.getBatchId())).thenReturn(userRoleProgramBatchMaplist);
+	 when(progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
+	   (anyInt(), anyLong(), anyString())).thenReturn(Optional.of(mockBatch));
+
+	 //when
+	 List<UserDto> userDtos = userService.getUserByProgramBatch(batch.getBatchId());
+	
+	 
+	 //then
+	 assertThat(userDtos).isNotNull();
+	 assertThat(userDtos.size()).isGreaterThan(0);
+	}
+	
+	
+
+	}
+
+
