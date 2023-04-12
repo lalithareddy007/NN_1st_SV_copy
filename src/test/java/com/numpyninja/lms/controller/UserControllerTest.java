@@ -322,5 +322,24 @@ public class UserControllerTest {
 
 		assertEquals(expectedResponse, response);
 	}
+	@DisplayName("test to get user by program programId ")
+	@SneakyThrows
+	@Test
+	void testGetUserByProgramBatches() {
 
+		List<UserDto> userDtoList = new ArrayList<UserDto>();
+		userDtoList.add(mockUserDto);
+
+		Long programId = 1L;
+		when(userService.getUsersByProgram(programId)).thenReturn(userDtoList);
+
+
+		ResultActions response = mockMvc.perform(get("/users/programs/{programId}", programId));
+
+		response.andExpect(status().isOk())
+				.andExpect(jsonPath("$..userId")
+						.value("U01"))
+				.andExpect(jsonPath("$", hasSize(userDtoList.size())));
+
+	}
 }

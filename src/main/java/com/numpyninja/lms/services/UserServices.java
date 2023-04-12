@@ -502,26 +502,35 @@ public class UserServices {
 			throw new ResourceNotFoundException("No staff data is available in database");
 		}
 	}
-
+	public List<UserDto> getUsersByProgram(Long programId) {
+		Program program = programRepository.findById(programId)
+				.orElseThrow(() -> new ResourceNotFoundException("programId " + programId + " not found"));
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId);
+		if (userRoleProgramBatchMapList.isEmpty()) {
+			throw new ResourceNotFoundException("No Users found for the given program ID: " + programId);
+		}
+		// Use the UserMapper to directly map each User object to its corresponding UserDto object
+		List<UserDto> userDtoList = userRoleProgramBatchMapList.stream()
+				.map(UserRoleProgramBatchMap::getUser)
+				.map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
+				.collect(Collectors.toList());
+		return userDtoList;
+	}
 	/**
 	 * Check if the code below this comment are needed or not from front end. - The
 	 * controller endpoints for these are commented out for now.
 	 */
 
 /*
-
 	// Displays Users Info with their user status, role
 	public List<UserRoleMap> getAllUsersWithRoles() {
 		// List<UserRoleMap> list = userRoleMapRepository.findAll();
 		return userRoleMapRepository.findAll();
 	}
-
 	public UserDto createUser(UserDto newUserDto) throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
 		Date utilDate = new Date();
-
 		if (newUserDto != null) {
-
 			List<User> userList = userRepository.findAll();
 			if (userList.size() > 0) {
 				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserDto.getUserPhoneNumber());
@@ -530,20 +539,15 @@ public class UserServices {
 							+ newUserDto.getUserPhoneNumber() + " already exists !!");
 				}
 			}
-
 			if (!isTimeZoneValid(newUserDto.getUserTimeZone())) {
 				throw new InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
 			}
-
 			if (!isVisaStatusValid(newUserDto.getUserVisaStatus())) {
 				throw new InvalidDataException("Failed to create user, as 'Visa Status' is invalid !! ");
 			}
-
 			newUser = userMapper.user(newUserDto);
-
 			newUser.setCreationTime(new Timestamp(utilDate.getTime()));
 			newUser.setLastModTime(new Timestamp(utilDate.getTime()));
-
 		} else {
 			throw new InvalidDataException("User Data not valid ");
 		}
@@ -551,24 +555,19 @@ public class UserServices {
 		UserDto createdUserdto = userMapper.userDto(createdUser);
 		return createdUserdto;
 	}
-
 	public List<User> getAllUsersByRole(String roleName) {
 		return userRoleMapRepository.findUserRoleMapsByRoleRoleName(roleName).stream()
 				.map(userRoleMap -> userRoleMap.getUser()).collect(Collectors.toList());
 	}
-
 	public UserDto updateUserWithRole(UserAndRoleDTO updateUserRoleDto, String userId) throws InvalidDataException {
 		User toBeupdatedUser = null;
 		Date utilDate = new Date();
 		List<UserRoleMap> UpdatedUserRoleMapList = null;
-
 		if (userId == null) {
 			throw new InvalidDataException("UserId cannot be blank/null");
 		}
-
 		else {
 			Optional<User> userById = userRepository.findById(userId);
-
 			// System.out.println("updateUserRoleDto " + updateUserRoleDto);
 			if (userById.isEmpty()) {
 				throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
@@ -579,52 +578,40 @@ public class UserServices {
 				if (!isVisaStatusValid(updateUserRoleDto.getUserVisaStatus())) {
 					throw new InvalidDataException("Failed to update user, as 'Visa Status' is invalid !! ");
 				}
-
 				toBeupdatedUser = userMapper.toUser(updateUserRoleDto);
 				toBeupdatedUser.setUserId(userId);
 				toBeupdatedUser.setCreationTime(userById.get().getCreationTime());
 				toBeupdatedUser.setLastModTime(new Timestamp(utilDate.getTime()));
 			}
-
 			User updatedUser = userRepository.save(toBeupdatedUser);
-
 			// Update Role Info
-
 			List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
-
 			// System.out.println("existingUserRoles " + existingUserRoles);
 			if (existingUserRoles != null) {
 				for (int userRoleCnt = 0; userRoleCnt <= existingUserRoles.size(); userRoleCnt++) {
 					Long existingUserRoleId = existingUserRoles.get(userRoleCnt).getUserRoleId();
 					String existingRoleId = existingUserRoles.get(userRoleCnt).getRole().getRoleId();
-
 					if (updateUserRoleDto.getUserRoleMaps() != null) {
 						for (int i = 0; i < updateUserRoleDto.getUserRoleMaps().size(); i++) {
 							String roleName = null;
 							String roleId = null;
 							String roleStatus = null;
 							// String userId = null;
-
 							// System.out.println(newUserRoleDto.getUserRoleMaps().get(i).getRoleName());
 							roleId = updateUserRoleDto.getUserRoleMaps().get(i).getRoleId();
 							// System.out.println("roleId " + roleId);
 							Role roleUser = roleRepository.getById(roleId);
-
 							// uncommented the below line
 							roleStatus = updateUserRoleDto.getUserRoleMaps().get(i).getUserRoleStatus();
 							System.out.println("roleStatus " + roleStatus);
 							// userId = createdUser.getUserId();
 							// System.out.println("userId " + userId);
-
 							UpdatedUserRoleMapList = userMapper.userRoleMapList(updateUserRoleDto.getUserRoleMaps());
 							System.out.println("UpdatedUserRoleMapList " + UpdatedUserRoleMapList);
-
 							if (roleId == existingRoleId) {
-
 								UpdatedUserRoleMapList.get(i).setUserRoleId(existingUserRoleId);
 							}
 							UpdatedUserRoleMapList.get(i).setUserRoleStatus(roleStatus);
-
 							UpdatedUserRoleMapList.get(i).setUser(updatedUser);
 							UpdatedUserRoleMapList.get(i).setRole(roleUser);
 							UpdatedUserRoleMapList.get(i).setCreationTime(new Timestamp(utilDate.getTime()));
@@ -636,11 +623,9 @@ public class UserServices {
 					}
 				}
 			}
-
 			UserDto updatedUserDto = userMapper.userDto(updatedUser);
 			return updatedUserDto;
 		}
-
 	}
 */
 
