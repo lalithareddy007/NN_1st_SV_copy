@@ -3,13 +3,9 @@ package com.numpyninja.lms.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.dto.*;
-
-import com.numpyninja.lms.entity.*;
-
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
-
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.UserMapper;
 import com.numpyninja.lms.services.UserServices;
@@ -58,8 +54,6 @@ public class UserControllerTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
-	
-	private Program program;
 
 	private UserDto mockUserDto, mockUserDto2;
 
@@ -328,24 +322,5 @@ public class UserControllerTest {
 
 		assertEquals(expectedResponse, response);
 	}
-	@DisplayName("test to get user by program programId ")
-	@SneakyThrows
-	@Test
-	void testGetUserByProgramBatches() {
 
-		List<UserDto> userDtoList = new ArrayList<UserDto>();
-		userDtoList.add(mockUserDto);
-
-		Long programId = 1L;
-		when(userService.getUsersByProgram(programId)).thenReturn(userDtoList);
-
-
-		ResultActions response = mockMvc.perform(get("/users/programs/{programId}", programId));
-
-		response.andExpect(status().isOk())
-				.andExpect(jsonPath("$..userId")
-						.value("U01"))
-				.andExpect(jsonPath("$", hasSize(userDtoList.size())));
-
-	}
 }

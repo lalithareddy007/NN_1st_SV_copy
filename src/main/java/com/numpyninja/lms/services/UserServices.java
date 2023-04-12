@@ -38,8 +38,6 @@ public class UserServices {
 	@Autowired
 	ProgramRepository programRepository;
 
-
-
 	@Autowired
 	ProgBatchRepository progBatchRepository;
 
@@ -102,23 +100,12 @@ public class UserServices {
 		if(!userSkills.isEmpty())
 			userAllDto.setUserSkillSlimDtos(userSkillMapper.toUserSkillSlimDtoList(userSkills));
 
-
-	/*public List<UserRoleMap> getUsersForProgram(Long programId) {
-		List<UserRoleMap> list = userRoleMapRepository.findUserRoleMapsByBatchesProgramProgramId(programId);
-
-		return list.stream().map(userRoleMap -> {
-			userRoleMap.getBatches().removeIf(batch -> batch.getProgram().getProgramId() == programId);
-			return userRoleMap;
-		}).collect(Collectors.toList());
-	}*/
-
 		List<UserPictureEntity> userPictureEntityList = userPictureRepository.findByUser_UserId(userId);
 		if(!userPictureEntityList.isEmpty())
 			userAllDto.setUserPictureSlimDtos(userPictureMapper.toUserPictureSlimDtoList(userPictureEntityList));
 
 		return userAllDto;
 	}
-
 
 	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
@@ -655,49 +642,6 @@ public class UserServices {
 		}
 
 	}
-
-
-	public List<Object> getAllStaff()
-	{
-		List<Object> result=userRepository.getAllStaffList();
-		if(!(result.size()<=0))
-		{
-			//return (userMapper.toUserStaffDTO(result));
-			return result;
-		}else
-		{
-			throw new ResourceNotFoundException("No staff data is available in database");
-		}
-	}
-
-	public List<UserDto> getUsersByProgram(Long programId) {
-
-		Program program = programRepository.findById(programId)
-				.orElseThrow(() -> new ResourceNotFoundException("programId " + programId + " not found"));
-
-		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId);
-
-		if (userRoleProgramBatchMapList.isEmpty()) {
-			throw new ResourceNotFoundException("No Users found for the given program ID: " + programId);
-		}
-
-		// Use the UserMapper to directly map each User object to its corresponding UserDto object
-		List<UserDto> userDtoList = userRoleProgramBatchMapList.stream()
-				.map(UserRoleProgramBatchMap::getUser)
-				.map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
-				.collect(Collectors.toList());
-
-		return userDtoList;
-	}
-}
-	/*
-	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
-	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
-	 * { throw new ResourceNotFoundException("User Id " + Id +" not found"); } else
-	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
-	 */
-
 */
 
-
-
+}
