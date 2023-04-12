@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Timestamp;
@@ -901,4 +902,48 @@ class UserServicesTest {
 		assertEquals(message, response);
 	}
 	/** JUnit test cases for mapping program/batch(es) to Student/Staff : END **/
+	@DisplayName("test for getting List of Users for a given Program - ProgramId")
+	@Test
+	void getUsersByProgram_returnsUsers_whenProgramExists() {
+		// Given
+		long programId = 7;
+
+
+		when(programRepository.findById(programId)).thenReturn(Optional.of(mockProgram));
+
+		UserRoleProgramBatchMap mockUserRoleProgramBatchMap = new UserRoleProgramBatchMap();
+
+		mockUserRoleProgramBatchMap.setUserRoleProgramBatchStatus("Active");
+		mockUserRoleProgramBatchMap.setUser(mockUser2);
+
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMaplist = new ArrayList<UserRoleProgramBatchMap>();
+		userRoleProgramBatchMaplist.add(mockUserRoleProgramBatchMap);
+		when(userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId)).thenReturn(userRoleProgramBatchMaplist);
+
+		List<UserDto> mockUserDtoList = new ArrayList<>();
+		mockUserDtoList.add(mockUserDto);
+		when(userMapper.userDtos(anyList())).thenReturn(mockUserDtoList);
+
+		// When
+		List<UserDto> result = userService.getUsersByProgram(programId);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.size()).isEqualTo(1);
+		assertThat(result.get(0)).isEqualTo(mockUserDto);
+	}
+
+	@DisplayName("Test getUsersByProgram_returnsEmptyList_whenProgramDoesNotExist()")
+	@Test
+	void getUsersByProgram_returnsEmptyList_whenProgramDoesNotExist() {
+		// Given
+		long programId = 30;
+		when(programRepository.findById(programId)).thenReturn(Optional.empty());
+
+		// When
+		assertThrows(ResourceNotFoundException.class, () -> userService.getUsersByProgram(programId));
+
+		// Then
+		Mockito.verify(programRepository).findById(programId);
+	}
 }
