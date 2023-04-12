@@ -49,17 +49,11 @@ public class UserController {
 	}
 
 
-	//get user by ID - information on role, user, batch and details displayed
+	//get user by ID - user, role, program, batch, skill and other details
 	@GetMapping("/users/{id}")
-	public ResponseEntity<?> getUserInfoById(@PathVariable String id) throws ResourceNotFoundException {
-		List<?> userInfo = userServices.getUserInfoById(id);
-		return ResponseEntity.status(200).body(userInfo);
-	}
-
-	//Get all users with all their info - Role, status, Program, Batch
-	@GetMapping("/users/roles")
-	protected List<?> getAllUsersWithRoles() {
-		return userServices.getAllUsersWithRoles() ;
+	public ResponseEntity getUserInfoById(@PathVariable String id) {
+		UserAllDto userInfo = userServices.getUserInfoById(id);
+		return ResponseEntity.ok(userInfo);
 	}
 
 	//create user with Role
@@ -112,47 +106,36 @@ public class UserController {
 	/** Check if the below end points are required or not for the future**/
     /*
 	//Check if this is needed form front end or not??
+
+	//Get all users with all their info - Role, status
+	@GetMapping("/users/roles")
+	protected List<?> getAllUsersWithRoles() {
+		return userServices.getAllUsersWithRoles() ;
+	}
+
 	//Get all the users for a given role (Admin,Staff,User)- only giving user table info
     @GetMapping("/users/roles/{rolename}")
     protected List<?> getAllUsersByRole(@PathVariable(value="rolename")String roleName) {
     	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
     }
-	*/
-    /* @GetMapping("/users/roles/{rolename}")
+
+	 @GetMapping("/users/roles/{rolename}")
      protected List<?> getAllRoles(@PathVariable(value="rolename")String roleName) {
      	return userMapper.userDtos( userServices.getAllUsersByRole(roleName) );
-     }*/
-     
-    /*
-     //To check if this is needed from front end? 
-     // Batch value coming empty?? - check this logic
-     @GetMapping("/users/programs/{programid}")
-     protected List<?> getUsersForProgram(@PathVariable(value="programid")Long programId) {
-         return userServices.getUsersForProgram(programId);
      }
-     */
- 	/*
- 	//get user by ID from LMS_Users table	
- 	@GetMapping("/users/{id}")
- 	public ResponseEntity<UserDto> getAllUsersById(@PathVariable String id) throws ResourceNotFoundException {
- 		UserDto userDto = userServices.getAllUsersById(id);
- 		return ResponseEntity.status(200).body(userDto);
- 	}
- 	*/
-    
-    /*
-    //Creates user only but no role added
+
+	//Creates user only but no role added
     @PostMapping("/users")
     public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto newuserDto) throws InvalidDataException, DuplicateResourceFoundException {
     	UserDto responseDto = userServices.createUser(newuserDto);
     	return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);  
     }
-    */
-    
-    /* @PutMapping("/users/roleStatus/{userId}")
+
+	@PutMapping("/users/roleStatus/{userId}")
     public ResponseEntity<UserDto> updateUserWithRole(@Valid @RequestBody UserAndRoleDTO updateUserRoleDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFoundException, ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUserWithRole(updateUserRoleDto, userId);
     	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
-    }*/
+    }
+    */
 
 }
