@@ -1,0 +1,12 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${STAGE_DB_HOST}:${STAGE_DB_PORT}/${STAGE_DB_NAME} 
+    username: ${STAGE_DB_USERNAME}
+    password: ${STAGE_DB_PASSWORD}
+ 
+
+app:
+  frontend.url: ${FRONTEND_URL_HEROKU}
+  #frontend.url: https://lms-frontend.herokuapp.com
+
