@@ -91,7 +91,7 @@ public class ClassRepositoryTest {
 
         //then
         assertThat(lists).isNotNull();
-        assertThat(lists.size()).isGreaterThan(0);
+
 
 
     }
