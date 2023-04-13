@@ -170,6 +170,10 @@ public class AssignmentSubmitService {
     			.orElseThrow(() -> new ResourceNotFoundException("Batch", "ID", batchid));
     	
     	List<Assignment> assignments = this.assignmentRepository.findByBatch(batch);
+    	
+    	if(assignments.isEmpty())
+    		throw new ResourceNotFoundException("Assignment does not exist for Batch ID : "+batchid);
+    		
     	List<AssignmentSubmit> assignmentsubmitList = new ArrayList<AssignmentSubmit>();
     	
     	List<Long> assignmentIds = new ArrayList<Long>();
