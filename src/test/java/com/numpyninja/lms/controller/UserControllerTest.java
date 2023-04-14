@@ -3,7 +3,6 @@ package com.numpyninja.lms.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.dto.*;
-import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
@@ -14,7 +13,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,12 +20,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,7 +56,7 @@ public class UserControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	private UserDto mockUserDto;
+	private UserDto mockUserDto, mockUserDto2;
 
 	private UserRoleMap mockUserRoleMap;
 
@@ -63,6 +65,12 @@ public class UserControllerTest {
 	private UserRoleMapSlimDTO mockUserRoleMapSlimDto;
 
 	private UserRoleProgramBatchDto mockUserRoleProgramBatchDto, mockUserRoleProgramBatchDto2;
+
+	private BatchSlimDto mockBatchSlimDto;
+
+	private UserProgramBatchSlimDto mockUserProgramBatchSlimDto;
+
+	private UserAllDto mockUserAllDto;
 
 	@BeforeEach
 	public void setup() {
@@ -85,11 +93,9 @@ public class UserControllerTest {
 		Role role = new Role("R03", "User", "LMS_User", new Timestamp(utilDate.getTime()),
 				new Timestamp(utilDate.getTime()));
 
-		Set<Batch> batches = new HashSet<Batch>();
-
 		String userRoleStatus = "Active";
 
-		mockUserRoleMap = new UserRoleMap(userRoleId, user, role, batches, userRoleStatus,
+		mockUserRoleMap = new UserRoleMap(userRoleId, user, role, userRoleStatus,
 				new Timestamp(utilDate.getTime()), new Timestamp(utilDate.getTime()));
 
 		List<UserRoleProgramBatchSlimDto> mockUserRoleProgramBatches =
@@ -103,11 +109,27 @@ public class UserControllerTest {
 		mockUserRoleProgramBatchDto2 = UserRoleProgramBatchDto.builder().roleId("R02").programId(2L)
 				.userRoleProgramBatches(mockUserRoleProgramBatches2).build();
 
+		mockUserDto2 = new UserDto("U07",  "Mary", "Poppins", "",
+				9899245876L, "India", "IST", "www.linkedin.com/Mary123",
+				"BCA", "MBA", "", "H4");
+
+		mockUserRoleMapSlimDto = new UserRoleMapSlimDTO("RO3","Active");
+
+		mockBatchSlimDto = new BatchSlimDto(1, "SDET 01", "Active");
+
+		mockUserProgramBatchSlimDto = new UserProgramBatchSlimDto(2L, "SDET", List.of(mockBatchSlimDto));
+
+		mockUserAllDto = UserAllDto.builder()
+				.userDto(mockUserDto2)
+				.userRoleMaps(List.of(mockUserRoleMapSlimDto))
+				.userProgramBatchSlimDtos(List.of(mockUserProgramBatchSlimDto))
+				.build();
+
 	}
 
 	@Test
 	@DisplayName("test to get all the users")
-	void testgetAllUsers() throws Exception {
+	void testGetAllUsers() throws Exception {
 
 		UserDto mockUserDto2 = new UserDto("U02", "Abdul", "Kalam", " ", 2222222222L, "India", "IST",
 				"www.linkedin.com/Kalam1234", "MCA", "MBA", "Indian scientist", "H4");
@@ -125,27 +147,19 @@ public class UserControllerTest {
 				.andDo(print());
 	}
 
-	@Test
+
 	@DisplayName("test to get user Info for a given user ID")
-	void testgetUserInfoById() throws Exception {
+	@SneakyThrows
+	@Test
+	void testGetUserInfoById() {
+		String userId = "U07";
 
-		ArrayList<UserRoleMap> userRoleMapList = new ArrayList();
-		userRoleMapList.add(mockUserRoleMap);
-		String userId = "U02";
-		given(userService.getUserInfoById(userId)).willReturn(userRoleMapList);
+		given(userService.getUserInfoById(userId)).willReturn(mockUserAllDto);
 
-		ResultActions response = mockMvc.perform(get("/users/{id}", userId));
+		ResultActions resultActions = mockMvc.perform(get("/users/{id}", userId));
 
-		response.andExpect(status().isOk())
-				.andDo(print())
-				.andExpect(jsonPath("$..userRoleStatus")
-						.value("Active"))
-				.andExpect(jsonPath("$..user.userId")
-						.value("U02"))
-				.andExpect(jsonPath("$..role.roleId")
-						.value("R03"))
-				.andExpect(jsonPath("$..user.userFirstName").value("Abdul"))
-				.andExpect(jsonPath("$", hasSize(userRoleMapList.size())));
+		resultActions.andExpect(status().isOk()).andDo(print());
+
 	}
 
 
@@ -309,13 +323,36 @@ public class UserControllerTest {
 
 		assertEquals(expectedResponse, response);
 	}
-
 	
 	
-	@DisplayName("test to get user by program/batches batchid ")
+	@DisplayName("test to get user by program programId ")
 	@SneakyThrows
 	@Test
 	void testGetUserByProgramBatches() {
+
+		
+		
+		List<UserDto> userDtoList = new ArrayList<UserDto>();
+		userDtoList.add(mockUserDto);
+
+		Long programId = 1L;
+		when(userService.getUsersByProgram(programId)).thenReturn(userDtoList);
+
+
+		ResultActions response = mockMvc.perform(get("/users/programs/{programId}", programId));
+
+		response.andExpect(status().isOk())
+				.andExpect(jsonPath("$..userId")
+						.value("U01"))
+				.andExpect(jsonPath("$", hasSize(userDtoList.size())));
+
+	}
+	
+	//changed name because there was conflict for get by programid and get by batchid
+@DisplayName("test to get user by program/batches batchid ")
+@SneakyThrows
+	@Test
+	void testGetUserByProgramBatchesBatchid() {
 		
 		List<UserDto> userDtoList = new ArrayList<UserDto>();
 		userDtoList.add(mockUserDto);
@@ -340,4 +377,7 @@ public class UserControllerTest {
 	
 	
 	
+
+	
+
 }

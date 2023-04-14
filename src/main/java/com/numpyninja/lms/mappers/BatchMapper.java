@@ -2,8 +2,11 @@ package com.numpyninja.lms.mappers;
 
 import java.util.List;
 
+import com.numpyninja.lms.dto.BatchSlimDto;
+import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import com.numpyninja.lms.dto.BatchDTO;
@@ -24,4 +27,14 @@ public interface BatchMapper {
  	Batch  toBatch ( BatchDTO dto);
 	 
 	List<BatchDTO> toBatchDTOs(List<Batch> baches);
+
+	@Mappings(value = {
+			@Mapping(source="batch.batchId", target="batchId"),
+			@Mapping(source="batch.batchName", target="batchName"),
+			@Mapping(source="userRoleProgramBatchStatus", target="userRoleProgramBatchStatus")
+	})
+	BatchSlimDto toBatchSlimDto(UserRoleProgramBatchMap userRoleProgramBatchMap);
+
+	List<BatchSlimDto> toBatchSlimDtoList(List<UserRoleProgramBatchMap> userRoleProgramBatchMapList);
+
 }

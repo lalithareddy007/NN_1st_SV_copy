@@ -1,17 +1,15 @@
 package com.numpyninja.lms.mappers;
 
-import java.util.List;
-
+import com.numpyninja.lms.dto.UserPictureEntityDTO;
+import com.numpyninja.lms.dto.UserPictureSlimDto;
+import com.numpyninja.lms.entity.UserPictureEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
 
-import com.numpyninja.lms.dto.AttendanceDto;
-import com.numpyninja.lms.dto.UserPictureEntityDTO;
-//import com.numpyninja.lms.dto.UserPictureEntityDto;
-import com.numpyninja.lms.entity.Attendance;
-import com.numpyninja.lms.entity.UserPictureEntity;
+import java.util.List;
 
 
 	
@@ -32,7 +30,10 @@ import com.numpyninja.lms.entity.UserPictureEntity;
 		@Mapping(source = "userpictureentity.user.userId",target ="userId")
 		UserPictureEntityDTO toUserPictureEntityDto(UserPictureEntity userpictureentity);
 
-		
+
+		UserPictureSlimDto toUserPictureSlimDto(UserPictureEntity userPictureEntity);
+
+		List<UserPictureSlimDto> toUserPictureSlimDtoList(List<UserPictureEntity> userPictureEntityList);
 		
 
 	}
