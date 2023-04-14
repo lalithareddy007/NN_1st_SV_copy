@@ -6,7 +6,7 @@ import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 import org.mapstruct.Mapper;
 
-<<<<<<< HEAD
+
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.ClassDto;
 import com.numpyninja.lms.dto.UserAndRoleDTO;
@@ -15,8 +15,7 @@ import com.numpyninja.lms.dto.UserDto;
 import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
 import com.numpyninja.lms.dto.UserRoleProgramBatchDto;
 import com.numpyninja.lms.entity.Assignment;
-=======
->>>>>>> LMSPhase2
+
 import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
