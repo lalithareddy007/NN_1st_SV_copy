@@ -26,6 +26,13 @@ public interface AssignmentSubmitRepository extends JpaRepository<AssignmentSubm
     List<AssignmentSubmit> getGradesByStudentID(String studentID);
 
     List<AssignmentSubmit> findByAssignment_Batch_BatchId(Integer batchId);
+
+
+	List<AssignmentSubmit> findByAssignment_AssignmentIdIn(List<Long> assignmentIds);
+    
+    
+
     
     List <AssignmentSubmit> findByAssignment_assignmentId(Long assignmentId);
+
 }

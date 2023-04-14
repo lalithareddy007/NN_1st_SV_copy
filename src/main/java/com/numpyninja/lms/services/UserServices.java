@@ -1,7 +1,9 @@
 package com.numpyninja.lms.services;
 
+import com.numpyninja.lms.config.UserIDGenerator;
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
@@ -502,6 +504,33 @@ public class UserServices {
 			throw new ResourceNotFoundException("No staff data is available in database");
 		}
 	}
+	
+	
+//get users by batchid
+	public List<UserDto> getUserByProgramBatch(Integer batchid) {
+	
+	Batch batch= progBatchRepository.findById(batchid)
+				.orElseThrow(() -> new ResourceNotFoundException("batchid " + batchid + " not found"));
+	
+	List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByBatch_BatchId(batchid);
+	
+	if (userRoleProgramBatchMapList.isEmpty()) 
+	{
+		   throw new ResourceNotFoundException("No Users found for the given Batch ID: " + batchid);
+	}
+	
+	  List<UserDto> userDtoList = userRoleProgramBatchMapList.stream()
+	    .map(UserRoleProgramBatchMap::getUser)
+	    .map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
+	    .collect(Collectors.toList());
+
+	  return userDtoList;
+	
+}
+	
+	
+	
+	
 	public List<UserDto> getUsersByProgram(Long programId) {
 		Program program = programRepository.findById(programId)
 				.orElseThrow(() -> new ResourceNotFoundException("programId " + programId + " not found"));
@@ -516,9 +545,29 @@ public class UserServices {
 				.collect(Collectors.toList());
 		return userDtoList;
 	}
+	
+	
+	
+	/*
+	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
+	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
+	 * { throw new ResourceNotFoundException("User Id " + Id +" not found"); } else
+	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
+
+
+
+
+
+	
+	
+	
+	
+	
+	
 	/**
 	 * Check if the code below this comment are needed or not from front end. - The
 	 * controller endpoints for these are commented out for now.
+>>>>>>> LMSPhase2
 	 */
 
 /*

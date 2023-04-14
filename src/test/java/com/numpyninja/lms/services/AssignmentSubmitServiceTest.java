@@ -1,12 +1,14 @@
 package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
+import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.entity.*;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
 import com.numpyninja.lms.repository.AssignmentRepository;
 import com.numpyninja.lms.repository.AssignmentSubmitRepository;
+import com.numpyninja.lms.repository.ProgBatchRepository;
 import com.numpyninja.lms.repository.UserRepository;
 
 import com.numpyninja.lms.repository.UserRoleMapRepository;
@@ -25,6 +27,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,6 +54,9 @@ public class AssignmentSubmitServiceTest {
 
     @Mock
     private AssignmentRepository mockAssignmentRepository;
+    
+    @Mock
+    private ProgBatchRepository batchRepository;
 
     private AssignmentSubmit mockAssignmentSubmit1, mockAssignmentSubmit2, mockAssignmentSubmit3,
                         mockAssignmentSubmit4;
@@ -171,7 +177,7 @@ public class AssignmentSubmitServiceTest {
         List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getSubmissionsByUserID(userId);
 
         assertEquals(0,assignmentSubmitDTOList.size());
-        assertThat(!assignmentSubmitDTOList.contains(mockAssignmentSubmitDTO1));
+       // assertThat(!assignmentSubmitDTOList.contains(mockAssignmentSubmitDTO1));
 
         verify(mockUserRepository).existsById(userId);
         verify(mockAssignmentSubmitRepository).findByUser_userId(userId);
@@ -213,6 +219,48 @@ public class AssignmentSubmitServiceTest {
     	assertEquals(assignmentSubmitDTOList.size(),assignmentSubmitDTOList.size());
     }
 
+    
+    
+    
+//test for submissions by batch to check on heroku
+    
+    
+//	@Test
+//	@DisplayName("test for getting submissions by BatchId")
+//	void testGetSubmissionsByBatchHeroku() {
+//Integer batchidInteger =1;
+//    	
+//    	List<Long> assignmentIds = new ArrayList<Long>();
+//		Batch batch = setMockBatch();
+//		
+//		Assignment mockassignment1= mockAssignment;
+//		mockassignment1.setAssignmentId(7L);
+//		mockassignment1.setAssignmentName("SQL");
+//		
+//		List<Assignment> assignmentList = new ArrayList<Assignment>();
+//		assignmentList.add(mockassignment1);
+//		
+//		AssignmentSubmit mockAssignmentSubmit = mockAssignmentSubmit1;
+//		mockAssignmentSubmit.setGrade(1);
+//		mockAssignmentSubmit.setGradedBy("U02");
+//		
+//		List<AssignmentSubmit> assignmentSubmitList = mockAssignmentSubmitList;
+//		assignmentSubmitList.add(mockAssignmentSubmit);
+//		
+//		given(batchRepository.findById(batchidInteger)).willReturn(Optional.of(batch));
+//	    given(mockAssignmentRepository.findByBatch(batch)).willReturn(assignmentList);
+//	    given(mockAssignmentSubmitRepository.findByAssignment_AssignmentIdIn(assignmentIds)).willReturn(assignmentSubmitList);
+//	    given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList)).willReturn(mockAssignmentSubmitDTOList);
+//		
+//		//when
+//		List<AssignmentSubmitDTO> assignmentSubmitDTOs = mockAssignmentSubmitService.getSubmissionsByBatchHeroku(batch.getBatchId());
+//		
+//		//then
+//		assertThat(assignmentSubmitDTOs).isNotNull();
+//		
+//		
+//		
+//	}
 
     @Test
     @DisplayName("Test for get Grades by AssignmentID")
@@ -308,7 +356,7 @@ public class AssignmentSubmitServiceTest {
 
         //then
         assertNotNull(result);
-        assertThat(result).isNotNull();
+      //assertThat(result).isNotNull();
 
     }
 

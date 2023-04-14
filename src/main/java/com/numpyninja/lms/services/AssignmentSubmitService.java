@@ -3,6 +3,8 @@ package com.numpyninja.lms.services;
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.AssignmentSubmit;
+import com.numpyninja.lms.entity.Batch;
+import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
@@ -143,6 +145,11 @@ public class AssignmentSubmitService {
     	
    // List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findAll();
     List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchid);
+  System.out.println(assignmentsubmits);
+  
+  if(assignmentsubmits.isEmpty())
+	  throw new ResourceNotFoundException("Assignmentsubmissions does not exist for Batch ID : "+batchid);
+  
     assignmentsubmits.forEach((as)->{
     Assignment 	assignment2 =   as.getAssignment();
     Integer bid = assignment2.getBatch().getBatchId(); 	
@@ -156,8 +163,41 @@ public class AssignmentSubmitService {
     	
     } 
 
-
-    public AssignmentSubmitDTO resubmitAssignment(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId) {
+    
+//writing another service with different logic and method name to check if this works on heroku
+    public List<AssignmentSubmitDTO> getSubmissionsByBatchHeroku(Integer batchid){
+    	Batch batch= this.batchRepository.findById(batchid)
+    			.orElseThrow(() -> new ResourceNotFoundException("Batch", "ID", batchid));
+    	
+    	List<Assignment> assignments = this.assignmentRepository.findByBatch(batch);
+    	
+    	if(assignments.isEmpty())
+    		throw new ResourceNotFoundException("Assignment does not exist for Batch ID : "+batchid);
+    		
+    	List<AssignmentSubmit> assignmentsubmitList = new ArrayList<AssignmentSubmit>();
+    	
+    	List<Long> assignmentIds = new ArrayList<Long>();
+    	
+    	for(int i =0;i<assignments.size();i++)
+    	{
+    		assignmentIds.add(i, assignments.get(i).getAssignmentId());
+    	}
+       
+    	assignmentsubmitList = this.assignmentSubmitRepository.findByAssignment_AssignmentIdIn(assignmentIds);
+    	
+    	if(assignmentsubmitList.isEmpty())
+    	  throw new ResourceNotFoundException("Assignmentsubmissions does not exist for Batch ID : "+batchid);
+     
+      
+        List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
+        .toAssignmentSubmitDTOList(assignmentsubmitList);
+    	return assignmentSubmitDTOs;
+        	
+        } 
+    
+    
+    
+  public AssignmentSubmitDTO resubmitAssignment(AssignmentSubmitDTO assignmentSubmitDTO, Long submissionId) {
         AssignmentSubmit savedAssignmentSubmit = this.assignmentSubmitRepository.findById(submissionId)
                         .orElseThrow(() ->new ResourceNotFoundException("Submission","ID",submissionId));
 

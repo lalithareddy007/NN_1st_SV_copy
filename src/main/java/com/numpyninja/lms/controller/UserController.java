@@ -5,6 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.numpyninja.lms.dto.*;
+import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -102,6 +104,15 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
+
+	//USER - GET USER BY PROGRAM-Batch
+	@GetMapping("/users/programBatch/{batchId}")
+	public ResponseEntity<List<UserDto>> getUserByProgramBatches(@PathVariable Integer batchId) throws ResourceNotFoundException
+	{
+			return ResponseEntity.ok(this.userServices.getUserByProgramBatch(batchId));
+	}
+	
+	
 	@GetMapping("/users/programs/{programId}")
 	public ResponseEntity<List<UserDto>> getUsersForProgram(@PathVariable Long programId) throws ResourceNotFoundException {
 		{
@@ -109,11 +120,18 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.OK).body(list);
 		}
 
-		/** Check if the below end points are required or not for the future**/
-    /*
+	}
+}
+		
+		
+		
+		
+	
+
+    
 	//Check if this is needed form front end or not??
 	//Get all users with all their info - Role, status
-	@GetMapping("/users/roles")
+	/*@GetMapping("/users/roles")
 	protected List<?> getAllUsersWithRoles() {
 		return userServices.getAllUsersWithRoles() ;
 	}
@@ -135,9 +153,10 @@ public class UserController {
 	@PutMapping("/users/roleStatus/{userId}")
     public ResponseEntity<UserDto> updateUserWithRole(@Valid @RequestBody UserAndRoleDTO updateUserRoleDto, @PathVariable(value="userId") String userId) throws DuplicateResourceFoundException, ResourceNotFoundException, InvalidDataException {
     	UserDto responseDto = userServices.updateUserWithRole(updateUserRoleDto, userId);
-    	return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-    */
 
-	}
-}
+    	return ResponseEntity.status(HttpStatus.OK).body(responseDto); 
+    }
+	
+	*/
+	
+	

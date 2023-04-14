@@ -95,7 +95,14 @@ class UserServicesTest {
 
 	private UserRoleProgramBatchDto mockUserRoleProgramBatchDtoWithBatch, mockUserRoleProgramBatchDtoWithBatches;
 
+
+
+	//private UserRoleProgramBatchMap mockUserRoleProgramBatchMap; 
+	
+	private List<UserRoleProgramBatchMap> mockUserRoleProgramBatchMapList;
+
 	private UserRoleProgramBatchMap mockUserRoleProgramBatchMap;
+
 
 	private SkillMaster mockSkillMaster;
 
@@ -902,6 +909,39 @@ class UserServicesTest {
 		assertEquals(message, response);
 	}
 	/** JUnit test cases for mapping program/batch(es) to Student/Staff : END **/
+
+	
+	
+	@DisplayName("test for getting List of Users for a given Program/batch batchid")
+	@Test
+	void GetUserByProgramBatches() {
+     Batch batch = mockBatch;
+	 given(progBatchRepository.findById(mockBatch.getBatchId())).willReturn(Optional.of(mockBatch));
+
+	 UserRoleProgramBatchMap userRoleProgramBatchMap = new UserRoleProgramBatchMap();
+	 userRoleProgramBatchMap.setUserRoleProgramBatchStatus("active");
+	 mockUserRoleProgramBatchMap.setUser(mockUser2);
+	 
+	 List<UserRoleProgramBatchMap> userRoleProgramBatchMaplist = new ArrayList<UserRoleProgramBatchMap>();
+	 userRoleProgramBatchMaplist.add(mockUserRoleProgramBatchMap);
+	 when(userRoleProgramBatchMapRepository.findByBatch_BatchId(batch.getBatchId()))
+	     .thenReturn(userRoleProgramBatchMaplist);
+
+	 List<UserDto> mockUserDtoList = new ArrayList<>();
+	 mockUserDtoList.add(mockUserDto);
+	 when(userMapper.userDtos(anyList())).thenReturn(mockUserDtoList);
+	 
+	 // When
+	 List<UserDto> result = userService.getUserByProgramBatch(batch.getBatchId());
+
+	 // Then
+	 assertThat(result).isNotNull();
+	 assertThat(result.size()).isEqualTo(1);
+	 assertThat(result.get(0)).isEqualTo(mockUserDto);
+	}
+
+	 
+
 	@DisplayName("test for getting List of Users for a given Program - ProgramId")
 	@Test
 	void getUsersByProgram_returnsUsers_whenProgramExists() {
@@ -945,5 +985,8 @@ class UserServicesTest {
 
 		// Then
 		Mockito.verify(programRepository).findById(programId);
+
 	}
 }
+
+
