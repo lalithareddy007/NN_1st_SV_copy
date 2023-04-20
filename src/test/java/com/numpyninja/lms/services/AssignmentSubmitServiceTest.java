@@ -206,61 +206,42 @@ public class AssignmentSubmitServiceTest {
 
     }
 
+   
     @Test
-    @DisplayName("Test for get submissions by Batch")
-    public void testGetSubmissionsByBatch()
-    {
-    	Integer batchId =mockAssignment.getBatch().getBatchId();
-    	when(mockAssignmentSubmitRepository.findByAssignment_Batch_BatchId(batchId)).thenReturn(mockAssignmentSubmitList);
-    	given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList))
-         .willReturn(mockAssignmentSubmitDTOList);
-
-    	List<AssignmentSubmitDTO> assignmentSubmitDTOList = mockAssignmentSubmitService.getSubmissionsByBatch(batchId);
-    	assertEquals(assignmentSubmitDTOList.size(),assignmentSubmitDTOList.size());
-    }
-
-    
-    
-    
-//test for submissions by batch to check on heroku
-    
-    
-//	@Test
-//	@DisplayName("test for getting submissions by BatchId")
-//	void testGetSubmissionsByBatchHeroku() {
-//Integer batchidInteger =1;
-//    	
-//    	List<Long> assignmentIds = new ArrayList<Long>();
-//		Batch batch = setMockBatch();
-//		
-//		Assignment mockassignment1= mockAssignment;
-//		mockassignment1.setAssignmentId(7L);
-//		mockassignment1.setAssignmentName("SQL");
-//		
-//		List<Assignment> assignmentList = new ArrayList<Assignment>();
-//		assignmentList.add(mockassignment1);
-//		
-//		AssignmentSubmit mockAssignmentSubmit = mockAssignmentSubmit1;
-//		mockAssignmentSubmit.setGrade(1);
-//		mockAssignmentSubmit.setGradedBy("U02");
-//		
-//		List<AssignmentSubmit> assignmentSubmitList = mockAssignmentSubmitList;
-//		assignmentSubmitList.add(mockAssignmentSubmit);
-//		
-//		given(batchRepository.findById(batchidInteger)).willReturn(Optional.of(batch));
-//	    given(mockAssignmentRepository.findByBatch(batch)).willReturn(assignmentList);
-//	    given(mockAssignmentSubmitRepository.findByAssignment_AssignmentIdIn(assignmentIds)).willReturn(assignmentSubmitList);
-//	    given(assignmentSubmitMapper.toAssignmentSubmitDTOList(mockAssignmentSubmitList)).willReturn(mockAssignmentSubmitDTOList);
-//		
-//		//when
-//		List<AssignmentSubmitDTO> assignmentSubmitDTOs = mockAssignmentSubmitService.getSubmissionsByBatchHeroku(batch.getBatchId());
-//		
-//		//then
-//		assertThat(assignmentSubmitDTOs).isNotNull();
-//		
-//		
-//		
-//	}
+	@DisplayName("test for getting submissions by BatchId")
+	void testGetSubmissionsByBatch() {
+        Integer batchidInteger =1;
+    	
+        List<Long> assignmentIds = Arrays.asList(1L); 
+		Batch batch = setMockBatch();
+		
+		Assignment mockassignment1= mockAssignment;
+		mockassignment1.setAssignmentId(1L);
+		mockassignment1.setAssignmentName("Test Assignment");
+		
+		List<Assignment> assignmentList = new ArrayList<Assignment>();
+		assignmentList.add(mockassignment1);
+		
+		AssignmentSubmit mockAssignmentSubmit = mockAssignmentSubmit2;
+		mockAssignmentSubmit.setGrade(1);
+		mockAssignmentSubmit.setGradedBy("U02");
+		
+		List<AssignmentSubmit> assignmentSubmitList = new ArrayList<AssignmentSubmit>();
+		assignmentSubmitList.add(mockAssignmentSubmit);
+		
+		//given
+		given(mockAssignmentRepository.findByBatch(batch)).willReturn(assignmentList);
+	    given(batchRepository.findById(batch.getBatchId())).willReturn(Optional.of(batch));
+	    given(mockAssignmentSubmitRepository.findByAssignment_AssignmentIdIn(assignmentIds)).willReturn(assignmentSubmitList);
+	    given(assignmentSubmitMapper.toAssignmentSubmitDTOList(assignmentSubmitList)).willReturn(mockAssignmentSubmitDTOList);
+	
+	    
+	    //when
+		List<AssignmentSubmitDTO> assignmentSubmitDTOs = mockAssignmentSubmitService.getSubmissionsByBatch(batch.getBatchId());
+		
+		//then
+		assertThat(assignmentSubmitDTOs).isNotNull();
+	}
 
     @Test
     @DisplayName("Test for get Grades by AssignmentID")

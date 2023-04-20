@@ -136,36 +136,8 @@ public class AssignmentSubmitService {
     	
     }
 
-    /**
-     * get submissions by batchid
-     */
+//get submissions by batchid
     public List<AssignmentSubmitDTO> getSubmissionsByBatch(Integer batchid){
-    	
-    List<AssignmentSubmit> assignmentsubmitList = new ArrayList<AssignmentSubmit>();
-    	
-   // List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findAll();
-    List<AssignmentSubmit> assignmentsubmits =	this.assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchid);
-  System.out.println(assignmentsubmits);
-  
-  if(assignmentsubmits.isEmpty())
-	  throw new ResourceNotFoundException("Assignmentsubmissions does not exist for Batch ID : "+batchid);
-  
-    assignmentsubmits.forEach((as)->{
-    Assignment 	assignment2 =   as.getAssignment();
-    Integer bid = assignment2.getBatch().getBatchId(); 	
-    if(bid == batchid )
-        assignmentsubmitList.add(as);
-    	});
-    	
-    List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
-    .toAssignmentSubmitDTOList(assignmentsubmitList);
-	return assignmentSubmitDTOs;
-    	
-    } 
-
-    
-//writing another service with different logic and method name to check if this works on heroku
-    public List<AssignmentSubmitDTO> getSubmissionsByBatchHeroku(Integer batchid){
     	Batch batch= this.batchRepository.findById(batchid)
     			.orElseThrow(() -> new ResourceNotFoundException("Batch", "ID", batchid));
     	
@@ -187,9 +159,8 @@ public class AssignmentSubmitService {
     	
     	if(assignmentsubmitList.isEmpty())
     	  throw new ResourceNotFoundException("Assignmentsubmissions does not exist for Batch ID : "+batchid);
-     
-      
-        List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
+        
+    	List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitMapper
         .toAssignmentSubmitDTOList(assignmentsubmitList);
     	return assignmentSubmitDTOs;
         	
