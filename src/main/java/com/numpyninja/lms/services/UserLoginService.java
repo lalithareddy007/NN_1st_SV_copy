@@ -23,16 +23,16 @@ public class UserLoginService {
     }
 
     public UserLoginDto authenticateUser(UserLoginDto uDto) {
-        String username = uDto.getUsername();
+        String userLoginEmail = uDto.getUserLoginEmail();
         String password = uDto.getPassword();
 
-        Optional<UserLogin> userOptional = userLoginRepository.findByUsernameIgnoreCase(username);
+        Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEmail);
         if (userOptional.isPresent()) { // User is present in database
             UserLogin userLogin = userOptional.get();
             if (password.equals(userLogin.getPassword())) { // Password matches for requested User
                 if ("active".equalsIgnoreCase(userLogin.getLoginStatus())) { // Login status is active
                     // Check for associated roles
-                    List<UserRoleMap> extUserRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUser_id());
+                    List<UserRoleMap> extUserRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUser().getUserId());
                     if (extUserRoleMaps.isEmpty()) // No roles available for requested user
                         uDto.setStatus("role unavailable");
                     else {
@@ -59,7 +59,7 @@ public class UserLoginService {
             uDto.setStatus("invalid");
 
         UserLoginDto resUserLoginDto = UserLoginDto.builder()
-                .username(uDto.getUsername())
+                .userLoginEmail(uDto.getUserLoginEmail())
                 .status(uDto.getStatus())
                 .roleIds(uDto.getRoleIds())
                 .build();
