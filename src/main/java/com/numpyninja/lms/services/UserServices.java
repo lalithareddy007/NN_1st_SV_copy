@@ -77,6 +77,7 @@ public class UserServices implements UserDetailsService {
 	}
 
 	@Override
+	@Transactional
 	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
 		UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "EMailId", loginEmail)	);

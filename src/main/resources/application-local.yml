@@ -11,3 +11,4 @@ security:
   app:
     jwtSecret: lmsAppSecretKey
     jwtExpirationMs: 86400000  # 86400000 Ms = 1 day
+

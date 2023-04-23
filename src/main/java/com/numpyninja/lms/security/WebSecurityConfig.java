@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity   // allows Spring to find and automatically apply the class to the global Web Security.
 @EnableGlobalMethodSecurity(
         // securedEnabled = true,
-        // jsr250Enabled = true,
+        jsr250Enabled = true,    // enables @RolesAllowed annotation.
         prePostEnabled = true)  // provides AOP security on methods. It enables @PreAuthorize, @PostAuthorize
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -58,7 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/login").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().authenticated();        // ”permitAll” will configure the authorization so that all requests are allowed on that particular path ; '/login'
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

@@ -2,6 +2,7 @@ package com.numpyninja.lms.controller;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 
@@ -60,6 +61,7 @@ public class ProgBatchController  {
 	
 	
     @PostMapping(path = "/batches", consumes = "application/json", produces = "application/json")
+    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BatchDTO> createBatch( @Valid @RequestBody BatchDTO batchDTO ) {
         BatchDTO batchDTOCreatd = batchService.createBatch(batchDTO );
         return ResponseEntity.status(HttpStatus.CREATED).body(batchDTOCreatd);
@@ -68,6 +70,7 @@ public class ProgBatchController  {
     
     //Update program Information
     @PutMapping(path = "/batches/{batchId}", consumes = "application/json", produces = "application/json")
+    @RolesAllowed({"ROLE_ADMIN"})
     public ResponseEntity<BatchDTO> updateBatch( @Valid @RequestBody BatchDTO batchDTO,  @PathVariable Integer batchId ) {
     	BatchDTO batchDTOUpd = batchService.updateBatch( batchDTO, batchId);
     	return ResponseEntity.ok( batchDTOUpd );
@@ -75,6 +78,7 @@ public class ProgBatchController  {
 
     
     @DeleteMapping(path = "/batches/{id}" , produces = "application/json" )
+    @RolesAllowed({"ROLE_ADMIN"})
     public String deleteBatch( @PathVariable Integer id) {
         batchService.deleteProgramBatch(id);
         String message = "Message:" + " Batch with Id-" + id + " deleted Successfully!";
