@@ -1,5 +1,7 @@
 package com.numpyninja.lms.controller;
 
+import com.numpyninja.lms.dto.JwtResponseDto;
+import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.dto.UserLoginDto;
 import com.numpyninja.lms.services.UserLoginService;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ public class UserLoginController {
         this.userLoginService = userLoginService;
     }
 
-    @PostMapping("/authenticate")
+    /*@PostMapping("/authenticate")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserLoginDto uDto){
         UserLoginDto resUserLoginDto = userLoginService.authenticateUser(uDto);
         String status = resUserLoginDto.getStatus().toLowerCase();
@@ -32,5 +34,11 @@ public class UserLoginController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         else
             return ResponseEntity.status(HttpStatus.OK).body(resUserLoginDto);
+    }
+    */
+
+    @PostMapping("")
+    public ResponseEntity<JwtResponseDto> signin(@Valid @RequestBody LoginDto loginDto){
+        return ResponseEntity.ok(userLoginService.signin( loginDto ));
     }
 }

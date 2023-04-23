@@ -9,7 +9,11 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -23,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServices {
+public class UserServices implements UserDetailsService {
 
 	@Autowired
 	UserRepository userRepository;
@@ -63,7 +67,8 @@ public class UserServices {
 
 	@Autowired
 	UserPictureMapper userPictureMapper;
-
+	@Autowired
+	private UserLoginRepository userLoginRepository;
 	private static final String ROLE_STUDENT = "R03";
 
 	public List<UserDto> getAllUsers() {
@@ -71,7 +76,20 @@ public class UserServices {
 		// return userRepository.findAll();
 	}
 
-	public UserAllDto getUserInfoById(String userId){
+	@Override
+	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
+		UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "EMailId", loginEmail)	);
+		User user = userRepository.findById(userLogin.getUser_id())
+				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userLogin.getUser_id()));  // get it from UserLogin once link is established
+
+		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUser_id());
+		List<String> roles = userRoleMaps.stream().map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList());
+
+		return UserDetailsImpl.build(user, userLogin, roles);
+	}
+
+		public UserAllDto getUserInfoById(String userId){
 		User existingUser = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
@@ -545,8 +563,6 @@ public class UserServices {
 				.collect(Collectors.toList());
 		return userDtoList;
 	}
-	
-	
 	
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
