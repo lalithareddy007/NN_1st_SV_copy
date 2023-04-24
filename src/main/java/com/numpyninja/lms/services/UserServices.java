@@ -29,6 +29,9 @@ public class UserServices {
 	UserRepository userRepository;
 
 	@Autowired
+	UserLoginRepository userLoginRepository;
+
+	@Autowired
 	UserRoleMapRepository userRoleMapRepository;
 
 	@Autowired
@@ -108,7 +111,6 @@ public class UserServices {
 
 		return userAllDto;
 	}
-
 	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
 			throws InvalidDataException, DuplicateResourceFoundException {
@@ -184,6 +186,115 @@ public class UserServices {
 
 		} else {
 			throw new InvalidDataException("User Data not valid ");
+		}
+
+
+		// UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);
+
+		// How to return createdUSerRoleDTO
+
+		UserDto createdUserdto = userMapper.userDto(createdUser);
+		// UserRoleDTO createdUserRoleDto = userMapper.userDto(createdUser);
+		return createdUserdto;
+	}
+
+
+
+	@Transactional
+	public UserDto createUserLoginWithRole(UserLoginRoleDTO newUserLoginRoleDto) throws InvalidDataException, DuplicateResourceFoundException {
+		User newUser = null;
+		UserRoleMap newUserRoleMap = null;
+		Role userRole = null;
+		List<UserRoleMap> newUserRoleMapList = null;
+		User createdUser = null;
+		UserLogin createdUserLogin = null;
+		Date utilDate = new Date();
+
+		if (newUserLoginRoleDto != null) {
+
+			/** Checking phone number to prevent duplicate entry **/
+			List<User> userList = userRepository.findAll();
+			if (userList.size() > 0) {
+				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserLoginRoleDto.getUserPhoneNumber());
+				if (isPhoneNumberExists) {
+					throw new DuplicateResourceFoundException("Failed to create new User as phone number "
+							+ newUserLoginRoleDto.getUserPhoneNumber() + " already exists !!");
+				}
+			}
+			/** Checking for valid TimeZone **/
+			if (!isTimeZoneValid(newUserLoginRoleDto.getUserTimeZone())) {
+				throw new InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
+			}
+			/** Checking for valid Visa Status **/
+			if (!isVisaStatusValid(newUserLoginRoleDto.getUserVisaStatus())) {
+				throw new InvalidDataException("Failed to create user, as 'Visa Status' is invalid !! ");
+			}
+
+			newUser = userMapper.toUser(newUserLoginRoleDto);
+			// System.out.println("new user " + newUser);
+
+			newUser.setCreationTime(new Timestamp(utilDate.getTime()));
+			newUser.setLastModTime(new Timestamp(utilDate.getTime()));
+
+
+			/** Creating a new user **/
+			createdUser = userRepository.save(newUser);
+
+			if (newUserLoginRoleDto.getUserRoleMaps() != null) {
+				for (int i = 0; i < newUserLoginRoleDto.getUserRoleMaps().size(); i++) {
+					String roleName = null;
+					String roleId = null;
+					String roleStatus = null;
+					String userId = null;
+
+					roleId = newUserLoginRoleDto.getUserRoleMaps().get(i).getRoleId();
+
+					Role roleUser = roleRepository.getById(roleId);
+
+					roleStatus = newUserLoginRoleDto.getUserRoleMaps().get(i).getUserRoleStatus();
+
+					newUserRoleMapList = userMapper.userRoleMapList(newUserLoginRoleDto.getUserRoleMaps());
+					newUserRoleMapList.get(i).setUserRoleStatus(roleStatus);
+
+					newUserRoleMapList.get(i).setUser(createdUser);
+					newUserRoleMapList.get(i).setRole(roleUser);
+					newUserRoleMapList.get(i).setCreationTime(new Timestamp(utilDate.getTime()));
+					newUserRoleMapList.get(i).setLastModTime(new Timestamp(utilDate.getTime()));
+					UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMapList.get(i));
+
+				}
+
+			} else {
+				throw new InvalidDataException("User Data not valid - Missing Role information");
+			}
+
+		} else {
+			throw new InvalidDataException("User Data not valid ");
+		}
+		//UserLoginEmail
+		if (newUserLoginRoleDto.getUserLogin() != null) {
+			UserLoginDto userLoginDto = newUserLoginRoleDto.getUserLogin();
+			UserLogin userLogin = userMapper.toUserLogin(userLoginDto);
+
+			// Check for existing user logins with the same email
+			Optional<UserLogin> existingUserLogins = userLoginRepository.findByUserLoginEmailIgnoreCase(userLogin.getUserLoginEmail());
+
+			if (!existingUserLogins.isEmpty()) {
+				// If there are existing user logins, check if any of them have the same password
+				if (existingUserLogins.stream().anyMatch(existingUserLogin -> existingUserLogin.getPassword().equals(userLogin.getPassword()))) {
+					throw new DuplicateResourceFoundException("Failed to create new UserLogin as email and password combination already exists!");
+				}
+				// If none of them have the same password, throw an exception for duplicate email
+				throw new DuplicateResourceFoundException("Failed to create new UserLogin as email already exists!");
+			}
+
+			userLogin.setUserId(createdUser.getUserId());
+			userLogin.setUser(createdUser);
+			userLogin.setCreationTime(new Timestamp(utilDate.getTime()));
+			userLogin.setLastModTime(new Timestamp(utilDate.getTime()));
+			createdUserLogin = userLoginRepository.save(userLogin);
+		} else {
+			throw new InvalidDataException("User Data not valid - Email is missing");
 		}
 
 		// UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);

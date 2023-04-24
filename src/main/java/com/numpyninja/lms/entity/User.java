@@ -2,12 +2,7 @@ package com.numpyninja.lms.entity;
 
 import java.sql.Timestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -78,7 +73,12 @@ public class User {
 	@Column
 	@JsonIgnore
 	private Timestamp lastModTime;
+	public String getUserId() {
+		return userId;
+	}
 
-		
-	
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 }

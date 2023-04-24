@@ -58,6 +58,4 @@ public class UserDto {
 	@JsonProperty("userVisaStatus")
 	private String userVisaStatus;
 
-
-	
 }

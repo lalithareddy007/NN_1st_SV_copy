@@ -60,8 +60,8 @@ public class UserController {
 
 	//create user with Role
 	@PostMapping("/users/roleStatus")
-	public ResponseEntity<UserDto> createUserWithRole(@Valid @RequestBody UserAndRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFoundException {
-		UserDto responseDto = userServices.createUserWithRole(newUserRoleDto);
+	public ResponseEntity<UserDto> createUserloginWithRole(@Valid @RequestBody UserLoginRoleDTO newUserRoleDto) throws InvalidDataException, DuplicateResourceFoundException {
+		UserDto responseDto = userServices.createUserLoginWithRole(newUserRoleDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
 	}
 
