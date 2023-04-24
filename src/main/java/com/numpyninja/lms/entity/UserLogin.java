@@ -16,11 +16,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="tbl_lms_user_login")
 public class UserLogin {
-   /* @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_login_id_generator")
-    @SequenceGenerator(name = "user_login_id_generator", sequenceName = "tbl_lms_user_login_user_login_id_seq", allocationSize = 1)
-    @Column( name ="user_login_id")
-    private Long userLoginId;*/
+
    @Id
    private String userId;
 
