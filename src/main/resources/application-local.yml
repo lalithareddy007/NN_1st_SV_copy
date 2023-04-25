@@ -1,11 +1,23 @@
-
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/LMS_DB
     username: postgres  #changed as per Local DB
     password: admin  #changed as per Local DB
     
-    
+    # configurations specific to SMTP email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sudhavalli@gmail.com
+    password: coeu-asxo-tiko-qtnc
+    protocol: smtp
+    #properties.mail.smtp:
+    smtp:
+      auth: true
+      starttls.enable: true
+      ssl.trust: smtp.gmail.com
  
 app:
-  frontend.url: https://lms-frontend.herokuapp.com
+  frontend.url: http://localhost:4200
+
+

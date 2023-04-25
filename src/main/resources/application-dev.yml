@@ -7,7 +7,19 @@ spring:
     url: jdbc:postgresql://${DEV_DB_HOST}:${DEV_DB_PORT}/${DEV_DB_NAME} 
     username: ${DEV_DB_USERNAME}
     password: ${DEV_DB_PASSWORD}
- 
+
+  # configurations specific to SMTP email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sudhavalli@gmail.com
+    password: coeu-asxo-tiko-qtnc
+    protocol: smtp
+    #properties.mail.smtp:
+    smtp:
+      auth: true
+      starttls.enable: true
+      ssl.trust: smtp.gmail.com
 
 app:
   frontend.url: ${FRONTEND_URL_HEROKU}
