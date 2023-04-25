@@ -185,7 +185,7 @@ public class UserControllerTest {
 				"www.linkedin.com/Ramanujan1234", "MCA", "MBA", "Indian scientist", "H1B");
 
 		//given
-		given(userService.createUserWithRole(any(UserAndRoleDTO.class))).willReturn(mockUserDto1);
+		given(userService.createUserLoginWithRole(any(UserLoginRoleDTO.class))).willReturn(mockUserDto1);
 
 		//when
 		ResultActions response = mockMvc.perform(post("/users/roleStatus")
