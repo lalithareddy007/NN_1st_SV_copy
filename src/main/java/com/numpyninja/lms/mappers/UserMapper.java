@@ -3,24 +3,17 @@ package com.numpyninja.lms.mappers;
 import java.util.List;
 
 import com.numpyninja.lms.dto.*;
-import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
+import com.numpyninja.lms.entity.*;
 import org.mapstruct.Mapper;
 
 
-import com.numpyninja.lms.dto.AssignmentDto;
-import com.numpyninja.lms.dto.ClassDto;
 import com.numpyninja.lms.dto.UserAndRoleDTO;
 import com.numpyninja.lms.dto.UserDto;
 
 import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
 import com.numpyninja.lms.dto.UserRoleProgramBatchDto;
-import com.numpyninja.lms.entity.Assignment;
 
-import com.numpyninja.lms.entity.Class;
-import com.numpyninja.lms.entity.User;
-import com.numpyninja.lms.entity.UserRoleMap;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 @Mapper(
 		componentModel = "spring"
@@ -36,6 +29,10 @@ public interface UserMapper {
 
 	//for user role creation
 	User toUser(UserAndRoleDTO userAndRoleDto);
+	User toUser(UserLoginRoleDTO userLoginRoleDTO);
+
+	UserLogin toUserLogin(UserLoginDto userLogin);
+
 
 	UserRoleMap userRoleMap(UserRoleMapSlimDTO userRoleMapSlimDto);
 

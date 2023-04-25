@@ -1,9 +1,11 @@
 package com.numpyninja.lms.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -11,13 +13,17 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
+@JsonIgnoreProperties(value = {"roleIds"}, allowGetters = true)
 public class UserLoginDto {
-    @NotBlank(message = "Username is mandatory")
-    private String username;
+    @NotBlank(message = "UserLoginEmail is mandatory")
+    private String userLoginEmail;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotBlank(message = "Password is mandatory")
     private String password;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String loginStatus;
 
     @JsonIgnore
     private String status;

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @ToString
 public class UserDetailsImpl implements UserDetails {
-
+    private static final long serialVersionUID = 1L;
     private String userId;
     private String username;  // username used to authenticate the user - In LMS it is email Id
     private String email;
@@ -62,5 +63,15 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        UserDetailsImpl user = (UserDetailsImpl) o;
+        return Objects.equals(userId, user.getUserId());
     }
 }

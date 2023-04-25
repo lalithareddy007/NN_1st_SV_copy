@@ -1,14 +1,10 @@
 package com.numpyninja.lms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.sql.Timestamp;
+
 
 @Getter
 @Setter
@@ -17,11 +13,11 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name="tbl_lms_user_login")
-public class UserLogin  {
-    @Id
-    private String user_id;
+public class UserLogin {
+   @Id
+   private String userId;
 
-    @Column(name="user_login_name")
+    @Column(name="user_login_email")
     private String userLoginEmail;
 
     @Column(name="user_password")
@@ -30,5 +26,17 @@ public class UserLogin  {
     @Column(name="user_login_status")
     private String loginStatus;
 
-}
+    @Column
+    @JsonIgnore
+    private Timestamp creationTime;
 
+    @Column
+    @JsonIgnore
+    private Timestamp lastModTime;
+
+    // One-to-One relationship with UserLogin entity
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
+
+}
