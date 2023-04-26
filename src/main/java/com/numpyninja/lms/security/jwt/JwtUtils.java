@@ -32,13 +32,13 @@ public class JwtUtils {
 
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
-        String authorities = authentication.getAuthorities().stream()
+        /*String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(",")); */    // uncomment if u want to include roles in token
 
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
-                .claim( ROLES , authorities)
+                //.claim( ROLES , authorities)   // uncomment if u want to include roles in token
                 .setIssuedAt(new Date())
                 .setExpiration(new Date( (new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

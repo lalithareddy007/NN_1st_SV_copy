@@ -9,6 +9,6 @@ app:
 
 security:
   app:
-    jwtSecret: lmsAppSecretKey
+    jwtSecret: lmsAppSecretKeyTest
     jwtExpirationMs: 86400000  # 86400000 Ms = 1 day
 
