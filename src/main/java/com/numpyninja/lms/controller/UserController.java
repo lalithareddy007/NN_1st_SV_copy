@@ -80,7 +80,12 @@ public class UserController {
 		String responseDto = userServices.updateUserRoleStatus(updateUserRoleStatus, userId);
 		return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " + userId);
 	}
-
+	@PutMapping("/users/userLogin/{userId}")
+	public ResponseEntity<String> updateUserLoginStatus(@Valid @PathVariable(value = "userId") String userId, @Valid @RequestBody UserLoginDto updateUserLogin) throws InvalidDataException {
+		//String UserRole, String UserStatus
+		String responseDto = userServices.updateUserLogin(updateUserLogin,userId);
+		return ResponseEntity.status(HttpStatus.OK).body("UserLoginEmail/Status Updated for User: " + userId);
+	}
 	//cascade deletes users and User roles
 	@DeleteMapping("/users/{userId}")
 	public ResponseEntity<String> deleteUser(@PathVariable(value = "userId") String userId) throws ResourceNotFoundException {

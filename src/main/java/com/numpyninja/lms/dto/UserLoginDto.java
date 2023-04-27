@@ -18,8 +18,7 @@ public class UserLoginDto {
     @NotBlank(message = "UserLoginEmail is mandatory")
     private String userLoginEmail;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @NotBlank(message = "Password is mandatory")
+
     private String password;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

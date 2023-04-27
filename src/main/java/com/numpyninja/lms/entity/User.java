@@ -73,12 +73,6 @@ public class User {
 	@Column
 	@JsonIgnore
 	private Timestamp lastModTime;
-	public String getUserId() {
-		return userId;
-	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
 
 }
