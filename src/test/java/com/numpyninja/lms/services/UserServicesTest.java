@@ -70,6 +70,7 @@ class UserServicesTest {
 	@Mock
 	private UserSkillRepository userSkillRepository;
 
+
 	@Mock
 	private UserPictureRepository userPictureRepository;
 
@@ -95,7 +96,8 @@ class UserServicesTest {
 
 	private UserRoleProgramBatchDto mockUserRoleProgramBatchDtoWithBatch, mockUserRoleProgramBatchDtoWithBatches;
 
-
+	@Mock
+	private UserLoginRepository userLoginRepository;
 
 	//private UserRoleProgramBatchMap mockUserRoleProgramBatchMap; 
 	
@@ -121,7 +123,7 @@ class UserServicesTest {
 				new Timestamp(utilDate.getTime()));
 
 		mockUserDto = new UserDto("U02", "Abdul", "Kalam", " ", 2222222222L, "India", "IST", "www.linkedin.com/Kalam1234",
-				"MCA", "MBA", "Indian scientist", "H4");
+				"MCA", "MBA", "Indian scientist", "H4","abdul.kalam@gmail.com");
 
 		String userRoleStatus = "Active";
 		Timestamp Timestamp = new Timestamp(utilDate.getTime());
@@ -151,7 +153,7 @@ class UserServicesTest {
 
 		mockUserDto2 = new UserDto("U07", "Mary", "Poppins", "",
 				9899245876L, "India", "IST", "www.linkedin.com/Mary123",
-				"BCA", "MBA", "", "H4");
+				"BCA", "MBA", "", "H4","Mary.poppins@gmail.com");
 
 		mockRole2 = new Role("R03","Student","LMS_User",Timestamp.valueOf(LocalDateTime.now()),
 				Timestamp.valueOf(LocalDateTime.now()));
@@ -163,7 +165,7 @@ class UserServicesTest {
 
 		mockUserDto3 = new UserDto("U02", "Steve", "Jobs", "",
 				9899245877L, "India", "IST", "www.linkedin.com/Steve123",
-				"BE", "MBA", "", "H4");
+				"BE", "MBA", "", "H4","steve.jobs@gmail.com");
 
 		mockRole3 = new Role("R02","Staff","LMS_Staff",Timestamp.valueOf(LocalDateTime.now()),
 				Timestamp.valueOf(LocalDateTime.now()));
@@ -229,32 +231,59 @@ class UserServicesTest {
 		//@Order(1)
 	void getAllUsersTest() {
 
-		User mockuser2 = mockUser;
-		mockuser2.setUserId("U03");
-		mockuser2.setUserFirstName("Homi");
-		mockuser2.setUserLastName("Baba");
-		mockuser2.setUserPhoneNumber(1122112211L);
+		// create mock users
+		User mockUser2 = new User();
+		mockUser2.setUserId("U03");
+		mockUser2.setUserFirstName("Homi");
+		mockUser2.setUserLastName("Baba");
+		mockUser2.setUserPhoneNumber(1122112211L);
 
-
-		List<User>  userList = new ArrayList<>();
+		List<User> userList = new ArrayList<>();
 		userList.add(mockUser);
-		userList.add(mockuser2);
+		userList.add(mockUser2);
 
-		UserDto mockUserMapper = userMapper.userDto(mockUser);
-		UserDto mockUserMapper1 = userMapper.userDto(mockuser2);
-		List<UserDto>  userMapperDtoList = new ArrayList<>();
-		userMapperDtoList.add(mockUserMapper);
-		userMapperDtoList.add(mockUserMapper1);
+		UserDto mockUserDto1 = new UserDto();
+		mockUserDto1.setUserId(mockUser.getUserId());
+		mockUserDto1.setUserFirstName(mockUser.getUserFirstName());
+		mockUserDto1.setUserLastName(mockUser.getUserLastName());
+		mockUserDto1.setUserPhoneNumber(mockUser.getUserPhoneNumber());
+
+		UserDto mockUserDto2 = new UserDto();
+		mockUserDto2.setUserId(mockUser2.getUserId());
+		mockUserDto2.setUserFirstName(mockUser2.getUserFirstName());
+		mockUserDto2.setUserLastName(mockUser2.getUserLastName());
+		mockUserDto2.setUserPhoneNumber(mockUser2.getUserPhoneNumber());
+
+		List<UserDto> userDtoList = new ArrayList<>();
+		userDtoList.add(mockUserDto1);
+		userDtoList.add(mockUserDto2);
+
+		// create mock user login data
+		UserLogin mockUserLogin1 = new UserLogin();
+		mockUserLogin1.setUserId(mockUser.getUserId());
+		mockUserLogin1.setUserLoginEmail("user1@example.com");
+
+		UserLogin mockUserLogin2 = new UserLogin();
+		mockUserLogin2.setUserId(mockUser2.getUserId());
+		mockUserLogin2.setUserLoginEmail("user2@example.com");
+
+		Map<String, String> userLoginEmailMap = new HashMap<>();
+		userLoginEmailMap.put(mockUser.getUserId(), mockUserLogin1.getUserLoginEmail());
+		userLoginEmailMap.put(mockUser2.getUserId(), mockUserLogin2.getUserLoginEmail());
 
 		given(userRepo.findAll()).willReturn(userList);
-
-		given(userMapper.userDtos(userList)).willReturn(userMapperDtoList);
+		given(userMapper.userDtos(userList)).willReturn(userDtoList);
+		given(userLoginRepository.findByUserId(mockUser.getUserId())).willReturn(Optional.of(mockUserLogin1));
+		given(userLoginRepository.findByUserId(mockUser2.getUserId())).willReturn(Optional.of(mockUserLogin2));
 
 		//when
-		List<UserDto> userDto = userService.getAllUsers();
+		List<UserDto> userDtos = userService.getAllUsers();
 
-		assertThat(userDto).isNotNull();
-
+		//then
+		assertThat(userDtos).isNotNull();
+		assertThat(userDtos.size()).isEqualTo(2);
+		assertThat(userDtos.get(0).getUserLoginEmail()).isEqualTo(mockUserLogin1.getUserLoginEmail());
+		assertThat(userDtos.get(1).getUserLoginEmail()).isEqualTo(mockUserLogin2.getUserLoginEmail());
 	}
 
 	@DisplayName("test for deleting an user by id")

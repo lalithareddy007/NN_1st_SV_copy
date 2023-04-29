@@ -81,7 +81,7 @@ public class UserControllerTest {
 		// mockUser = new User("U01","Srinivasa", "Ramanujan"," ", 2323232323L, "India",
 		// "IST", "www.linkedin.com/Ramanujan1234","MCA","MBA","Indian scientist","H1B",null, null);
 		mockUserDto = new UserDto("U01", "Srinivasa", "Ramanujan", " ", 2323232323L, "India", "IST",
-				"www.linkedin.com/Ramanujan1234", "MCA", "MBA", "Indian scientist", "H1B");
+				"www.linkedin.com/Ramanujan1234", "MCA", "MBA", "Indian scientist", "H1B","srinivasa.ramanujan@gmail.com");
 
 		Date utilDate = new Date();
 		Long userRoleId = 10L;
@@ -111,7 +111,7 @@ public class UserControllerTest {
 
 		mockUserDto2 = new UserDto("U07",  "Mary", "Poppins", "",
 				9899245876L, "India", "IST", "www.linkedin.com/Mary123",
-				"BCA", "MBA", "", "H4");
+				"BCA", "MBA", "", "H4","mary.poppins@gmail.com");
 
 		mockUserRoleMapSlimDto = new UserRoleMapSlimDTO("RO3","Active");
 
@@ -132,7 +132,7 @@ public class UserControllerTest {
 	void testGetAllUsers() throws Exception {
 
 		UserDto mockUserDto2 = new UserDto("U02", "Abdul", "Kalam", " ", 2222222222L, "India", "IST",
-				"www.linkedin.com/Kalam1234", "MCA", "MBA", "Indian scientist", "H4");
+				"www.linkedin.com/Kalam1234", "MCA", "MBA", "Indian scientist", "H4","abdul.kalam@gmail.com");
 
 		ArrayList<UserDto> userDtoList = new ArrayList();
 		userDtoList.add(mockUserDto);
@@ -182,7 +182,7 @@ public class UserControllerTest {
 
 
 		mockUserDto1 = new UserDto("U05", "Homi", "Bhabha", "J", 2323232323L, "India", "IST",
-				"www.linkedin.com/Ramanujan1234", "MCA", "MBA", "Indian scientist", "H1B");
+				"www.linkedin.com/Ramanujan1234", "MCA", "MBA", "Indian scientist", "H1B","homi.bhabha@gmail.com");
 
 		//given
 		given(userService.createUserLoginWithRole(any(UserLoginRoleDTO.class))).willReturn(mockUserDto1);

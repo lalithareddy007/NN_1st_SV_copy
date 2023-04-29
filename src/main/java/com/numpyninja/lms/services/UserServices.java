@@ -69,9 +69,28 @@ public class UserServices {
 
 	private static final String ROLE_STUDENT = "R03";
 
-	public List<UserDto> getAllUsers() {
+	/*public List<UserDto> getAllUsers() {
 		return userMapper.userDtos(userRepository.findAll());
 		// return userRepository.findAll();
+	}*/
+	public List<UserDto> getAllUsers() {
+		List<User> users = userRepository.findAll();
+		Map<String, String> userLoginEmailMap = new HashMap<>();
+		for (User user : users) {
+			Optional<UserLogin> optionalUserLogin = userLoginRepository.findByUserId(user.getUserId());
+			if (optionalUserLogin.isPresent()) {
+				UserLogin userLogin = optionalUserLogin.get();
+				userLoginEmailMap.put(user.getUserId(), userLogin.getUserLoginEmail());
+			}
+		}
+		List<UserDto> userDtos = userMapper.userDtos(users);
+		for (UserDto userDto : userDtos) {
+			String userLoginEmail = userLoginEmailMap.get(userDto.getUserId());
+			if (userLoginEmail != null) {
+				userDto.setUserLoginEmail(userLoginEmail);
+			}
+		}
+		return userDtos;
 	}
 
 	public UserAllDto getUserInfoById(String userId){
