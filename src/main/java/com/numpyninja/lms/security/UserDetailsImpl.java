@@ -20,15 +20,13 @@ public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
     private String userId;
     private String username;  // username used to authenticate the user - In LMS it is email Id
-    private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String id, String username, String email, String password,
+    public UserDetailsImpl(String id, String username,  String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.userId = id;
         this.username = username;
-        this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
@@ -40,7 +38,6 @@ public class UserDetailsImpl implements UserDetails {
         return new UserDetailsImpl(
                 user.getUserId(),
                 userLogin.getUserLoginEmail(),    // Email Id is used as Username in LMS ; so UserName is set to Email Id
-                userLogin.getUserLoginEmail(),
                 userLogin.getPassword(),
                 authorities);
     }

@@ -64,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 }
 
-// AuthenticationEntryPoint : a filter which is the first point of entry for Spring Security.
-//   It is the entry point to check if a user is authenticated and logs the person in or throws exception (unauthorized).
-//   Usually the class can be used like that in simple applications but when using Spring security in REST, JWT etc
+//  AuthenticationEntryPoint : a filter which is the first point of entry for Spring Security.
+//  It is the entry point to check if a user is authenticated and logs the person in or throws exception (unauthorized).
+//  Usually the class can be used like that in simple applications but when using Spring security in REST, JWT etc
 //  one will have to extend it to provide better Spring Security filter chain management.
