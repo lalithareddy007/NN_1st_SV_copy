@@ -2,6 +2,7 @@ package com.numpyninja.lms.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -54,4 +55,10 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ApiResponse> badCredentialsExceptionExceptionHandler(BadCredentialsException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+	}
 }
