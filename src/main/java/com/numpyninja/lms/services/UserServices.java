@@ -9,7 +9,9 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -66,6 +68,9 @@ public class UserServices {
 
 	@Autowired
 	UserPictureMapper userPictureMapper;
+
+	@Autowired
+	private JavaMailSender javaMailSender;
 
 	private static final String ROLE_STUDENT = "R03";
 
@@ -293,8 +298,27 @@ public class UserServices {
 			userLogin.setCreationTime(new Timestamp(utilDate.getTime()));
 			userLogin.setLastModTime(new Timestamp(utilDate.getTime()));
 			createdUserLogin = userLoginRepository.save(userLogin);
+
+
 		} else {
 			throw new InvalidDataException("User Data not valid - Email is missing");
+		}
+
+		//sending welcome email after user creation
+		try {
+			EmailSender emailSender = new EmailSender();
+			Map<String, Object> model = new HashMap<>();
+			model.put("firstName", newUserLoginRoleDto.getUserFirstName());
+			model.put("lastName", newUserLoginRoleDto.getUserLastName());
+			model.put("regLink", "http://localhost:5678/lms/register");
+			String emailMessage = emailSender.sendSimpleEmail(new EmailDetails
+					(newUserLoginRoleDto.getUserLogin().getUserLoginEmail(), "", "", "Welcome to Numpy Ninja!", model));
+			System.out.println(emailMessage);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 
 		// UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);

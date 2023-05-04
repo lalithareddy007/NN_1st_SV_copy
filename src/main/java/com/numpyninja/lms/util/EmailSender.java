@@ -1,12 +1,22 @@
 package com.numpyninja.lms.util;
 
 import com.numpyninja.lms.entity.EmailDetails;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Component
@@ -15,55 +25,85 @@ public class EmailSender{
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Value("${spring.mail.username}")
-    private String senderEmail;
+    @Autowired
+    private Configuration freeMarkerConfig;
+
+//    @Value("${spring.mail.username}")
+//    private String senderEmail;
 
     private String emailSuccessMsg = "Email sent successfully";
 
-   // public EmailSender(JavaMailSender javaMailSender){
-//        this.javaMailSender = javaMailSender;
+//    public EmailSender(JavaMailSender javaMailSender){
+//       this.javaMailSender = javaMailSender;
+//       //this.freeMarkerConfiguration = freeMarkerConfiguration;
 //    }
 
     /*send simple email */
-    public String sendSimpleEmail(EmailDetails emailDetails){
+    public String sendSimpleEmail(EmailDetails emailDetails) throws MailException, IOException {
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             //simpleMailMessage.setFrom(senderEmail);
             simpleMailMessage.setTo(emailDetails.getRecipient());
             simpleMailMessage.setSubject(emailDetails.getSubject());
-            simpleMailMessage.setText(emailDetails.getBody());
-            if (!emailDetails.getCc().isEmpty())
+            simpleMailMessage.setText(emailDetails.getContent());
+            if (emailDetails.getCc()!=null && !emailDetails.getCc().isEmpty())
                 simpleMailMessage.setCc(emailDetails.getCc());
 
             javaMailSender.send(simpleMailMessage);
         }
-        catch(Exception e){
-            System.out.println("Exception while sending email:"+e);
+        catch(MailException e){
+           e.printStackTrace();
             return "Email could not be sent!";
         }
 
         return emailSuccessMsg;
     }
 
-    public String sendSimpleEmailWithUniqueLink(EmailDetails emailDetails){
+    public String sendSimpleEmailWithFreeTemplate(EmailDetails emailDetails) throws MessagingException, TemplateException,
+                                                    IOException{
         try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+            Map<String,Object> model = emailDetails.getModel();
 
-            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            Template t = freeMarkerConfig.getTemplate("WelcomeEmail.ftl");
+            String htmlEmail = FreeMarkerTemplateUtils.processTemplateIntoString(t,model);
+
+            //SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             //simpleMailMessage.setFrom(senderEmail);
-            simpleMailMessage.setTo(emailDetails.getRecipient());
-            simpleMailMessage.setSubject(emailDetails.getSubject());
-            simpleMailMessage.setText(emailDetails.getBody());
+            mimeMessageHelper.setTo(emailDetails.getRecipient());
+            mimeMessageHelper.setSubject(emailDetails.getSubject());
+            //mimeMessageHelper.setText(emailDetails.getBody());
             if (!emailDetails.getCc().isEmpty())
-                simpleMailMessage.setCc(emailDetails.getCc());
+                mimeMessageHelper.setCc(emailDetails.getCc());
 
-            javaMailSender.send(simpleMailMessage);
+            //emailDetails.setContent(getContentFromTemplate(emailDetails.getModel()));
+            mimeMessageHelper.setText(htmlEmail,true);
+
+            System.out.println(javaMailSender.toString());
+            javaMailSender.send(mimeMessageHelper.getMimeMessage());
         }
-        catch(Exception e){
+        catch(MessagingException | TemplateException | IOException e){
             System.out.println("Exception while sending email:"+e);
-            return "Email could not be sent!";
+            e.printStackTrace();
+            return "Email could not be delivered!";
         }
 
         return emailSuccessMsg;
     }
+
+//    private String getContentFromTemplate(Map<String,Object> model){
+//        StringBuffer content= new StringBuffer();
+//        try{
+//            FreeMarkerTemplateUtils.processTemplateIntoString();
+//            content.append();
+//        }
+//        catch (Exception e){
+//            System.out.println("Exception while reading Email template file reading...");
+//            e.getStackTrace();
+//        }
+//        return content;
+//
+//    }
 
 }

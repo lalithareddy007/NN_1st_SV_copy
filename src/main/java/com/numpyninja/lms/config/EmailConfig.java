@@ -1,29 +1,30 @@
 package com.numpyninja.lms.config;
 
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.util.Properties;
 
 @Configuration
-@ConfigurationProperties(prefix="mail")
-public class EmailConfigure {
-    //@Value("${spring.mail.host}")
+public class EmailConfig {
+    @Value("${spring.mail.host}")
     private String host;
-    //@Value("${spring.mail.port}")
+    @Value("${spring.mail.port}")
     private int port;
-    //@Value("${spring.mail.username}")
+    @Value("${spring.mail.username}")
     private String userName;
-    //@Value("${spring.mail.password}")
+    @Value("${spring.mail.password}")
     private String password;
-    //@Value("${spring.mail.host}")
-    private String smtpServer;
+    @Value("${spring.mail.protocol}")
+    private String protocol;
 
-//    @Value("${mail.transfer.protocol}")
+//    @Value("${mail.protocol}")
 //    private String protocol;
 
 //    @Value("${mail.smtp.starttls.enable}")
@@ -34,6 +35,7 @@ public class EmailConfigure {
 
     @Bean
     public JavaMailSender getJavaMailSender(){
+        System.out.println("Mail property values:"+host+" "+port+" "+userName+" "+password);
         JavaMailSenderImpl javaMailSender =  new JavaMailSenderImpl();
         javaMailSender.setHost(host);
         javaMailSender.setPort(port);
@@ -45,6 +47,15 @@ public class EmailConfigure {
         prop.put("mail.debug","true");
         prop.put("mail.smtp.starttls.enable","true");
         prop.put("mail.smtp.auth","true");
+        javaMailSender.setJavaMailProperties(prop);
         return javaMailSender;
     }
+
+    @Bean
+    public FreeMarkerConfigurer getFreeMarkerConfigurer(){
+        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+        freeMarkerConfigurer.setTemplateLoaderPath("classpath:/templates/email-templates/");
+        return freeMarkerConfigurer;
+    }
+
 }
