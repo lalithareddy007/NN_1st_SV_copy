@@ -1,12 +1,10 @@
 package com.numpyninja.lms.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.numpyninja.lms.config.UserIDGenerator;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
+
 
 @Getter
 @Setter
@@ -16,7 +14,6 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="tbl_lms_user_login")
 public class UserLogin {
-
    @Id
    private String userId;
 
@@ -41,7 +38,5 @@ public class UserLogin {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
-
-
 
 }

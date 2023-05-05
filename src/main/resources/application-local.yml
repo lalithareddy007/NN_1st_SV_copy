@@ -3,21 +3,13 @@ spring:
     url: jdbc:postgresql://localhost:5432/LMS_DB
     username: postgres  #changed as per Local DB
     password: admin  #changed as per Local DB
-    
-    # configurations specific to SMTP email
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: sudhavalli@gmail.com
-    password: coeuasxotikoqtnc
-    protocol: smtp
-    #properties.mail.smtp:
-    smtp:
-      auth: true
-      starttls.enable: true
-      ssl.trust: smtp.gmail.com
- 
+
 app:
-  frontend.url: http://localhost:4200
+  frontend.url: https://lms-frontend.herokuapp.com
+
+security:
+  app:
+    jwtSecret: lmsAppSecretKeyTest
+    jwtExpirationMs: 28800000  # 28800000 Ms = 8 hours
 
 

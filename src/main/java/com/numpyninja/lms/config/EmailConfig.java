@@ -13,15 +13,15 @@ import java.util.Properties;
 
 @Configuration
 public class EmailConfig {
-    @Value("${spring.mail.host}")
+    @Value("${mail.host}")
     private String host;
-    @Value("${spring.mail.port}")
+    @Value("${mail.port}")
     private int port;
-    @Value("${spring.mail.username}")
+    @Value("${mail.username}")
     private String userName;
-    @Value("${spring.mail.password}")
+    @Value("${mail.password}")
     private String password;
-    @Value("${spring.mail.protocol}")
+    @Value("${mail.protocol}")
     private String protocol;
 
 //    @Value("${mail.protocol}")

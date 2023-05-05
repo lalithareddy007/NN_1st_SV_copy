@@ -9,12 +9,24 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.security.jwt.JwtUtils;
 import com.numpyninja.lms.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
+import com.numpyninja.lms.security.UserDetailsImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -25,7 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServices {
+public class UserServices implements UserDetailsService {
 
 	@Autowired
 	UserRepository userRepository;
@@ -70,6 +82,11 @@ public class UserServices {
 	UserPictureMapper userPictureMapper;
 
 	@Autowired
+	AuthenticationManager authenticationManager;
+
+	@Autowired
+	JwtUtils jwtUtils;
+	@Autowired
 	private JavaMailSender javaMailSender;
 
 	private static final String ROLE_STUDENT = "R03";
@@ -79,7 +96,20 @@ public class UserServices {
 		// return userRepository.findAll();
 	}
 
-	public UserAllDto getUserInfoById(String userId){
+	@Override
+	@Transactional
+	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
+		UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "EMailId", loginEmail)	);
+		User user = userLogin.getUser();
+
+		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUserId());
+		List<String> roles = userRoleMaps.stream().map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList());
+
+		return UserDetailsImpl.build(user, userLogin, roles);
+	}
+
+		public UserAllDto getUserInfoById(String userId){
 		User existingUser = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
@@ -310,7 +340,10 @@ public class UserServices {
 			Map<String, Object> model = new HashMap<>();
 			model.put("firstName", newUserLoginRoleDto.getUserFirstName());
 			model.put("lastName", newUserLoginRoleDto.getUserLastName());
-			model.put("regLink", "http://localhost:5678/lms/register");
+			//get the url link
+			String url = createEmailUrlWithToken(createdUserLogin.getUserLoginEmail());
+			System.out.println("email URL:"+url);
+			model.put("regLink", url);
 			String emailMessage = emailSender.sendSimpleEmail(new EmailDetails
 					(newUserLoginRoleDto.getUserLogin().getUserLoginEmail(), "", "", "Welcome to Numpy Ninja!", model));
 			System.out.println(emailMessage);
@@ -680,9 +713,28 @@ public class UserServices {
 				.collect(Collectors.toList());
 		return userDtoList;
 	}
-	
-	
-	
+
+
+	public String  createEmailUrlWithToken(String loginEmail){
+
+//		Optional<UserLogin> user = userLoginRepository.findByUserLoginEmailIgnoreCase(loginDto.getUserLoginEmailId());
+//		//String token = jwutils.generateJwtTokenEmail(userLoginDto.getUserLoginEmail());
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginEmail,null)); // calls loadUserByName() in UserServices
+		// password verification is done by Spring security
+		//UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
+
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		String token = jwtUtils.generateJwtToken(authentication);
+
+		final String url= UriComponentsBuilder.fromHttpUrl("https://lms-frontend.herokuapp.com/reset-password")
+				.path("/generateURL/").queryParam("token", token).toUriString();
+
+		return url;
+
+
+	}
+
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
 	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
@@ -812,5 +864,6 @@ public class UserServices {
 		}
 	}
 */
+
 
 }
