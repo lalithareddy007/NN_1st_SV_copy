@@ -1,9 +1,7 @@
 package com.numpyninja.lms.services;
 
-import com.numpyninja.lms.config.UserIDGenerator;
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.*;
-import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
@@ -12,17 +10,11 @@ import com.numpyninja.lms.repository.*;
 import com.numpyninja.lms.security.jwt.JwtUtils;
 import com.numpyninja.lms.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import com.numpyninja.lms.security.UserDetailsImpl;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -81,13 +73,15 @@ public class UserServices implements UserDetailsService {
 	@Autowired
 	UserPictureMapper userPictureMapper;
 
-	@Autowired
-	AuthenticationManager authenticationManager;
 
 	@Autowired
 	JwtUtils jwtUtils;
+
 	@Autowired
-	private JavaMailSender javaMailSender;
+	private EmailSender emailSender;
+
+	@Value("${app.frontend.url}")
+	private String frontendUrl;
 
 	private static final String ROLE_STUDENT = "R03";
 
@@ -336,7 +330,6 @@ public class UserServices implements UserDetailsService {
 
 		//sending welcome email after user creation
 		try {
-			EmailSender emailSender = new EmailSender();
 			Map<String, Object> model = new HashMap<>();
 			model.put("firstName", newUserLoginRoleDto.getUserFirstName());
 			model.put("lastName", newUserLoginRoleDto.getUserLastName());
@@ -344,7 +337,8 @@ public class UserServices implements UserDetailsService {
 			String url = createEmailUrlWithToken(createdUserLogin.getUserLoginEmail());
 			System.out.println("email URL:"+url);
 			model.put("regLink", url);
-			String emailMessage = emailSender.sendSimpleEmail(new EmailDetails
+
+			String emailMessage = emailSender.sendEmailUsingTemplate(new EmailDetails
 					(newUserLoginRoleDto.getUserLogin().getUserLoginEmail(), "", "", "Welcome to Numpy Ninja!", model));
 			System.out.println(emailMessage);
 
@@ -717,18 +711,9 @@ public class UserServices implements UserDetailsService {
 
 	public String  createEmailUrlWithToken(String loginEmail){
 
-//		Optional<UserLogin> user = userLoginRepository.findByUserLoginEmailIgnoreCase(loginDto.getUserLoginEmailId());
-//		//String token = jwutils.generateJwtTokenEmail(userLoginDto.getUserLoginEmail());
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginEmail,null)); // calls loadUserByName() in UserServices
-		// password verification is done by Spring security
-		//UserDetailsImpl userDetailsImpl = (UserDetailsImpl) authentication.getPrincipal();
-
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String token = jwtUtils.generateJwtToken(authentication);
-
-		final String url= UriComponentsBuilder.fromHttpUrl("https://lms-frontend.herokuapp.com/reset-password")
-				.path("/generateURL/").queryParam("token", token).toUriString();
+		String token = jwtUtils.generateEmailUrlToken(loginEmail);
+		final String url= UriComponentsBuilder.fromHttpUrl(frontendUrl)
+				.path("/reset-password/").queryParam("token", token).toUriString();
 
 		return url;
 

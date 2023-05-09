@@ -27,15 +27,15 @@ public class EmailConfig {
 //    @Value("${mail.protocol}")
 //    private String protocol;
 
-//    @Value("${mail.smtp.starttls.enable}")
-//    private String starttls;
-//
-//    @Value("${mail.smtp.auth}")
-//    private String auth;
+    @Value("${mail.smtp.starttls.enable}")
+    private boolean starttls;
+
+    @Value("${mail.smtp.auth}")
+    private boolean auth;
 
     @Bean
-    public JavaMailSender getJavaMailSender(){
-        System.out.println("Mail property values:"+host+" "+port+" "+userName+" "+password);
+    public JavaMailSender javaMailSender(){
+
         JavaMailSenderImpl javaMailSender =  new JavaMailSenderImpl();
         javaMailSender.setHost(host);
         javaMailSender.setPort(port);
@@ -44,9 +44,9 @@ public class EmailConfig {
         Properties prop = javaMailSender.getJavaMailProperties();
         //prop.put("mail.transfer.protocol",protocol);
 
-        prop.put("mail.debug","true");
-        prop.put("mail.smtp.starttls.enable","true");
-        prop.put("mail.smtp.auth","true");
+        //prop.put("mail.debug","true");
+        prop.put("mail.smtp.starttls.enable",starttls);
+        prop.put("mail.smtp.auth",auth);
         javaMailSender.setJavaMailProperties(prop);
         return javaMailSender;
     }
