@@ -28,6 +28,9 @@ public class JwtUtils {
     @Value("${security.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    @Value("${security.app.jwtAcctActiveExpMs}")
+    private int jwtAcctActiveExpMs;
+
     public String generateJwtToken(Authentication authentication) {
 
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
@@ -68,6 +71,17 @@ public class JwtUtils {
         return false;
     }
 
+    public String generateEmailUrlToken(String loginEmail){
+
+       return  Jwts.builder()
+                .setSubject((loginEmail))
+                //.claim( ROLES , authorities)   // uncomment if u want to include roles in token
+                .setIssuedAt(new Date())
+                .setExpiration(new Date( (new Date()).getTime() + jwtAcctActiveExpMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+
+    }
 
 /*
     UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {

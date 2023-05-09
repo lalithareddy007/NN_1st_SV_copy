@@ -1,22 +1,24 @@
 package com.numpyninja.lms.services;
 
-import com.numpyninja.lms.config.UserIDGenerator;
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.*;
-import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
-import com.numpyninja.lms.security.UserDetailsImpl;
+import com.numpyninja.lms.security.jwt.JwtUtils;
+import com.numpyninja.lms.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import com.numpyninja.lms.security.UserDetailsImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -70,6 +72,16 @@ public class UserServices implements UserDetailsService {
 
 	@Autowired
 	UserPictureMapper userPictureMapper;
+
+
+	@Autowired
+	JwtUtils jwtUtils;
+
+	@Autowired
+	private EmailSender emailSender;
+
+	@Value("${app.frontend.url}")
+	private String frontendUrl;
 
 	private static final String ROLE_STUDENT = "R03";
 
@@ -310,8 +322,30 @@ public class UserServices implements UserDetailsService {
 			userLogin.setCreationTime(new Timestamp(utilDate.getTime()));
 			userLogin.setLastModTime(new Timestamp(utilDate.getTime()));
 			createdUserLogin = userLoginRepository.save(userLogin);
+
+
 		} else {
 			throw new InvalidDataException("User Data not valid - Email is missing");
+		}
+
+		//sending welcome email after user creation
+		try {
+			Map<String, Object> model = new HashMap<>();
+			model.put("firstName", newUserLoginRoleDto.getUserFirstName());
+			model.put("lastName", newUserLoginRoleDto.getUserLastName());
+			//get the url link
+			String url = createEmailUrlWithToken(createdUserLogin.getUserLoginEmail());
+			System.out.println("email URL:"+url);
+			model.put("regLink", url);
+
+			String emailMessage = emailSender.sendEmailUsingTemplate(new EmailDetails
+					(newUserLoginRoleDto.getUserLogin().getUserLoginEmail(), "", "", "Welcome to Numpy Ninja!", model));
+			System.out.println(emailMessage);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 
 		// UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);
@@ -673,7 +707,19 @@ public class UserServices implements UserDetailsService {
 				.collect(Collectors.toList());
 		return userDtoList;
 	}
-	
+
+
+	public String  createEmailUrlWithToken(String loginEmail){
+
+		String token = jwtUtils.generateEmailUrlToken(loginEmail);
+		final String url= UriComponentsBuilder.fromHttpUrl(frontendUrl)
+				.path("/reset-password/").queryParam("token", token).toUriString();
+
+		return url;
+
+
+	}
+
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
 	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())

@@ -37,5 +37,16 @@ logging:
   file:
     name: lmsservice.log
     path: ./
-    
 
+# configurations specific to SMTP email
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: sudhavalli@gmail.com
+  password: coeuasxotikoqtnc
+  protocol: smtp
+  #properties.mail.smtp:
+  smtp:
+    auth: true
+    starttls.enable: true
+    ssl.trust: smtp.gmail.com
