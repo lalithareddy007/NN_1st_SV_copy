@@ -36,7 +36,7 @@ public class UserLogin {
 
     // One-to-One relationship with UserLogin entity
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
 
 }
