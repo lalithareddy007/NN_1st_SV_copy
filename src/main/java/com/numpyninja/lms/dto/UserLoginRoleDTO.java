@@ -65,6 +65,8 @@ public class UserLoginRoleDTO {
     @JsonProperty("userRoleMaps")
     private List<UserRoleMapSlimDTO> userRoleMaps;
 
+    @Valid
+    @JsonProperty("userLogin")
     private UserLoginDto userLogin;
 
 

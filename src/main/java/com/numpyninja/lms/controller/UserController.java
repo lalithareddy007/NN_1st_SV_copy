@@ -121,6 +121,13 @@ public class UserController {
 		}
 
 	}
+
+	@PutMapping("/users/userLogin/{userId}")
+	public ResponseEntity<String> updateUserLoginStatus(@Valid @PathVariable(value = "userId") String userId, @Valid @RequestBody UserLoginDto updateUserLogin) throws InvalidDataException {
+		//String UserRole, String UserStatus
+		String responseDto = userServices.updateUserLogin(updateUserLogin,userId);
+		return ResponseEntity.status(HttpStatus.OK).body("UserLoginEmail/Status Updated for User: " + userId);
+	}
 }
 		
 		

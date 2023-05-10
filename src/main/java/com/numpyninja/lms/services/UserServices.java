@@ -720,6 +720,43 @@ public class UserServices implements UserDetailsService {
 
 	}
 
+	@Transactional
+	public String updateUserLogin(UserLoginDto updateUserLogin, String userId) throws InvalidDataException {
+		if (userId == null) {
+			throw new InvalidDataException("UserId cannot be blank/null");
+		} else {
+			Optional<User> userById = userRepository.findById(userId);
+			System.out.println("userById"+ userById);
+			if (userById.isEmpty()) {
+				throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
+			} else {
+				Optional<UserLogin> userLogin = userLoginRepository.findByUserUserId(userId);
+				System.out.println("userLogin"+ userLogin);
+
+				if (userLogin == null) {
+					throw new ResourceNotFoundException("UserLogin not found for the UserID: " + userId);
+				} else {
+					// Check for existing user logins with the same email
+					Optional<UserLogin> existingUserLogins = userLoginRepository.findByUserLoginEmailIgnoreCase(updateUserLogin.getUserLoginEmail());
+					System.out.println("existingUserLogins"+ existingUserLogins);
+					// Update the userLoginEmail and userLoginStatus for the current user
+					String userEmailToUpdate = updateUserLogin.getUserLoginEmail();
+					System.out.println("userEmailToUpdate"+ userEmailToUpdate);
+					String userLoginStatusToUpdate = updateUserLogin.getLoginStatus();
+					System.out.println("userLoginStatusToUpdate"+ userLoginStatusToUpdate);
+					if (!existingUserLogins.isEmpty() && !existingUserLogins.get().getUserId().equals(userId)) {
+						// If there are existing user logins, and it's not the current user's login, throw an exception for duplicate email
+						throw new DuplicateResourceFoundException("Failed to update UserLogin as email already exists!");
+					}
+					userLoginRepository.updateUserLogin(userId, userEmailToUpdate ,userLoginStatusToUpdate);
+				}
+			}
+			System.out.println("userId11"+ userId);
+			return "UserLogin updated successfully";
+		}
+	}
+
+
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
 	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
