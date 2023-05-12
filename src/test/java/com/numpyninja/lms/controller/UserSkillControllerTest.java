@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -31,8 +32,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(UserSkillController.class)
-public class UserSkillControllerTest {
+@WithMockUser
+public class UserSkillControllerTest extends AbstractTestController {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -101,52 +104,55 @@ public class UserSkillControllerTest {
         //then
         verify(userSkillService).getUserSkillForUser(userId);
     }
+
     @DisplayName("Test for Creating a UserSkill")
     @Test
     @SneakyThrows
-    public void createUserSkillTest(){
+    public void createUserSkillTest() {
         //given
         given(userSkillService.createUserSkill(ArgumentMatchers.any(UserSkillDTO.class)))
-                .willAnswer((i)->i.getArgument(0));
+                .willAnswer((i) -> i.getArgument(0));
         //when
-        ResultActions resultActions=mockMvc.perform(post("/userSkill/create")
+        ResultActions resultActions = mockMvc.perform(post("/userSkill/create")
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(userSkillDTO)));
         //then
         resultActions.andExpect(status().isCreated())
-                .andExpect((ResultMatcher) jsonPath("$.userId",equalTo(userSkillDTO.getUserId()),String.class))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userSkillId",equalTo(userSkillDTO.getUserSkillId())));
+                .andExpect((ResultMatcher) jsonPath("$.userId", equalTo(userSkillDTO.getUserId()), String.class))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userSkillId", equalTo(userSkillDTO.getUserSkillId())));
     }
+
     @DisplayName("Test for Updating UserSkill by UserSKillId")
     @Test
     @SneakyThrows
-    public void updateUserSkillByUserIdTest(){
+    public void updateUserSkillByUserIdTest() {
         //given
-        String userSkillId="U1";
-        UserSkillDTO updatedUserSkillDTO=userSkillDTO;
+        String userSkillId = "U1";
+        UserSkillDTO updatedUserSkillDTO = userSkillDTO;
         updatedUserSkillDTO.setUserSkillId("US1");
-        given(userSkillService.updateUserSkill(ArgumentMatchers.any(UserSkillDTO.class),ArgumentMatchers.any(String.class)))
+        given(userSkillService.updateUserSkill(ArgumentMatchers.any(UserSkillDTO.class), ArgumentMatchers.any(String.class)))
                 .willReturn(updatedUserSkillDTO);
         //when
-        ResultActions resultActions=mockMvc.perform(put("/userSkill/{id}",userSkillId)
-                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updatedUserSkillDTO)));
+        ResultActions resultActions = mockMvc.perform(put("/userSkill/{id}", userSkillId)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updatedUserSkillDTO)));
         //then
         resultActions.andExpect(status().isOk()).andDo(print())
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.userId",equalTo(updatedUserSkillDTO.getUserId()),String.class))
-                        .andExpect(MockMvcResultMatchers.jsonPath("$.userSkillId",equalTo(updatedUserSkillDTO.getUserSkillId())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", equalTo(updatedUserSkillDTO.getUserId()), String.class))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userSkillId", equalTo(updatedUserSkillDTO.getUserSkillId())));
     }
-  /*  @DisplayName("Test - Delete UserSkill By UserId ")
-    @SneakyThrows
-    @Test
-    void deleteUserSkillByUserId() {
-        //given
-        String userId = "U10";
-        willDoNothing().given(userSkillService).deleteUserByUserId(userId);
-        //when
-        ResultActions resultActions = mockMvc.perform(delete("/userSkill/deleteByUser/{id}", userId));
-        //then
-        resultActions.andExpect(status().isOk());
-        verify(userSkillService).deleteUserByUserId(userId);
-    }*/
+
+    /*  @DisplayName("Test - Delete UserSkill By UserId ")
+      @SneakyThrows
+      @Test
+      void deleteUserSkillByUserId() {
+          //given
+          String userId = "U10";
+          willDoNothing().given(userSkillService).deleteUserByUserId(userId);
+          //when
+          ResultActions resultActions = mockMvc.perform(delete("/userSkill/deleteByUser/{id}", userId));
+          //then
+          resultActions.andExpect(status().isOk());
+          verify(userSkillService).deleteUserByUserId(userId);
+      }*/
     @DisplayName("Test - Delete UserSkill By UserSKillId ")
     @SneakyThrows
     @Test

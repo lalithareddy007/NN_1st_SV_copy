@@ -1,21 +1,10 @@
 package com.numpyninja.lms.controller;
 
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.dto.BatchDTO;
+import com.numpyninja.lms.services.ProgBatchServices;
+import com.numpyninja.lms.services.ProgramServices;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,160 +14,168 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-//import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.numpyninja.lms.dto.BatchDTO;
-import com.numpyninja.lms.services.ProgBatchServices;
-import com.numpyninja.lms.services.ProgramServices;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest ( ProgBatchController.class )
-//@WithMockUser  // to overcome Login
-public class ProgBatchControllerTest {
+@WebMvcTest(ProgBatchController.class)
+@WithMockUser  // to overcome Login
+public class ProgBatchControllerTest extends AbstractTestController {
 
-	@Autowired
-	private MockMvc mockMvc;    //MockMVC - WebLayer unit Testing without starting the server 
+    @Autowired
+    private MockMvc mockMvc;    //MockMVC - WebLayer unit Testing without starting the server
 
-	@Autowired
-	private ObjectMapper objectMapper;                                
-	
-	@MockBean
-	private ProgBatchServices batchService;
-	
-	@MockBean
-	private ProgramServices programService;
-	
-	private static List<BatchDTO> listOfBatches;
-	
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private ProgBatchServices batchService;
+
+    @MockBean
+    private ProgramServices programService;
+
+    private static List<BatchDTO> listOfBatches;
+
     @BeforeAll
     public static void setData() {
         long programId1 = 1;
         long programId2 = 2;
         String prg1Desc = "SDET";
         String prg2Desc = "Datascience";
- 
-    	BatchDTO batchDTO1 = new BatchDTO(1,"01","SDET BATCH 01","In Active",  6, programId1, prg1Desc );
-    	BatchDTO batchDTO2 = new BatchDTO(2,"02","SDET BATCH 02","Active", 4, programId1, prg1Desc );
-    	BatchDTO batchDTO3 = new BatchDTO(3,"01","DataScience 01","Active", 6, programId2, prg2Desc );
-    	listOfBatches = Arrays.asList(batchDTO1, batchDTO2, batchDTO3);
-    	System.out.println("List size :" + listOfBatches.size());
+
+        BatchDTO batchDTO1 = new BatchDTO(1, "01", "SDET BATCH 01", "In Active", 6, programId1, prg1Desc);
+        BatchDTO batchDTO2 = new BatchDTO(2, "02", "SDET BATCH 02", "Active", 4, programId1, prg1Desc);
+        BatchDTO batchDTO3 = new BatchDTO(3, "01", "DataScience 01", "Active", 6, programId2, prg2Desc);
+        listOfBatches = Arrays.asList(batchDTO1, batchDTO2, batchDTO3);
+        System.out.println("List size :" + listOfBatches.size());
     }
-    
-    
+
+
     @Test
-	public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesList() throws Exception {
-		// given - BDDMockito.given()
-		given(batchService.getAllBatches() ).willReturn(listOfBatches);
-		mockMvc.perform( MockMvcRequestBuilders.get("/batches").contentType(MediaType.APPLICATION_JSON) )
-		       .andExpect(status().isOk())
-		       .andExpect(jsonPath("$", hasSize(3)));
-	}
-
-	
-	// positive scenario - GET batch by valid batchId  
-	@Test  
-	public void givenBatchId_whenGetBatchById_thenReturnBatch() throws Exception{
-		BatchDTO batchDTO2 = listOfBatches.get(1);
-    	 
-		given( batchService.findBatchById(batchDTO2.getBatchId())).willReturn(batchDTO2);
-		
-        System.out.println(batchDTO2.toString() );
-		//When
-		ResultActions response = mockMvc.perform(get("/batches/batchId/{batchId}", batchDTO2.getBatchId())  
-				                                .contentType(MediaType.APPLICATION_JSON));
-
-		//Then
-		response.andDo(print()).andExpect( status().isOk());
-		System.out.println( "response : " + response.toString() );
-		response.andExpect(jsonPath("batchId", is(batchDTO2.getBatchId())) )
-		        .andExpect( jsonPath("batchName", is(batchDTO2.getBatchName())));
+    public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesList() throws Exception {
+        // given - BDDMockito.given()
+        given(batchService.getAllBatches()).willReturn(listOfBatches);
+        mockMvc.perform(MockMvcRequestBuilders.get("/batches").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)));
     }
-	
-	
-	/* getBatchByName */
-	@Test  
-	public void givenBatchName_whenGetBatchByName_thenReturnBatches() throws Exception{
-		String batchName = "01";
-		List<BatchDTO> batch01List = new ArrayList<BatchDTO>();
-		batch01List.add(listOfBatches.get(0));
-		batch01List.add(listOfBatches.get(2));
-		
-		given ( batchService.findByProgramBatchName(batchName)).willReturn(batch01List);
-		
-		//when
-		ResultActions response = mockMvc.perform(get("/batches/batchName/{batchName}", batchName)  
+
+
+    // positive scenario - GET batch by valid batchId
+    @Test
+    public void givenBatchId_whenGetBatchById_thenReturnBatch() throws Exception {
+        BatchDTO batchDTO2 = listOfBatches.get(1);
+
+        given(batchService.findBatchById(batchDTO2.getBatchId())).willReturn(batchDTO2);
+
+        System.out.println(batchDTO2.toString());
+        //When
+        ResultActions response = mockMvc.perform(get("/batches/batchId/{batchId}", batchDTO2.getBatchId())
                 .contentType(MediaType.APPLICATION_JSON));
-	
-		//Then
-		response.andDo(print()).andExpect( status().isOk());
-		response.andExpect(jsonPath("$", hasSize(2)));
-	}
-	
-	
-	/* getBatchByProgram */
- 	@Test  
-	public void givenProgramId_whenGetBatchByProgram_thenReturnBatchches() throws Exception{
-		long programId = 1;
-		List<BatchDTO> batchList = new ArrayList<BatchDTO>();
-		batchList.add(listOfBatches.get(0));
-		batchList.add(listOfBatches.get(1));
-		
-		given ( batchService.findBatchByProgramId(programId)).willReturn(batchList);
-		
-		//when
-		ResultActions response = mockMvc.perform(get("/batches/program/{programId}", programId)  
+
+        //Then
+        response.andDo(print()).andExpect(status().isOk());
+        System.out.println("response : " + response.toString());
+        response.andExpect(jsonPath("batchId", is(batchDTO2.getBatchId())))
+                .andExpect(jsonPath("batchName", is(batchDTO2.getBatchName())));
+    }
+
+
+    /* getBatchByName */
+    @Test
+    public void givenBatchName_whenGetBatchByName_thenReturnBatches() throws Exception {
+        String batchName = "01";
+        List<BatchDTO> batch01List = new ArrayList<BatchDTO>();
+        batch01List.add(listOfBatches.get(0));
+        batch01List.add(listOfBatches.get(2));
+
+        given(batchService.findByProgramBatchName(batchName)).willReturn(batch01List);
+
+        //when
+        ResultActions response = mockMvc.perform(get("/batches/batchName/{batchName}", batchName)
                 .contentType(MediaType.APPLICATION_JSON));
-	
-		//Then
-		response.andDo(print()).andExpect( status().isOk());
-		response.andExpect(jsonPath("$", hasSize(2)));
-	}
-	
- 	
-	@Test
-    public void givenBatch_whenCreateBatch_thenReturnSavedBatch() throws Exception{
-		BatchDTO batchDTO3 = listOfBatches.get(2);
- 
-		given( batchService.createBatch(org.mockito.ArgumentMatchers.any())).willReturn(batchDTO3);   // it works for this code only 
-		
-		ResultActions response = mockMvc.perform(post("/batches").contentType(MediaType.APPLICATION_JSON)
-				                                                 .content(objectMapper.writeValueAsString(batchDTO3)));
-		response.andDo(print()).andExpect( status().isCreated());
-		System.out.println( "response : " + response.toString() );
-		response.andExpect(jsonPath("$.batchId", is(batchDTO3.getBatchId())) )
-		        .andExpect( jsonPath("$.batchName", is(batchDTO3.getBatchName())));
-	}
-	
-	
-	@Test
-	public void givenUpdatedBatch_whenUpdateBatch_thenReturnUpdateBatchObject() throws Exception{
-    	BatchDTO updateDetailDTO = new BatchDTO(1,"01","SDET BATCH 01 Updation","Active", 8, (long)1, "SDET");
-    	 
+
+        //Then
+        response.andDo(print()).andExpect(status().isOk());
+        response.andExpect(jsonPath("$", hasSize(2)));
+    }
+
+
+    /* getBatchByProgram */
+    @Test
+    public void givenProgramId_whenGetBatchByProgram_thenReturnBatchches() throws Exception {
+        long programId = 1;
+        List<BatchDTO> batchList = new ArrayList<BatchDTO>();
+        batchList.add(listOfBatches.get(0));
+        batchList.add(listOfBatches.get(1));
+
+        given(batchService.findBatchByProgramId(programId)).willReturn(batchList);
+
+        //when
+        ResultActions response = mockMvc.perform(get("/batches/program/{programId}", programId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        //Then
+        response.andDo(print()).andExpect(status().isOk());
+        response.andExpect(jsonPath("$", hasSize(2)));
+    }
+
+
+    @Test @WithUserDetails("vijaybharathi@gmail.com")
+    public void givenBatch_whenCreateBatch_thenReturnSavedBatch() throws Exception {
+        BatchDTO batchDTO3 = listOfBatches.get(2);
+
+        given(batchService.createBatch(org.mockito.ArgumentMatchers.any())).willReturn(batchDTO3);   // it works for this code only
+
+        ResultActions response = mockMvc.perform(post("/batches").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(batchDTO3)));
+        response.andDo(print()).andExpect(status().isCreated());
+        System.out.println("response : " + response.toString());
+        response.andExpect(jsonPath("$.batchId", is(batchDTO3.getBatchId())))
+                .andExpect(jsonPath("$.batchName", is(batchDTO3.getBatchName())));
+    }
+
+
+    @Test @WithUserDetails("vijaybharathi@gmail.com")
+    public void givenUpdatedBatch_whenUpdateBatch_thenReturnUpdateBatchObject() throws Exception {
+        BatchDTO updateDetailDTO = new BatchDTO(1, "01", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
+
         Integer batchId = 1;
-    	 
-    	given( batchService.updateBatch(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any())).willReturn(updateDetailDTO);   // it works for this code only 
-    	 
-    	ResultActions response = mockMvc.perform(put("/batches/{batchId}", batchId).contentType(MediaType.APPLICATION_JSON)
+
+        given(batchService.updateBatch(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any())).willReturn(updateDetailDTO);   // it works for this code only
+
+        ResultActions response = mockMvc.perform(put("/batches/{batchId}", batchId).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateDetailDTO)));
 
-		response.andDo(print()).andExpect( status().isOk());
-		System.out.println( "response : " + response.toString() );
-		response.andExpect(jsonPath("batchId", is(updateDetailDTO.getBatchId())) )
-		        .andExpect( jsonPath("batchName", is(updateDetailDTO.getBatchName())))
-		        .andExpect(jsonPath("batchDescription", is(updateDetailDTO.getBatchDescription())));
-	}
-	
-	
-   @Test
-    public void givenBatchId_whenDeleteBatch_thenReturn200() throws Exception{
-    	Integer batchId = 2;
-    	
-    	// given
-    	BDDMockito.willDoNothing().given( batchService ).deleteProgramBatch(batchId);
+        response.andDo(print()).andExpect(status().isOk());
+        System.out.println("response : " + response.toString());
+        response.andExpect(jsonPath("batchId", is(updateDetailDTO.getBatchId())))
+                .andExpect(jsonPath("batchName", is(updateDetailDTO.getBatchName())))
+                .andExpect(jsonPath("batchDescription", is(updateDetailDTO.getBatchDescription())));
+    }
+
+
+    @Test @WithUserDetails("vijaybharathi@gmail.com")
+    public void givenBatchId_whenDeleteBatch_thenReturn200() throws Exception {
+        Integer batchId = 2;
+
+        // given
+        BDDMockito.willDoNothing().given(batchService).deleteProgramBatch(batchId);
 
         // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(delete("/batches/{batchId}", batchId));
@@ -187,7 +184,7 @@ public class ProgBatchControllerTest {
         response.andExpect(status().isOk())
                 .andDo(print());
     }
-    
+
 }
 
 
