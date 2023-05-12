@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(
         // securedEnabled = true,
         jsr250Enabled = true,    // enables @RolesAllowed annotation.
-        prePostEnabled = true)  // provides AOP security on methods. It enables @PreAuthorize, @PostAuthorize
+        prePostEnabled = true )  // provides AOP security on methods. It enables @PreAuthorize, @PostAuthorize
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserServices userServices;

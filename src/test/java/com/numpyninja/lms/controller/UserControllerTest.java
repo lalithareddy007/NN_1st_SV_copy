@@ -2,6 +2,7 @@ package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.TestWebSecurityConfig;
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
@@ -13,25 +14,27 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -41,8 +44,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(MockitoExtension.class)
 @WebMvcTest(UserController.class)
+@Import(TestWebSecurityConfig.class)   // imports TestConfiguration
 public class UserControllerTest {
+	@Autowired
+	private WebApplicationContext webApplicationContext;
 
 	@MockBean
 	private UserServices userService;
@@ -74,6 +81,7 @@ public class UserControllerTest {
 
 	@BeforeEach
 	public void setup() {
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 		setMockUserAndDto();
 	}
 
@@ -323,15 +331,15 @@ public class UserControllerTest {
 
 		assertEquals(expectedResponse, response);
 	}
-	
-	
+
+
 	@DisplayName("test to get user by program programId ")
 	@SneakyThrows
 	@Test
 	void testGetUserByProgramBatches() {
 
-		
-		
+
+
 		List<UserDto> userDtoList = new ArrayList<UserDto>();
 		userDtoList.add(mockUserDto);
 
@@ -347,37 +355,37 @@ public class UserControllerTest {
 				.andExpect(jsonPath("$", hasSize(userDtoList.size())));
 
 	}
-	
+
 	//changed name because there was conflict for get by programid and get by batchid
 @DisplayName("test to get user by program/batches batchid ")
 @SneakyThrows
 	@Test
 	void testGetUserByProgramBatchesBatchid() {
-		
+
 		List<UserDto> userDtoList = new ArrayList<UserDto>();
 		userDtoList.add(mockUserDto);
-		
+
 		Integer batchid = 1;
 		when(userService.getUserByProgramBatch(batchid)).thenReturn(userDtoList);
-		
-		
+
+
 		ResultActions response = mockMvc.perform(get("/users/programBatch/{batchId}", batchid));
 
 		response.andExpect(status().isOk())
 		.andExpect(jsonPath("$..userId")
 		.value("U01"))
 	    .andExpect(jsonPath("$", hasSize(userDtoList.size())));
-		
-	}
-	
-	
-	
-	
-	
-	
-	
-	
 
-	
+	}
+
+
+
+
+
+
+
+
+
+
 
 }
