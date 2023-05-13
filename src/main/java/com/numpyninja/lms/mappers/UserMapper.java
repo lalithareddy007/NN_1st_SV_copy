@@ -1,60 +1,53 @@
 package com.numpyninja.lms.mappers;
 
-import java.util.List;
-
 import com.numpyninja.lms.dto.*;
-import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.entity.User;
+import com.numpyninja.lms.entity.UserLogin;
+import com.numpyninja.lms.entity.UserRoleMap;
+import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 import org.mapstruct.Mapper;
-
-
-import com.numpyninja.lms.dto.UserAndRoleDTO;
-import com.numpyninja.lms.dto.UserDto;
-
-import com.numpyninja.lms.dto.UserRoleMapSlimDTO;
-import com.numpyninja.lms.dto.UserRoleProgramBatchDto;
-
 import org.mapstruct.Mapping;
 
-@Mapper(
-		componentModel = "spring"
-)
+import java.util.List;
+
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
-	UserDto userDto(User user);
+    UserDto userDto(User user);
 
-	User user(UserDto userDto);
+    User user(UserDto userDto);
 
-	List<UserDto> userDtos(List<User> users);
-
-
-	//for user role creation
-	User toUser(UserAndRoleDTO userAndRoleDto);
-	User toUser(UserLoginRoleDTO userLoginRoleDTO);
-
-	UserLogin toUserLogin(UserLoginDto userLogin);
+    List<UserDto> userDtos(List<User> users);
 
 
-	UserRoleMap userRoleMap(UserRoleMapSlimDTO userRoleMapSlimDto);
+    //for user role creation
+    User toUser(UserAndRoleDTO userAndRoleDto);
 
-	List<UserRoleMap> userRoleMapList(List<UserRoleMapSlimDTO> userRoleMapSlimDto);
+    User toUser(UserLoginRoleDTO userLoginRoleDTO);
 
-	UserRoleMap userRoleMap(UserAndRoleDTO userAndRoleDto);
-
-	List<UserRoleMap> touserRoleMapList(List<UserAndRoleDTO> userAndRoleDto);
-
-	//UserRoleDTO userRoleDto(UserRoleMap userRoleMap);
-
-	@Mapping(source="role.roleId", target="roleId")
-	UserRoleMapSlimDTO toUserSlimRoleMapDto(UserRoleMap userRoleMap);
-
-	@Mapping(source="batchId", target="batch.batchId")
-	UserRoleProgramBatchMap toUserRoleProgramBatchMap(UserRoleProgramBatchSlimDto userRoleProgramBatchSlimDto);
+    UserLogin toUserLogin(UserLoginDto userLogin);
 
 
-	
-	List<UserRoleProgramBatchDto> toUserRoleProgramBatchMapDtoList(List<UserRoleProgramBatchMap> UserProgBatch);
+    UserRoleMap userRoleMap(UserRoleMapSlimDTO userRoleMapSlimDto);
 
-	List<UserRoleMapSlimDTO> toUserRoleMapSlimDtos(List<UserRoleMap> userRoleMaps);
+    List<UserRoleMap> userRoleMapList(List<UserRoleMapSlimDTO> userRoleMapSlimDto);
+
+    UserRoleMap userRoleMap(UserAndRoleDTO userAndRoleDto);
+
+    List<UserRoleMap> touserRoleMapList(List<UserAndRoleDTO> userAndRoleDto);
+
+    //UserRoleDTO userRoleDto(UserRoleMap userRoleMap);
+
+    @Mapping(source = "role.roleId", target = "roleId")
+    UserRoleMapSlimDTO toUserSlimRoleMapDto(UserRoleMap userRoleMap);
+
+    @Mapping(source = "batchId", target = "batch.batchId")
+    UserRoleProgramBatchMap toUserRoleProgramBatchMap(UserRoleProgramBatchSlimDto userRoleProgramBatchSlimDto);
+
+
+    List<UserRoleProgramBatchDto> toUserRoleProgramBatchMapDtoList(List<UserRoleProgramBatchMap> UserProgBatch);
+
+    List<UserRoleMapSlimDTO> toUserRoleMapSlimDtos(List<UserRoleMap> userRoleMaps);
 
 
 }
