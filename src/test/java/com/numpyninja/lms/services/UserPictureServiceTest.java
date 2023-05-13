@@ -73,7 +73,7 @@ public class UserPictureServiceTest {
         user = new User("U02", "John", "K", " ", 1234123456L, "USA", "EST", "www.linkedin.com/John",
                 "MS", "MBA", "Professor", "GC", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
         userDto = new UserDto("U02", "Lily", "K", " ", 8765987623L, "USA", "CST", "www.linkedin.com/Lily",
-                "MCA", "MBA", "scientist", "Citizen");
+                "MCA", "MBA", "scientist", "Citizen", "lily.k@gmail.com");
         return mockUserPictureEntityDTO;
     }
 

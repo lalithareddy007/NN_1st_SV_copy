@@ -7,11 +7,11 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.security.UserDetailsImpl;
 import com.numpyninja.lms.security.jwt.JwtUtils;
 import com.numpyninja.lms.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import com.numpyninja.lms.security.UserDetailsImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -73,6 +73,8 @@ public class UserServices implements UserDetailsService {
 	@Autowired
 	UserPictureMapper userPictureMapper;
 
+	@Autowired
+	UserLoginMapper userLoginMapper;
 
 	@Autowired
 	JwtUtils jwtUtils;
@@ -85,10 +87,33 @@ public class UserServices implements UserDetailsService {
 
 	private static final String ROLE_STUDENT = "R03";
 
+	/*public List<UserDto> getAllUsers() {
+		List<User> users = userRepository.findAll();
+		Map<String, String> userLoginEmailMap = new HashMap<>();
+		for (User user : users) {
+			Optional<UserLogin> optionalUserLogin = userLoginRepository.findById(user.getUserId());
+			if (optionalUserLogin.isPresent()) {
+				UserLogin userLogin = optionalUserLogin.get();
+				userLoginEmailMap.put(user.getUserId(), userLogin.getUserLoginEmail());
+			}
+		}
+		List<UserDto> userDtos = userMapper.userDtos(users);
+		for (UserDto userDto : userDtos) {
+			String userLoginEmail = userLoginEmailMap.get(userDto.getUserId());
+			if (userLoginEmail != null) {
+				userDto.setUserLoginEmail(userLoginEmail);
+			}
+		}
+		return userDtos;
+	} */
+
+
 	public List<UserDto> getAllUsers() {
-		return userMapper.userDtos(userRepository.findAll());
-		// return userRepository.findAll();
+		List<UserLogin> userLogins = userLoginRepository.findAll();
+		List<UserDto> userDtos = userLoginMapper.toUserDTOs( userLogins);
+		return userDtos;
 	}
+
 
 	@Override
 	@Transactional

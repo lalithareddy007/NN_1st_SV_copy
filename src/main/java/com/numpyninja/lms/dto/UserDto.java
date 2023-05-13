@@ -58,4 +58,7 @@ public class UserDto {
 	@JsonProperty("userVisaStatus")
 	private String userVisaStatus;
 
+	@JsonProperty("userLoginEmail")
+	private String userLoginEmail;
+
 }
