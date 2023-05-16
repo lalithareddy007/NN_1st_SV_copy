@@ -83,6 +83,17 @@ public class JwtUtils {
 
     }
 
+//    public String generateAccountActivationToken(String url){
+//
+//        return  Jwts.builder()
+//                .setSubject((url))
+//                //.claim( ROLES , authorities)   // uncomment if u want to include roles in token
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date( (new Date()).getTime() + jwtAcctActiveExpMs))
+//                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+//                .compact();
+//    }
+
 /*
     UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {
 

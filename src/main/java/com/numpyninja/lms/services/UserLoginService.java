@@ -5,12 +5,15 @@ import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.dto.UserLoginDto;
 import com.numpyninja.lms.entity.UserLogin;
 import com.numpyninja.lms.entity.UserRoleMap;
+import com.numpyninja.lms.exception.InvalidDataException;
+import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.repository.UserLoginRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
 import com.numpyninja.lms.security.UserDetailsImpl;
+import com.numpyninja.lms.security.jwt.AuthTokenFilter;
 import com.numpyninja.lms.security.jwt.JwtUtils;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +23,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
+
 @Service
 public class UserLoginService {
     private UserLoginRepository userLoginRepository;
@@ -30,6 +35,8 @@ public class UserLoginService {
     PasswordEncoder encoder;
     @Autowired
     JwtUtils jwtUtils;
+
+
 
     public UserLoginService(UserLoginRepository userLoginRepository,
                             UserRoleMapRepository userRoleMapRepository) {
@@ -100,6 +107,21 @@ public class UserLoginService {
                 userDetailsImpl.getUsername(),
                 loginDto.getUserLoginEmailId(),
                 roles);
+    }
+
+
+//validating token on page load when token is received from front end
+    public boolean validateTokenAtAccountActivation(String token) {
+        String tokenparse = null;
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            tokenparse = token.substring(7, token.length());
+        }
+        boolean tokenvalue = jwtUtils.validateJwtToken(tokenparse);
+        if (tokenvalue)
+            return tokenvalue;
+        else
+            throw new InvalidDataException("token not valid");
+
     }
 }
 
