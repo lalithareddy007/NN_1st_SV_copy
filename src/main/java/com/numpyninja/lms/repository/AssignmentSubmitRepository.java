@@ -34,5 +34,9 @@ public interface AssignmentSubmitRepository extends JpaRepository<AssignmentSubm
 
     
     List <AssignmentSubmit> findByAssignment_assignmentId(Long assignmentId);
+    
+    @Query(value="SELECT * FROM tbl_lms_submissions s Inner JOIN tbl_lms_assignments a ON s.sub_a_id = a.a_id Inner JOIN tbl_lms_batch b ON a.a_batch_id= b.batch_id and b.batch_program_id = ?", nativeQuery=true)
+    List<AssignmentSubmit> getGradesByProgramId(Long programId);
+
 
 }
