@@ -34,7 +34,7 @@ public class UserPictureRepositoryTest {
     }
 
     private UserPictureEntity  setMockUserPictureEntity() {
-        mockUser = new User("U03", "John1", "K", " ", 1234123457L, "USA", "EST", "www.linkedin.com/John",
+        mockUser = new User("U01", "John1", "K", " ", 1234123457L, "USA", "EST", "www.linkedin.com/John",
                 "MS", "MBA", "Professor", "GC", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
         UserPictureEntity  userPictureEntity= new UserPictureEntity(2L, "Resume", mockUser, "/path/to/picture1.jpg");
         return userPictureEntity ;

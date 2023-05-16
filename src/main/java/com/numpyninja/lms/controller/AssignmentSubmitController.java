@@ -96,4 +96,12 @@ public class AssignmentSubmitController {
     	 List<AssignmentSubmitDTO> AssignmentsubmissionDTO = assignmentSubmitService.getSubmissionsByAssignment(assignmentId);
          return ResponseEntity.ok(AssignmentsubmissionDTO);
     }
+    
+    @GetMapping("/program/{programid}")
+    public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByProgramId(@PathVariable Long programid) {
+       
+    	List<AssignmentSubmitDTO> gradesListByProgram = assignmentSubmitService.getGradesByProgramId(programid);
+        return ResponseEntity.ok(gradesListByProgram);
+    }
+    
 }
