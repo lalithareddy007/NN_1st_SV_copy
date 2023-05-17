@@ -119,7 +119,7 @@ public class UserServices implements UserDetailsService {
 	@Transactional
 	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
 		UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
-				.orElseThrow(() -> new ResourceNotFoundException("User", "EMailId", loginEmail)	);
+				.orElseThrow(() -> new UsernameNotFoundException(  "EMailId"+ loginEmail + "not found")	);
 		User user = userLogin.getUser();
 
 		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUserId());
