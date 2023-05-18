@@ -25,10 +25,11 @@ app:
   frontend.url: ${FRONTEND_URL_HEROKU}
   #frontend.url: https://lms-frontend.herokuapp.com
 
-  security:
-    app:
-      jwtSecret: lmsAppSecretKeyTest
-      jwtExpirationMs: 28800000  # 28800000 Ms = 8 hours
-      jwtAcctActiveExpMs: 172800000 # 2 days in milli seconds
+security:
+  app:
+    jwtSecret: lmsAppSecretKeyTest
+    jwtExpirationMs: 28800000  # 28800000 Ms = 8 hours
+    jwtAcctActiveExpMs: 172800000 #2 days in milli seconds
+
 
 

@@ -123,7 +123,8 @@ public class UserServices implements UserDetailsService {
 		User user = userLogin.getUser();
 
 		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUserId());
-		List<String> roles = userRoleMaps.stream().map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList());
+		List<String> roles = userRoleMaps.stream().filter(urm -> urm.getUserRoleStatus().equalsIgnoreCase("ACTIVE"))
+				                  .map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList()); // only load "Active" Roles
 
 		return UserDetailsImpl.build(user, userLogin, roles);
 	}
