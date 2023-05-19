@@ -17,7 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
-//@ComponentScan(basePackages="com.ninja.lms")
+@ComponentScan(basePackages="com.ninja.lms")
 @Configuration
 public class LmsServicesApplication {
 	

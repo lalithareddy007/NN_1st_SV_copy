@@ -5,7 +5,8 @@ server:
 spring:
   profiles:
     active: local
-  #datasource:
+
+
     #url: jdbc:postgresql://localhost:5432/LMS_DB
     #username: postgres  #changed as per Local DB
     #password: admin  #changed as per Local DB
@@ -38,4 +39,4 @@ logging:
     name: lmsservice.log
     path: ./
 
-
+debug: true
