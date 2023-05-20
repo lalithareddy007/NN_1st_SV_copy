@@ -97,7 +97,6 @@ public class UserLoginService {
 
         return  new JwtResponseDto(jwt,
                 userDetailsImpl.getUserId(),
-                userDetailsImpl.getUsername(),
                 loginDto.getUserLoginEmailId(),
                 roles);
     }

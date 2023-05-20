@@ -6,6 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@WithMockUser(username="admin",roles={ "ADMIN", "STAFF"})
+@WithMockUser(username="Tim@gmail.com", password = "vision02", roles={ "ADMIN", "STAFF"})
 public @interface WithMockAdminStaff {
 }
