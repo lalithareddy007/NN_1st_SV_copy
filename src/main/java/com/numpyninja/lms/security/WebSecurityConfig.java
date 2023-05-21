@@ -4,6 +4,7 @@ import com.numpyninja.lms.security.jwt.AuthEntryPointJwt;
 import com.numpyninja.lms.security.jwt.AuthTokenFilter;
 import com.numpyninja.lms.services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.core.userdetails.UserCache;
+import org.springframework.security.core.userdetails.cache.SpringCacheBasedUserCache;
 
 @Configuration
 @EnableWebSecurity   // allows Spring to find and automatically apply the class to the global Web Security.
@@ -24,6 +27,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         jsr250Enabled = true,    // enables @RolesAllowed annotation.
         prePostEnabled = true )  // provides AOP security on methods. It enables @PreAuthorize, @PostAuthorize
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private CacheManager cacheManager;
+
     @Autowired
     UserServices userServices;
 
@@ -49,6 +55,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserCache userCache() {
+        // Create a SpringCacheBasedUserCache using your UserCache implementation
+        return new SpringCacheBasedUserCache(cacheManager.getCache("userDetailsCache"));
+        //we inject the CacheManager and retrieve the appropriate cache (e.g., "userDetailsCache") using the getCache method.
+        // Then, we pass the cache to the SpringCacheBasedUserCache constructor to create the UserCache implementation.
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.numpyninja.lms.security.jwt.JwtUtils;
 import com.numpyninja.lms.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -82,6 +83,9 @@ public class UserServices implements UserDetailsService {
 	@Autowired
 	private EmailSender emailSender;
 
+	@Autowired
+	private UserCache userCache;
+
 	@Value("${app.frontend.url}")
 	private String frontendUrl;
 
@@ -118,15 +122,20 @@ public class UserServices implements UserDetailsService {
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
-		UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
-				.orElseThrow(() -> new UsernameNotFoundException(  "EMailId"+ loginEmail + "not found")	);
-		User user = userLogin.getUser();
+		UserDetails userDetails = userCache.getUserFromCache(loginEmail);
+		if ( userDetails == null){
+			UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
+					.orElseThrow(() -> new UsernameNotFoundException(  "EMailId"+ loginEmail + "not found")	);
+			User user = userLogin.getUser();
 
-		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUserId());
-		List<String> roles = userRoleMaps.stream().filter(urm -> urm.getUserRoleStatus().equalsIgnoreCase("ACTIVE"))
-				                  .map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList()); // only load "Active" Roles
+			List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUserId());
+			List<String> roles = userRoleMaps.stream().filter(urm -> urm.getUserRoleStatus().equalsIgnoreCase("ACTIVE"))
+					.map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList()); // only load "Active" Roles
 
-		return UserDetailsImpl.build(user, userLogin, roles);
+			userDetails = UserDetailsImpl.build(user, userLogin, roles);
+			userCache.putUserInCache(userDetails);
+		}
+		return userDetails;
 	}
 
 		public UserAllDto getUserInfoById(String userId){
