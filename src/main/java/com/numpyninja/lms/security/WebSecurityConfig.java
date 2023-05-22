@@ -74,12 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
     
-   /* @Override
-    public void configure(WebSecurity web) throws Exception {
-    	web.ignoring().antMatchers(PUBLIC_URLS);
-    }*/
-
-}
+  }
 
 //  AuthenticationEntryPoint : a filter which is the first point of entry for Spring Security.
 //  It is the entry point to check if a user is authenticated and logs the person in or throws exception (unauthorized).
