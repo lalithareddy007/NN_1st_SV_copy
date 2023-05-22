@@ -24,14 +24,19 @@ import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.BatchDTO;
 import com.numpyninja.lms.services.ProgBatchServices;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 
 @RestController
+@Api(tags="Program Batch Controller", description="All Program Batch CRUD Operations")
 public class ProgBatchController  {
 
     @Autowired
     private ProgBatchServices batchService;
     
     @GetMapping("/batches")
+    @ApiOperation("Get All Batches")
     public List<BatchDTO> getAll(String searchString) {
         if (StringUtils.isNotBlank(searchString)) {
         	return  batchService.getAllBatches(searchString);           
@@ -41,6 +46,7 @@ public class ProgBatchController  {
     }
     
 	@GetMapping ( path = "/batches/batchId/{batchId}", produces = "application/json")
+	@ApiOperation("Get Batch details by Batch Id")
 	public ResponseEntity<BatchDTO> getBatchById(@PathVariable(value="batchId") @Positive Integer batchId) {
 		return ResponseEntity.ok(  batchService.findBatchById(batchId) );
 	}
@@ -48,13 +54,15 @@ public class ProgBatchController  {
 	
 	//Get Batch by Name
 	@GetMapping ( path = "/batches/batchName/{batchName}", produces = "application/json")
+	@ApiOperation("Get Batch details by Batch Name")
 	public ResponseEntity<List<BatchDTO>> getBatchByName(@PathVariable(value="batchName") String batchName) {
 		return ResponseEntity.ok(  batchService.findByProgramBatchName(batchName) );
 	}
 	
 	
 	//Get Batch List by Program
-	@GetMapping ( path = "/batches/program/{programId}", produces = "application/json")    
+	@GetMapping ( path = "/batches/program/{programId}", produces = "application/json")   
+	@ApiOperation("Get Batch details by Program Id")
 	public ResponseEntity<List<BatchDTO>> getBatchByProgram( @PathVariable(value="programId") @Positive Long programId) {
 		return ResponseEntity.ok(  batchService.findBatchByProgramId(programId) );
 	}
@@ -62,6 +70,7 @@ public class ProgBatchController  {
 	
     @PostMapping(path = "/batches", consumes = "application/json", produces = "application/json")
     @RolesAllowed({"ROLE_ADMIN"})
+    @ApiOperation("Create New Batch")
     public ResponseEntity<BatchDTO> createBatch( @Valid @RequestBody BatchDTO batchDTO ) {
         BatchDTO batchDTOCreatd = batchService.createBatch(batchDTO );
         return ResponseEntity.status(HttpStatus.CREATED).body(batchDTOCreatd);
@@ -71,6 +80,7 @@ public class ProgBatchController  {
     //Update program Information
     @PutMapping(path = "/batches/{batchId}", consumes = "application/json", produces = "application/json")
     @RolesAllowed({"ROLE_ADMIN"})
+    @ApiOperation("Update Batch details")
     public ResponseEntity<BatchDTO> updateBatch( @Valid @RequestBody BatchDTO batchDTO,  @PathVariable Integer batchId ) {
     	BatchDTO batchDTOUpd = batchService.updateBatch( batchDTO, batchId);
     	return ResponseEntity.ok( batchDTOUpd );
@@ -79,6 +89,7 @@ public class ProgBatchController  {
     
     @DeleteMapping(path = "/batches/{id}" , produces = "application/json" )
     @RolesAllowed({"ROLE_ADMIN"})
+    @ApiOperation("Delete existing Batch")
     public String deleteBatch( @PathVariable Integer id) {
         batchService.deleteProgramBatch(id);
         String message = "Message:" + " Batch with Id-" + id + " deleted Successfully!";

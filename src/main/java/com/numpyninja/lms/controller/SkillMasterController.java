@@ -23,8 +23,12 @@ import com.numpyninja.lms.dto.SkillMasterDto;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.SkillMasterService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping
+@Api(tags="Skill Master Controller", description="Skill Master CRUD Operations")
 public class SkillMasterController {
 	
 	@Autowired
@@ -33,6 +37,7 @@ public class SkillMasterController {
 	//createSkills
 	@PostMapping(path="/SaveSkillMaster",consumes = "application/json", produces = "application/json")  
 	@ResponseBody
+	@ApiOperation("Create New Skill")
 	private ResponseEntity<?> createAndSaveSkill(@Valid @RequestBody SkillMasterDto newSkillMaster)throws DuplicateResourceFoundException
 	{  
 		SkillMasterDto savedSkillMasterDTO = skillMasterService.createAndSaveSkillMaster(newSkillMaster);
@@ -41,6 +46,7 @@ public class SkillMasterController {
 	
 	//GetAllSkills
 	@GetMapping(value = "/allSkillMaster")
+	@ApiOperation("Get all Skills")
 	private ResponseEntity<?> getAllSkillsMaster()  throws ResourceNotFoundException
 	{ 
 		System.out.println("in getall SkillsMaster");
@@ -51,6 +57,7 @@ public class SkillMasterController {
 	//GetSkillByName
 	@GetMapping(path="skills/{skillMasterName}", produces = "application/json")  
 	@ResponseBody
+	@ApiOperation("Get Skill by Skill Name")
 	private ResponseEntity <?> getOneSkillByName(@PathVariable("skillMasterName") @NotBlank @Positive String skillName)throws ResourceNotFoundException
 	{  
 		List<SkillMasterDto> skillmasterModelList= skillMasterService.getSkillMasterByName(skillName);
@@ -60,6 +67,7 @@ public class SkillMasterController {
 	//UpdateSkillById
 	@PutMapping(path="updateSkills/{skillId}", consumes = "application/json", produces = "application/json")  
 	@ResponseBody
+	@ApiOperation("Update Skill by Skill ID")
 	private ResponseEntity <SkillMasterDto> updateSkillById(@PathVariable @NotBlank @Positive Long skillId ,@Valid @RequestBody SkillMasterDto modifySkillMaster) throws ResourceNotFoundException
 	{  
 	return ResponseEntity.ok(skillMasterService.updateSkillMasterById(skillId,modifySkillMaster));
@@ -68,6 +76,7 @@ public class SkillMasterController {
 	//DeleteSkillsById
 	@DeleteMapping(path="deletebySkillId/{skillId}",produces = "application/json")  
 	@ResponseBody
+	@ApiOperation("Delete Skill by Skill ID")
 	private ResponseEntity<?>  deleteBySkillId(@PathVariable("skillId")@NotBlank @Positive Long skillId) throws ResourceNotFoundException  
 	{  
 	System.out.println("in delete by SkillId controller");
