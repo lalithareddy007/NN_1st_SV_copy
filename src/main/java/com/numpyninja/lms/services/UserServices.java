@@ -124,6 +124,7 @@ public class UserServices implements UserDetailsService {
 	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
 		UserDetails userDetails = userCache.getUserFromCache(loginEmail);
 		if ( userDetails == null){
+			System.out.println( "getting " + loginEmail + " from Database ");
 			UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
 					.orElseThrow(() -> new UsernameNotFoundException(  "EMailId"+ loginEmail + "not found")	);
 			User user = userLogin.getUser();
@@ -515,9 +516,11 @@ public class UserServices implements UserDetailsService {
 			throw new ResourceNotFoundException("UserID: " + userId + " doesnot exist ");
 		} else {
 			userRepository.deleteById(userId);
+
 		}
 		return userId;
 	}
+
 
 	private void validateUserRoleProgramBatchDtoForUser(UserRoleProgramBatchDto userRoleProgramBatchDto) {
 		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();

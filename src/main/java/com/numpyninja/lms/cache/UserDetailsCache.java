@@ -18,7 +18,7 @@ public class UserDetailsCache implements UserCache {
     public UserDetailsCache() {
         GuavaCacheManager cacheManager = new GuavaCacheManager();
         cacheManager.setCacheBuilder(CacheBuilder.newBuilder()
-                .expireAfterWrite(10, TimeUnit.MINUTES));
+                .expireAfterAccess(8, TimeUnit.HOURS)); // remove Users that have been idle for specified time
 
         userCache = cacheManager.getCache("users");
     }
@@ -38,4 +38,10 @@ public class UserDetailsCache implements UserCache {
     public void removeUserFromCache(String username) {
         userCache.evict(username);
     }
+
+    /*public UserDetails getUserById(String userId) {
+
+        ValueWrapper wrapper = userCache.get(username);
+        return wrapper != null ? (UserDetails) wrapper.get() : null;
+    } */
 }
