@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,6 +30,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+    
+    private static final String[] PUBLIC_URLS = {
+    		"/v2/api-docs",
+    		"/swagger-resources/**",
+    		"/swagger-ui/**",
+    		"/swagger-ui.html",
+    		"/webjars/**"
+    		};
+
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -58,10 +68,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/login").permitAll()
+                .antMatchers(PUBLIC_URLS).permitAll()
                 .anyRequest().authenticated();        // ”permitAll” will configure the authorization so that all requests are allowed on that particular path ; '/login'
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
+    
+   /* @Override
+    public void configure(WebSecurity web) throws Exception {
+    	web.ignoring().antMatchers(PUBLIC_URLS);
+    }*/
+
 }
 
 //  AuthenticationEntryPoint : a filter which is the first point of entry for Spring Security.

@@ -18,10 +18,14 @@ import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.services.AssignmentService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/assignments")
+@Api(tags="Assignment Controller", description="Assignment CRUD Operations")
 public class AssignmentController {
 	
 	@Autowired
@@ -29,6 +33,7 @@ public class AssignmentController {
 	
 	//create an assignment
 	@PostMapping("")
+	@ApiOperation("Create New Assignment")
 	public ResponseEntity<AssignmentDto> createAssignment(@Valid @RequestBody AssignmentDto assignmentDto) {
 		AssignmentDto createdAssignmentDto =  this.assignmentService.createAssignment(assignmentDto);
 		return new ResponseEntity<>(createdAssignmentDto, HttpStatus.CREATED);
@@ -36,6 +41,7 @@ public class AssignmentController {
 	
 	//update an assignment
 	@PutMapping("/{id}")
+	@ApiOperation("Update existing Assignment")
 	public ResponseEntity<AssignmentDto> updateAssignment(@Valid @RequestBody AssignmentDto assignmentDto, @PathVariable Long id) {
 		AssignmentDto updatedAssignmentDto =  this.assignmentService.updateAssignment(assignmentDto, id);
 		return ResponseEntity.ok(updatedAssignmentDto);
@@ -43,6 +49,7 @@ public class AssignmentController {
 	
 	//delete an assignment
 	@DeleteMapping("/{id}")
+	@ApiOperation("Delete existing Assignment")
 	public ResponseEntity<ApiResponse> deleteAssignment(@PathVariable Long id) {
 		this.assignmentService.deleteAssignment(id);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Assignment deleted successfully", true), HttpStatus.OK);
@@ -50,18 +57,21 @@ public class AssignmentController {
 	
 	//get all assignments
     @GetMapping("")
+    @ApiOperation("Get list of all Assignments")
     public ResponseEntity<List<AssignmentDto>> getAllAssignments() {
         return ResponseEntity.ok(this.assignmentService.getAllAssignments());  
     }
     
     //get assignment by id
   	@GetMapping("/{id}")
+  	@ApiOperation("Get Assignment details by Assignment Id")
   	public ResponseEntity<AssignmentDto> getAssignmentById(@PathVariable(value="id") Long id) {
   		return ResponseEntity.ok(this.assignmentService.getAssignmentById(id));
   	}
   	
   	//get all batches of a program
   	@GetMapping("/batch/{batchId}")
+  	@ApiOperation("Get all Assignments for Batch")
   	public ResponseEntity<List<AssignmentDto>> getAssignmentsForBatch(@PathVariable(value="batchId") Integer batchId) {
   		return ResponseEntity.ok(this.assignmentService.getAssignmentsForBatch(batchId));
   	}
