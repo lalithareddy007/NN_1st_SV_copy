@@ -39,9 +39,4 @@ public class UserDetailsCache implements UserCache {
         userCache.evict(username);
     }
 
-    /*public UserDetails getUserById(String userId) {
-
-        ValueWrapper wrapper = userCache.get(username);
-        return wrapper != null ? (UserDetails) wrapper.get() : null;
-    } */
 }

@@ -515,12 +515,16 @@ public class UserServices implements UserDetailsService {
 		if (!userExists) {
 			throw new ResourceNotFoundException("UserID: " + userId + " doesnot exist ");
 		} else {
+			UserLogin userLogin = userLoginRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User", "userId", userId));
 			userRepository.deleteById(userId);
-
+			removeUserFromUserCache( userLogin.getUserLoginEmail());
 		}
 		return userId;
 	}
 
+	private void removeUserFromUserCache( String emailId ){
+		userCache.removeUserFromCache( emailId );
+	}
 
 	private void validateUserRoleProgramBatchDtoForUser(UserRoleProgramBatchDto userRoleProgramBatchDto) {
 		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -789,12 +793,16 @@ public class UserServices implements UserDetailsService {
 						throw new DuplicateResourceFoundException("Failed to update UserLogin as email already exists!");
 					}
 					userLoginRepository.updateUserLogin(userId, userEmailToUpdate ,userLoginStatusToUpdate);
+					// Once email id of a user is updated, their UserDetailsObject has to be removed from Cache
+					// when they login again with new email id, a new UserDetailsObject will be created and stored in cache
+					removeUserFromUserCache( userLogin.get().getUserLoginEmail());
 				}
 			}
 			System.out.println("userId11"+ userId);
 			return "UserLogin updated successfully";
 		}
 	}
+
 
 
 	/*

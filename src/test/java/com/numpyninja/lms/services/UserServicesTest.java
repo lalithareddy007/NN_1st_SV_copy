@@ -7,6 +7,7 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.security.UserDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserCache;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -105,6 +107,8 @@ class UserServicesTest {
 
     private UserRoleProgramBatchMap mockUserRoleProgramBatchMap;
 
+    @Mock
+    private UserCache userCache;
 
     private SkillMaster mockSkillMaster;
 
@@ -344,9 +348,11 @@ class UserServicesTest {
     @Test
         //@Order(4)
     void testDeleteUser() {
-
+        UserLogin mockUserLogin = new UserLogin("U02","abdul.kalam@gmail.com","sket","ACTIVE",
+                        Timestamp.valueOf(LocalDateTime.now()),Timestamp.valueOf(LocalDateTime.now()),mockUser);
         //given
         given(userRepo.existsById(mockUser.getUserId())).willReturn(true);
+        given(userLoginRepository.findById(mockUser.getUserId())).willReturn(Optional.of(mockUserLogin));
         willDoNothing().given(userRepo).deleteById(mockUser.getUserId());
 
         //when

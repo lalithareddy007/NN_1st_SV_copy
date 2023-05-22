@@ -15,10 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
@@ -43,6 +45,8 @@ public class UserLoginServiceTest  {
     private PasswordEncoder passwordEncoder;
     @Mock
     private JwtUtils jwtUtils;
+    @Mock
+    private UserCache userCache;
 
     @BeforeEach
     public void setUp() {
@@ -60,13 +64,15 @@ public class UserLoginServiceTest  {
         authorities.add(new SimpleGrantedAuthority("ROLE_STAFF"));
 
         //given
+        UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
+        when( userCache.getUserFromCache( loginDto.getUserLoginEmailId())).thenReturn( userDetails);
         Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
 
         String jwtToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzaGVudGhhbWFyYWkubjJAZ21haWwuY29tIiwiaWF0IjoxNjg0NDU0NDYwLCJleH";
         when(jwtUtils.generateJwtToken(authentication)).thenReturn(jwtToken);
 
-        UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
+
         when(authentication.getPrincipal()).thenReturn(userDetails);
 
         when(userDetails.getUserId()).thenReturn("U11");
