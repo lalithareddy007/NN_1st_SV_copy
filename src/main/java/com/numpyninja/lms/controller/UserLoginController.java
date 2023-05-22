@@ -1,8 +1,10 @@
 package com.numpyninja.lms.controller;
 
+import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.services.UserLoginService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,10 +39,17 @@ public class UserLoginController {
         return ResponseEntity.ok(userLoginService.signin( loginDto ));
     }
 
-    @GetMapping("/validate")
-    public ResponseEntity<Boolean> validateAccountActToken(
+    @GetMapping("/AccountActivation")
+    public ResponseEntity<ApiResponse> validateAccountActToken(
             @RequestHeader(value = "Authorization") String token) {
-        return  ResponseEntity.ok(userLoginService.validateTokenAtAccountActivation( token ));
+
+      boolean status = this.userLoginService.validateTokenAtAccountActivation( token );
+
+       if(status)
+           return new ResponseEntity<ApiResponse>(new ApiResponse("token validation success", true), HttpStatus.OK);
+else
+      return new ResponseEntity<ApiResponse>(new ApiResponse("token not valid", false), HttpStatus.BAD_REQUEST);
+        //return  ResponseEntity.ok(userLoginService.validateTokenAtAccountActivation( token ));
 
     }
 }

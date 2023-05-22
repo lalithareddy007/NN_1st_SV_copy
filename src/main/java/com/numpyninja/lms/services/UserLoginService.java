@@ -12,7 +12,8 @@ import com.numpyninja.lms.repository.UserRoleMapRepository;
 import com.numpyninja.lms.security.UserDetailsImpl;
 import com.numpyninja.lms.security.jwt.AuthTokenFilter;
 import com.numpyninja.lms.security.jwt.JwtUtils;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
+import org.springframework.beans.PropertyBatchUpdateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -116,12 +117,36 @@ public class UserLoginService {
         if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
             tokenparse = token.substring(7, token.length());
         }
-        boolean tokenvalue = jwtUtils.validateJwtToken(tokenparse);
-        if (tokenvalue)
+        boolean tokenvalue = jwtUtils.generateAccountActivationToken(tokenparse);
+       // if (tokenvalue)
             return tokenvalue;
-        else
-            throw new InvalidDataException("token not valid");
+        //else
+          //  throw new InvalidDataException("token not valid");
 
+
+
+
+//           if(tokenvalue)
+//            return true;
+//        } catch (ExpiredJwtException e) {
+//            throw new RuntimeException(e.getMessage());
+//        } catch (UnsupportedJwtException e) {
+//            throw new RuntimeException(e.getMessage());
+//        } catch (MalformedJwtException e) {
+//           // logger.error("Invalid JWT token: {}", e.getMessage());
+//             throw new RuntimeException(e.getMessage());
+//        } catch (SignatureException e) {
+//            throw new RuntimeException(e.getMessage());
+//        } catch (IllegalArgumentException e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
+
+
+
+           // throw new RuntimeException(e.getMessage());
+
+
+       // return false;
     }
 }
 

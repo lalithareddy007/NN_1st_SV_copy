@@ -83,16 +83,28 @@ public class JwtUtils {
 
     }
 
-//    public String generateAccountActivationToken(String url){
-//
-//        return  Jwts.builder()
-//                .setSubject((url))
-//                //.claim( ROLES , authorities)   // uncomment if u want to include roles in token
-//                .setIssuedAt(new Date())
-//                .setExpiration(new Date( (new Date()).getTime() + jwtAcctActiveExpMs))
-//                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-//                .compact();
-//    }
+    public Boolean generateAccountActivationToken(String token){
+        try {
+         Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+             throw new RuntimeException(e.getMessage());
+         } catch (UnsupportedJwtException e) {
+             throw new RuntimeException(e.getMessage());
+         } catch (MalformedJwtException e) {
+             logger.error("Invalid JWT token: {}", e.getMessage());
+             // throw new RuntimeException(e.getMessage());
+         } catch (SignatureException e) {
+             throw new RuntimeException(e.getMessage());
+         } catch (IllegalArgumentException e) {
+             throw new RuntimeException(e.getMessage());
+         }
+return false;
+    }
+
+   
+
+
 
 /*
     UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {
