@@ -43,13 +43,15 @@ public class UserLoginController {
     public ResponseEntity<ApiResponse> validateAccountActToken(
             @RequestHeader(value = "Authorization") String token) {
 
-      boolean status = this.userLoginService.validateTokenAtAccountActivation( token );
+      String status = this.userLoginService.validateTokenAtAccountActivation( token );
 
-       if(status)
-           return new ResponseEntity<ApiResponse>(new ApiResponse("token validation success", true), HttpStatus.OK);
-else
-      return new ResponseEntity<ApiResponse>(new ApiResponse("token not valid", false), HttpStatus.BAD_REQUEST);
-        //return  ResponseEntity.ok(userLoginService.validateTokenAtAccountActivation( token ));
+       if(status.equalsIgnoreCase("Valid"))
+           return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
+      else if(status.equalsIgnoreCase("Invalid"))
+      return new ResponseEntity<ApiResponse>(new ApiResponse(status, false), HttpStatus.BAD_REQUEST);
+        else if(status.equalsIgnoreCase("acctActivated"))
+           return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
 
+        return null;
     }
 }

@@ -4,6 +4,7 @@ package com.numpyninja.lms.security.jwt;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.*;
@@ -83,26 +84,36 @@ public class JwtUtils {
 
     }
 
-    public Boolean generateAccountActivationToken(String token){
+    public String validateAccountActivationToken(String token){
+        String validity,errMsg="Invalid";
+
         try {
          Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-            return true;
+         validity= "Valid";
+
         } catch (ExpiredJwtException e) {
-             throw new RuntimeException(e.getMessage());
+            logger.error("Expired JWT token: {}", e.getMessage());
+            validity =errMsg;
+
          } catch (UnsupportedJwtException e) {
-             throw new RuntimeException(e.getMessage());
+            logger.error("Unsupported JWT token: {}", e.getMessage());
+            validity =errMsg;
+
          } catch (MalformedJwtException e) {
-             logger.error("Invalid JWT token: {}", e.getMessage());
-             // throw new RuntimeException(e.getMessage());
+            logger.error("MalformedJwtException: {}", e.getMessage());
+            validity =errMsg;
+
          } catch (SignatureException e) {
-             throw new RuntimeException(e.getMessage());
+            logger.error("SignatureException", e.getMessage());
+            validity =errMsg;
          } catch (IllegalArgumentException e) {
-             throw new RuntimeException(e.getMessage());
+            logger.error("IllegalArgumentException", e.getMessage());
+            validity =errMsg;
          }
-return false;
+
+        return validity;
     }
 
-   
 
 
 
