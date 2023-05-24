@@ -4,6 +4,7 @@ package com.numpyninja.lms.security.jwt;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.*;
@@ -82,6 +83,39 @@ public class JwtUtils {
                 .compact();
 
     }
+
+    public String validateAccountActivationToken(String token){
+        String validity,errMsg="Invalid";
+
+        try {
+         Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+         validity= "Valid";
+
+        } catch (ExpiredJwtException e) {
+            logger.error("Expired JWT token: {}", e.getMessage());
+            validity =errMsg;
+
+         } catch (UnsupportedJwtException e) {
+            logger.error("Unsupported JWT token: {}", e.getMessage());
+            validity =errMsg;
+
+         } catch (MalformedJwtException e) {
+            logger.error("MalformedJwtException: {}", e.getMessage());
+            validity =errMsg;
+
+         } catch (SignatureException e) {
+            logger.error("SignatureException", e.getMessage());
+            validity =errMsg;
+         } catch (IllegalArgumentException e) {
+            logger.error("IllegalArgumentException", e.getMessage());
+            validity =errMsg;
+         }
+
+        return validity;
+    }
+
+
+
 
 /*
     UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {

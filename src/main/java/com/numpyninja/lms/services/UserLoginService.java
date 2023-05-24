@@ -5,21 +5,31 @@ import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.dto.UserLoginDto;
 import com.numpyninja.lms.entity.UserLogin;
 import com.numpyninja.lms.entity.UserRoleMap;
+import com.numpyninja.lms.exception.InvalidDataException;
+import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.repository.UserLoginRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
 import com.numpyninja.lms.security.UserDetailsImpl;
+import com.numpyninja.lms.security.jwt.AuthTokenFilter;
 import com.numpyninja.lms.security.jwt.JwtUtils;
+import io.jsonwebtoken.*;
+import org.springframework.beans.PropertyBatchUpdateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
+
 @Service
 public class UserLoginService {
     private UserLoginRepository userLoginRepository;
@@ -30,6 +40,7 @@ public class UserLoginService {
     PasswordEncoder encoder;
     @Autowired
     JwtUtils jwtUtils;
+
 
     public UserLoginService(UserLoginRepository userLoginRepository,
                             UserRoleMapRepository userRoleMapRepository) {
@@ -52,7 +63,7 @@ public class UserLoginService {
                         uDto.setStatus("role unavailable");
                     else {
                         // Retrieve list of rolesIds for associated Active roles
-                        List<String> activeRoleIds =  extUserRoleMaps.stream()
+                        List<String> activeRoleIds = extUserRoleMaps.stream()
                                 .filter(userRoleMap -> "active".equalsIgnoreCase(userRoleMap.getUserRoleStatus()))
                                 .map(userRoleMap -> userRoleMap.getRole().getRoleId())
                                 .collect(Collectors.toList());
@@ -63,14 +74,11 @@ public class UserLoginService {
                             uDto.setRoleIds(activeRoleIds);
                         }
                     }
-                }
-                else // Login status is inactive
+                } else // Login status is inactive
                     uDto.setStatus("login inactive");
-            }
-            else  // Password mismatch for requested User
+            } else  // Password mismatch for requested User
                 uDto.setStatus("invalid");
-        }
-        else // User is NOT present in database
+        } else // User is NOT present in database
             uDto.setStatus("invalid");
 
         UserLoginDto resUserLoginDto = UserLoginDto.builder()
@@ -83,10 +91,10 @@ public class UserLoginService {
     }
 
 
-    public JwtResponseDto signin(LoginDto loginDto){
+    public JwtResponseDto signin(LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUserLoginEmailId(), loginDto.getPassword())); // calls loadUserByName() in UserServices
-                                                               // password verification is done by Spring security
+        // password verification is done by Spring security
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
@@ -95,10 +103,36 @@ public class UserLoginService {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return  new JwtResponseDto(jwt,
+        return new JwtResponseDto(jwt,
                 userDetailsImpl.getUserId(),
                 loginDto.getUserLoginEmailId(),
                 roles);
+    }
+
+
+    //validating token on page load when token is received from front end
+    public String validateTokenAtAccountActivation(String token) {
+        String tokenparse = null;
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            tokenparse = token.substring(7, token.length());
+        }
+        String validity = jwtUtils.validateAccountActivationToken(tokenparse);
+
+        //checking if its first login or account already exist
+        if (validity.equalsIgnoreCase("Valid")) {
+            String userLoginEMail = jwtUtils.getUserNameFromJwtToken(tokenparse);
+            Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEMail);
+            if (userOptional.isPresent()) { // User is present in database
+                UserLogin userLogin = userOptional.get();
+                String password = userLogin.getPassword();
+
+                //if password is present in table
+                if (!password.isEmpty()) {
+                    validity = "acctActivated";
+                }
+            }
+        }
+        return validity;
     }
 }
 

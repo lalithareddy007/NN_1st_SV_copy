@@ -1,8 +1,8 @@
 package com.numpyninja.lms.controller;
 
+import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
-import com.numpyninja.lms.dto.UserLoginDto;
 import com.numpyninja.lms.services.UserLoginService;
 
 import io.swagger.annotations.Api;
@@ -43,5 +43,21 @@ public class UserLoginController {
     @ApiOperation("User Sign In")
     public ResponseEntity<JwtResponseDto> signin(@Valid @RequestBody LoginDto loginDto){
         return ResponseEntity.ok(userLoginService.signin( loginDto ));
+    }
+
+    @GetMapping("/AccountActivation")
+    public ResponseEntity<ApiResponse> validateAccountActToken(
+            @RequestHeader(value = "Authorization") String token) {
+
+      String status = this.userLoginService.validateTokenAtAccountActivation( token );
+
+       if(status.equalsIgnoreCase("Valid"))
+           return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
+      else if(status.equalsIgnoreCase("Invalid"))
+      return new ResponseEntity<ApiResponse>(new ApiResponse(status, false), HttpStatus.BAD_REQUEST);
+        else if(status.equalsIgnoreCase("acctActivated"))
+           return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
+
+        return null;
     }
 }
