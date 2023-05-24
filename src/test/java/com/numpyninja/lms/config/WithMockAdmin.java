@@ -8,5 +8,5 @@ import java.lang.annotation.RetentionPolicy;
 
 
 @Retention(RetentionPolicy.RUNTIME)
-@WithMockUser(username="sucheta@gmail.com",roles="ADMIN")
+@WithMockUser(username="sucheta@gmail.com", password = "ikkd^a", roles="ADMIN")
 public @interface WithMockAdmin { }

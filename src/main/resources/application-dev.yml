@@ -27,8 +27,10 @@ app:
 
 security:
   app:
-     jwtSecret: lmsAppSecretKeyTest
-     jwtExpirationMs: 28800000  # 28800000 Ms = 8 hours
-     jwtAcctActiveExpMs: 172800000 # 2 days in milli seconds
+    jwtSecret: lmsAppSecretKeyTest
+    jwtExpirationMs: 28800000  # 28800000 Ms = 8 hours
+    jwtAcctActiveExpMs: 172800000 #2 days in milli seconds
+
+
 
 
