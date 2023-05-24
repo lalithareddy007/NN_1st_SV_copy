@@ -4,7 +4,7 @@ server:
     context-path: /lms
 spring:
   profiles:
-    active: local
+    active: dev
   #datasource:
     #url: jdbc:postgresql://localhost:5432/LMS_DB
     #username: postgres  #changed as per Local DB

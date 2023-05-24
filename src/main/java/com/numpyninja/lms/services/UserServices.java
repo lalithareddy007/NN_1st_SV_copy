@@ -7,11 +7,11 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.security.UserDetailsImpl;
 import com.numpyninja.lms.security.jwt.JwtUtils;
 import com.numpyninja.lms.util.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import com.numpyninja.lms.security.UserDetailsImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -73,6 +73,8 @@ public class UserServices implements UserDetailsService {
 	@Autowired
 	UserPictureMapper userPictureMapper;
 
+	@Autowired
+	UserLoginMapper userLoginMapper;
 
 	@Autowired
 	JwtUtils jwtUtils;
@@ -85,20 +87,44 @@ public class UserServices implements UserDetailsService {
 
 	private static final String ROLE_STUDENT = "R03";
 
+	/*public List<UserDto> getAllUsers() {
+		List<User> users = userRepository.findAll();
+		Map<String, String> userLoginEmailMap = new HashMap<>();
+		for (User user : users) {
+			Optional<UserLogin> optionalUserLogin = userLoginRepository.findById(user.getUserId());
+			if (optionalUserLogin.isPresent()) {
+				UserLogin userLogin = optionalUserLogin.get();
+				userLoginEmailMap.put(user.getUserId(), userLogin.getUserLoginEmail());
+			}
+		}
+		List<UserDto> userDtos = userMapper.userDtos(users);
+		for (UserDto userDto : userDtos) {
+			String userLoginEmail = userLoginEmailMap.get(userDto.getUserId());
+			if (userLoginEmail != null) {
+				userDto.setUserLoginEmail(userLoginEmail);
+			}
+		}
+		return userDtos;
+	} */
+
+
 	public List<UserDto> getAllUsers() {
-		return userMapper.userDtos(userRepository.findAll());
-		// return userRepository.findAll();
+		List<UserLogin> userLogins = userLoginRepository.findAll();
+		List<UserDto> userDtos = userLoginMapper.toUserDTOs( userLogins);
+		return userDtos;
 	}
+
 
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
 		UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
-				.orElseThrow(() -> new ResourceNotFoundException("User", "EMailId", loginEmail)	);
+				.orElseThrow(() -> new UsernameNotFoundException(  "EMailId"+ loginEmail + "not found")	);
 		User user = userLogin.getUser();
 
 		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUserId());
-		List<String> roles = userRoleMaps.stream().map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList());
+		List<String> roles = userRoleMaps.stream().filter(urm -> urm.getUserRoleStatus().equalsIgnoreCase("ACTIVE"))
+				                  .map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList()); // only load "Active" Roles
 
 		return UserDetailsImpl.build(user, userLogin, roles);
 	}
@@ -713,12 +739,52 @@ public class UserServices implements UserDetailsService {
 
 		String token = jwtUtils.generateEmailUrlToken(loginEmail);
 		final String url= UriComponentsBuilder.fromHttpUrl(frontendUrl)
-				.path("/reset-password/").queryParam("token", token).toUriString();
+				.path("/reset-password")
+				.queryParam("accAct","yes")
+				.queryParam("token", token).toUriString();
+
 
 		return url;
 
 
 	}
+
+	@Transactional
+	public String updateUserLogin(UserLoginDto updateUserLogin, String userId) throws InvalidDataException {
+		if (userId == null) {
+			throw new InvalidDataException("UserId cannot be blank/null");
+		} else {
+			Optional<User> userById = userRepository.findById(userId);
+			System.out.println("userById"+ userById);
+			if (userById.isEmpty()) {
+				throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
+			} else {
+				Optional<UserLogin> userLogin = userLoginRepository.findByUserUserId(userId);
+				System.out.println("userLogin"+ userLogin);
+
+				if (userLogin == null) {
+					throw new ResourceNotFoundException("UserLogin not found for the UserID: " + userId);
+				} else {
+					// Check for existing user logins with the same email
+					Optional<UserLogin> existingUserLogins = userLoginRepository.findByUserLoginEmailIgnoreCase(updateUserLogin.getUserLoginEmail());
+					System.out.println("existingUserLogins"+ existingUserLogins);
+					// Update the userLoginEmail and userLoginStatus for the current user
+					String userEmailToUpdate = updateUserLogin.getUserLoginEmail();
+					System.out.println("userEmailToUpdate"+ userEmailToUpdate);
+					String userLoginStatusToUpdate = updateUserLogin.getLoginStatus();
+					System.out.println("userLoginStatusToUpdate"+ userLoginStatusToUpdate);
+					if (!existingUserLogins.isEmpty() && !existingUserLogins.get().getUserId().equals(userId)) {
+						// If there are existing user logins, and it's not the current user's login, throw an exception for duplicate email
+						throw new DuplicateResourceFoundException("Failed to update UserLogin as email already exists!");
+					}
+					userLoginRepository.updateUserLogin(userId, userEmailToUpdate ,userLoginStatusToUpdate);
+				}
+			}
+			System.out.println("userId11"+ userId);
+			return "UserLogin updated successfully";
+		}
+	}
+
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {

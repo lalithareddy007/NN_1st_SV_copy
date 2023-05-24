@@ -16,7 +16,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
-@EnableSwagger2
 //@ComponentScan(basePackages="com.ninja.lms")
 @Configuration
 public class LmsServicesApplication {
@@ -28,18 +27,7 @@ public class LmsServicesApplication {
         SpringApplication.run(LmsServicesApplication.class, args);
     }
 
-    @Bean
-    public Docket lmsApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.numpyninja.lms"))
-                .paths(PathSelectors.any())
-                .build();
-
-
-    }
     
-
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {

@@ -8,12 +8,12 @@ spring:
     username: ${DEV_DB_USERNAME}
     password: ${DEV_DB_PASSWORD}
 
-  # configurations specific to SMTP email
-  mail:
+# configurations specific to SMTP email
+mail:
     host: smtp.gmail.com
     port: 587
-    username: numpyninja01@gmail.com
-    password:
+    username: info.numpyninja@gmail.com
+    password: zzpkpsxuoagmurzy
     protocol: smtp
     #properties.mail.smtp:
     smtp:
@@ -25,10 +25,12 @@ app:
   frontend.url: ${FRONTEND_URL_HEROKU}
   #frontend.url: https://lms-frontend.herokuapp.com
 
-  security:
-    app:
-      jwtSecret: lmsAppSecretKeyTest
-      jwtExpirationMs: 28800000  # 28800000 Ms = 8 hours
-      jwtAcctActiveExpMs: 172800000 # 2 days in milli seconds
+security:
+  app:
+    jwtSecret: lmsAppSecretKeyTest
+    jwtExpirationMs: 28800000  # 28800000 Ms = 8 hours
+    jwtAcctActiveExpMs: 172800000 #2 days in milli seconds
+
+
 
 

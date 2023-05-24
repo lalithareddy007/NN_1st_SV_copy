@@ -4,6 +4,10 @@ import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.services.UserLoginService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +16,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/login")
+@Api(tags="User Login Controller", description="User Login Authentication")
 public class UserLoginController {
     private UserLoginService userLoginService;
 
@@ -35,6 +40,7 @@ public class UserLoginController {
     */
 
     @PostMapping("")
+    @ApiOperation("User Sign In")
     public ResponseEntity<JwtResponseDto> signin(@Valid @RequestBody LoginDto loginDto){
         return ResponseEntity.ok(userLoginService.signin( loginDto ));
     }

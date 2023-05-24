@@ -329,6 +329,21 @@ public class AssignmentSubmitService {
         return assignmentSubmitDTOs;
 
    }
+    
+    public List<AssignmentSubmitDTO> getGradesByProgramId(Long programId)
+    {
+    	List <AssignmentSubmit> subAssignment = assignmentSubmitRepository.getGradesByProgramId(programId);
+    		
+    	if(!(subAssignment.size()<=0))
+        {
+        	List <AssignmentSubmitDTO> listOfAssignmentSub = assignmentSubmitMapper.toAssignmentSubmitDTOList(subAssignment);
+        	return listOfAssignmentSub;
+        }
+        else
+        {
+        	throw new ResourceNotFoundException("Submissions for Program Id: "+programId+ " Not found");
+        }
+    }
      	
 
 }
