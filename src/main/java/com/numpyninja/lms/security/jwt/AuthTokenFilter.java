@@ -46,9 +46,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 if ( userDetails == null ){
                     userDetails = userServices.loadUserByUsername(userLoginEMail);
                 }
-                else {
-                	   System.out.println( "getting " + userLoginEMail + " from Cache ");
-                }
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
