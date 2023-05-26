@@ -343,6 +343,7 @@ public class UserServices implements UserDetailsService {
 				throw new DuplicateResourceFoundException("Failed to create new UserLogin as email already exists!");
 			}
 
+
 			userLogin.setUserId(createdUser.getUserId());
 			userLogin.setUser(createdUser);
 			userLogin.setCreationTime(new Timestamp(utilDate.getTime()));
@@ -373,13 +374,10 @@ public class UserServices implements UserDetailsService {
 		{
 			e.printStackTrace();
 		}
+		//Bug was  it was returning userdto object with null value in userlogin email
+		//Bug is fixed it is returning with value in userloginemail.
+		UserDto createdUserdto = userLoginMapper.toUserDto(createdUserLogin);
 
-		// UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);
-
-		// How to return createdUSerRoleDTO
-
-		UserDto createdUserdto = userMapper.userDto(createdUser);
-		// UserRoleDTO createdUserRoleDto = userMapper.userDto(createdUser);
 		return createdUserdto;
 	}
 
