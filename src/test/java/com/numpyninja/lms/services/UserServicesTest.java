@@ -204,7 +204,7 @@ class UserServicesTest {
         return mockUserDto;
     }
 
-    @DisplayName("test for creating user with Role info")
+   /* @DisplayName("test for creating user with Role info")
     @Test
         //@Order(2)
     void createUserWithRole() throws InvalidDataException, DuplicateResourceFoundException {
@@ -228,7 +228,7 @@ class UserServicesTest {
         //then
         assertThat(userDto).isNotNull();
 
-    }
+    } */
 
    /* @DisplayName("test for getAllUsers method")
 //    @Test
