@@ -91,27 +91,6 @@ public class UserServices implements UserDetailsService {
 
     private static final String ROLE_STUDENT = "R03";
 
-	/*public List<UserDto> getAllUsers() {
-		List<User> users = userRepository.findAll();
-		Map<String, String> userLoginEmailMap = new HashMap<>();
-		for (User user : users) {
-			Optional<UserLogin> optionalUserLogin = userLoginRepository.findById(user.getUserId());
-			if (optionalUserLogin.isPresent()) {
-				UserLogin userLogin = optionalUserLogin.get();
-				userLoginEmailMap.put(user.getUserId(), userLogin.getUserLoginEmail());
-			}
-		}
-		List<UserDto> userDtos = userMapper.userDtos(users);
-		for (UserDto userDto : userDtos) {
-			String userLoginEmail = userLoginEmailMap.get(userDto.getUserId());
-			if (userLoginEmail != null) {
-				userDto.setUserLoginEmail(userLoginEmail);
-			}
-		}
-		return userDtos;
-	} */
-
-
     public List<UserDto> getAllUsers() {
         List<UserLogin> userLogins = userLoginRepository.findAll();
         List<UserDto> userDtos = userLoginMapper.toUserDTOs(userLogins);
@@ -175,93 +154,6 @@ public class UserServices implements UserDetailsService {
             userAllDto.setUserPictureSlimDtos(userPictureMapper.toUserPictureSlimDtoList(userPictureEntityList));
 
         return userAllDto;
-    }
-
-    @Transactional
-    public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
-            throws InvalidDataException, DuplicateResourceFoundException {
-        User newUser = null;
-        UserRoleMap newUserRoleMap = null;
-        Role userRole = null;
-        List<UserRoleMap> newUserRoleMapList = null;
-        User createdUser = null;
-        Date utilDate = new Date();
-
-        if (newUserRoleDto != null) {
-
-            /** Checking phone number to prevent duplicate entry **/
-            List<User> userList = userRepository.findAll();
-            if (userList.size() > 0) {
-                boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserRoleDto.getUserPhoneNumber());
-                if (isPhoneNumberExists) {
-                    throw new DuplicateResourceFoundException("Failed to create new User as phone number "
-                            + newUserRoleDto.getUserPhoneNumber() + " already exists !!");
-                }
-            }
-            /** Checking for valid TimeZone **/
-            if (!isTimeZoneValid(newUserRoleDto.getUserTimeZone())) {
-                throw new InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
-            }
-            /** Checking for valid Visa Status **/
-            if (!isVisaStatusValid(newUserRoleDto.getUserVisaStatus())) {
-                throw new InvalidDataException("Failed to create user, as 'Visa Status' is invalid !! ");
-            }
-
-            newUser = userMapper.toUser(newUserRoleDto);
-            // System.out.println("new user " + newUser);
-
-            newUser.setCreationTime(new Timestamp(utilDate.getTime()));
-            newUser.setLastModTime(new Timestamp(utilDate.getTime()));
-
-            /** Creating a new user **/
-            createdUser = userRepository.save(newUser);
-
-            // System.out.println("get USer role maps from newUserRoleDto" +
-            // newUserRoleDto.getUserRoleMaps().toString());
-
-            if (newUserRoleDto.getUserRoleMaps() != null) {
-                for (int i = 0; i < newUserRoleDto.getUserRoleMaps().size(); i++) {
-                    String roleName = null;
-                    String roleId = null;
-                    String roleStatus = null;
-                    String userId = null;
-
-                    // System.out.println(newUserRoleDto.getUserRoleMaps().get(i).getRoleName());
-                    roleId = newUserRoleDto.getUserRoleMaps().get(i).getRoleId();
-                    // System.out.println("roleId " + roleId);
-                    Role roleUser = roleRepository.getById(roleId);
-
-                    roleStatus = newUserRoleDto.getUserRoleMaps().get(i).getUserRoleStatus();
-                    // System.out.println("roleStatus " + roleStatus);
-                    userId = createdUser.getUserId();
-                    // System.out.println("userId " + userId);
-
-                    newUserRoleMapList = userMapper.userRoleMapList(newUserRoleDto.getUserRoleMaps());
-                    newUserRoleMapList.get(i).setUserRoleStatus(roleStatus);
-
-                    newUserRoleMapList.get(i).setUser(createdUser);
-                    newUserRoleMapList.get(i).setRole(roleUser);
-                    newUserRoleMapList.get(i).setCreationTime(new Timestamp(utilDate.getTime()));
-                    newUserRoleMapList.get(i).setLastModTime(new Timestamp(utilDate.getTime()));
-                    UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMapList.get(i));
-
-                }
-            } else {
-                throw new InvalidDataException("User Data not valid - Missing Role information");
-            }
-
-        } else {
-            throw new InvalidDataException("User Data not valid ");
-        }
-
-
-        // UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);
-
-        // How to return createdUSerRoleDTO
-
-        UserDto createdUserdto = userMapper.userDto(createdUser);
-        // UserRoleDTO createdUserRoleDto = userMapper.userDto(createdUser);
-        return createdUserdto;
     }
 
 
@@ -487,7 +379,6 @@ public class UserServices implements UserDetailsService {
                         userRoleMapRepository.updateUserRole(userRoleId, roleStatusToUpdate);
                         break;
                     }
-
                 }
 
                 if (!roleFound) {
@@ -495,10 +386,8 @@ public class UserServices implements UserDetailsService {
                             "RoleID: " + roleIdToUpdate + " not found for the " + "UserID: " + userId);
                 }
             }
-
             return userId;
         }
-
     }
 
     /**
@@ -747,10 +636,7 @@ public class UserServices implements UserDetailsService {
                 .queryParam("accAct", "yes")
                 .queryParam("token", token).toUriString();
 
-
         return url;
-
-
     }
 
     @Transactional
@@ -801,14 +687,6 @@ public class UserServices implements UserDetailsService {
 	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
 
 
-
-
-
-	
-	
-	
-	
-	
 	
 	/**
 	 * Check if the code below this comment are needed or not from front end. - The
