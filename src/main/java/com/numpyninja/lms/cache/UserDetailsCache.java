@@ -18,7 +18,7 @@ public class UserDetailsCache implements UserCache {
     public UserDetailsCache() {
         GuavaCacheManager cacheManager = new GuavaCacheManager();
         cacheManager.setCacheBuilder(CacheBuilder.newBuilder()
-                .expireAfterAccess(8, TimeUnit.HOURS)); // remove Users that have been idle for specified time
+                .expireAfterAccess(2, TimeUnit.HOURS)); // remove Users that have been idle for specified time
 
         userCache = cacheManager.getCache("users");
     }
