@@ -1,5 +1,6 @@
 package com.numpyninja.lms.security;
 
+import com.numpyninja.lms.cache.UserDetailsCache;
 import com.numpyninja.lms.security.jwt.AuthEntryPointJwt;
 import com.numpyninja.lms.security.jwt.AuthTokenFilter;
 import com.numpyninja.lms.services.UserServices;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -25,6 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         jsr250Enabled = true,    // enables @RolesAllowed annotation.
         prePostEnabled = true )  // provides AOP security on methods. It enables @PreAuthorize, @PostAuthorize
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
     UserServices userServices;
 
@@ -61,13 +64,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public UserCache userCache() {
+        return new UserDetailsCache();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()   // CORS is enabled , CSRF is disabled
                 .exceptionHandling()
                 .authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/login").permitAll()
+                .authorizeRequests().antMatchers("/login/**").permitAll()
                 .antMatchers(PUBLIC_URLS).permitAll()
                 .anyRequest().authenticated();        // ”permitAll” will configure the authorization so that all requests are allowed on that particular path ; '/login'
 

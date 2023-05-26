@@ -36,10 +36,6 @@ public class JwtUtils {
 
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
-        /*String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(",")); */    // uncomment if u want to include roles in token
-
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 //.claim( ROLES , authorities)   // uncomment if u want to include roles in token
@@ -68,12 +64,10 @@ public class JwtUtils {
         } catch (IllegalArgumentException e) {
             logger.error("JWT claims string is empty: {}", e.getMessage());
         }
-
         return false;
     }
 
     public String generateEmailUrlToken(String loginEmail){
-
        return  Jwts.builder()
                 .setSubject((loginEmail))
                 //.claim( ROLES , authorities)   // uncomment if u want to include roles in token
@@ -81,56 +75,25 @@ public class JwtUtils {
                 .setExpiration(new Date( (new Date()).getTime() + jwtAcctActiveExpMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
-
     }
 
-    public String validateAccountActivationToken(String token){
-        String validity,errMsg="Invalid";
-
+    public String validateAccountActivationToken(String token) {
+        String validity = "Invalid";
         try {
-         Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-         validity= "Valid";
-
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token); // If the token is not valid, it will throw exception
+            validity = "Valid";  // If the token is valid only, control will come here; else it will land in one of catch block
         } catch (ExpiredJwtException e) {
             logger.error("Expired JWT token: {}", e.getMessage());
-            validity =errMsg;
-
-         } catch (UnsupportedJwtException e) {
+        } catch (UnsupportedJwtException e) {
             logger.error("Unsupported JWT token: {}", e.getMessage());
-            validity =errMsg;
-
-         } catch (MalformedJwtException e) {
+        } catch (MalformedJwtException e) {
             logger.error("MalformedJwtException: {}", e.getMessage());
-            validity =errMsg;
-
-         } catch (SignatureException e) {
+        } catch (SignatureException e) {
             logger.error("SignatureException", e.getMessage());
-            validity =errMsg;
-         } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             logger.error("IllegalArgumentException", e.getMessage());
-            validity =errMsg;
-         }
-
+        }
         return validity;
     }
 
-
-
-
-/*
-    UsernamePasswordAuthenticationToken getAuthenticationToken(final String token, final Authentication existingAuth, final UserDetails userDetails) {
-
-        final JwtParser jwtParser = Jwts.parser().setSigningKey(jwtSecret);
-
-        final Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
-
-        final Claims claims = claimsJws.getBody();
-
-        final Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(ROLES).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
-    } */
 }
