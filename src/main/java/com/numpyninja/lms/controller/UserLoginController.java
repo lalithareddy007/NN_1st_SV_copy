@@ -24,21 +24,6 @@ public class UserLoginController {
         this.userLoginService = userLoginService;
     }
 
-    /*@PostMapping("/authenticate")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserLoginDto uDto){
-        UserLoginDto resUserLoginDto = userLoginService.authenticateUser(uDto);
-        String status = resUserLoginDto.getStatus().toLowerCase();
-        if (status.equals("invalid"))
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        else if ((status.equals("role inactive"))
-                || (status.equals("login inactive"))
-                || (status.equals("role unavailable")))
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        else
-            return ResponseEntity.status(HttpStatus.OK).body(resUserLoginDto);
-    }
-    */
-
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> signin(@Valid @RequestBody LoginDto loginDto){
         return ResponseEntity.ok(userLoginService.signin( loginDto ));
