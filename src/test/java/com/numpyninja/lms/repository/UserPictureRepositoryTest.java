@@ -52,5 +52,7 @@ public class UserPictureRepositoryTest {
 
         // then
         assertNotNull(result);
+
+
     }
 }
