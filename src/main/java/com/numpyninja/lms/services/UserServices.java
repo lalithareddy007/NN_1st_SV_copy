@@ -274,13 +274,13 @@ public class UserServices implements UserDetailsService {
             e.printStackTrace();
         }
 
-        // UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);
 
-        // How to return createdUSerRoleDTO
+        //Bug was  it was returning userdto object with null value in userlogin email
+        //Bug is fixed it is returning with value in userloginemail.
+        UserDto createdUserdto = userLoginMapper.toUserDto(createdUserLogin);
 
-        UserDto createdUserdto = userMapper.userDto(createdUser);
-        // UserRoleDTO createdUserRoleDto = userMapper.userDto(createdUser);
         return createdUserdto;
+
     }
 
     public UserDto updateUser(UserDto updateuserDto, String userId)
