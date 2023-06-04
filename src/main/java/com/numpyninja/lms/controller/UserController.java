@@ -143,6 +143,14 @@ public class UserController {
 		String responseDto = userServices.updateUserLogin(updateUserLogin,userId);
 		return ResponseEntity.status(HttpStatus.OK).body("UserLoginEmail/Status Updated for User: " + userId);
 	}
+	
+	//create user with Role
+	@PostMapping("/users/confirmEmail")
+	@ApiOperation("ForgotPassword Confirm Email")
+	public ResponseEntity<ForgotPasswordResponseDto> forgotPasswordConfirmEmail(@Valid @RequestBody EmailDto emailDto) throws InvalidDataException {
+		ForgotPasswordResponseDto forgotPassResDto = userServices.forgotPasswordConfirmEmail(emailDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(forgotPassResDto);
+	}
 }
 		
 		

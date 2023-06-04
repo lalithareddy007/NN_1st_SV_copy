@@ -87,85 +87,75 @@ public class UserServices implements UserDetailsService {
 
 	private static final String ROLE_STUDENT = "R03";
 
-	/*public List<UserDto> getAllUsers() {
-		List<User> users = userRepository.findAll();
-		Map<String, String> userLoginEmailMap = new HashMap<>();
-		for (User user : users) {
-			Optional<UserLogin> optionalUserLogin = userLoginRepository.findById(user.getUserId());
-			if (optionalUserLogin.isPresent()) {
-				UserLogin userLogin = optionalUserLogin.get();
-				userLoginEmailMap.put(user.getUserId(), userLogin.getUserLoginEmail());
-			}
-		}
-		List<UserDto> userDtos = userMapper.userDtos(users);
-		for (UserDto userDto : userDtos) {
-			String userLoginEmail = userLoginEmailMap.get(userDto.getUserId());
-			if (userLoginEmail != null) {
-				userDto.setUserLoginEmail(userLoginEmail);
-			}
-		}
-		return userDtos;
-	} */
-
+	/*
+	 * public List<UserDto> getAllUsers() { List<User> users =
+	 * userRepository.findAll(); Map<String, String> userLoginEmailMap = new
+	 * HashMap<>(); for (User user : users) { Optional<UserLogin> optionalUserLogin
+	 * = userLoginRepository.findById(user.getUserId()); if
+	 * (optionalUserLogin.isPresent()) { UserLogin userLogin =
+	 * optionalUserLogin.get(); userLoginEmailMap.put(user.getUserId(),
+	 * userLogin.getUserLoginEmail()); } } List<UserDto> userDtos =
+	 * userMapper.userDtos(users); for (UserDto userDto : userDtos) { String
+	 * userLoginEmail = userLoginEmailMap.get(userDto.getUserId()); if
+	 * (userLoginEmail != null) { userDto.setUserLoginEmail(userLoginEmail); } }
+	 * return userDtos; }
+	 */
 
 	public List<UserDto> getAllUsers() {
 		List<UserLogin> userLogins = userLoginRepository.findAll();
-		List<UserDto> userDtos = userLoginMapper.toUserDTOs( userLogins);
+		List<UserDto> userDtos = userLoginMapper.toUserDTOs(userLogins);
 		return userDtos;
 	}
-
 
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String loginEmail) throws UsernameNotFoundException {
 		UserLogin userLogin = userLoginRepository.findByUserLoginEmailIgnoreCase(loginEmail)
-				.orElseThrow(() -> new UsernameNotFoundException(  "EMailId"+ loginEmail + "not found")	);
+				.orElseThrow(() -> new UsernameNotFoundException("EMailId" + loginEmail + "not found"));
 		User user = userLogin.getUser();
 
 		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userLogin.getUserId());
 		List<String> roles = userRoleMaps.stream().filter(urm -> urm.getUserRoleStatus().equalsIgnoreCase("ACTIVE"))
-				                  .map( urm -> urm.getRole().getRoleName()).collect(Collectors.toList()); // only load "Active" Roles
+				.map(urm -> urm.getRole().getRoleName()).collect(Collectors.toList()); // only load "Active" Roles
 
 		return UserDetailsImpl.build(user, userLogin, roles);
 	}
 
-		public UserAllDto getUserInfoById(String userId){
+	public UserAllDto getUserInfoById(String userId) {
 		User existingUser = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
 		List<UserRoleMap> userRoleMaps = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
 
-		UserAllDto userAllDto = UserAllDto.builder()
-				.userDto(userMapper.userDto(existingUser))
-				.userRoleMaps(userMapper.toUserRoleMapSlimDtos(userRoleMaps))
-				.build();
+		UserAllDto userAllDto = UserAllDto.builder().userDto(userMapper.userDto(existingUser))
+				.userRoleMaps(userMapper.toUserRoleMapSlimDtos(userRoleMaps)).build();
 
-		List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository.findByUser_UserId(userId);
-		if(!userRoleProgramBatchMaps.isEmpty()) {
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository
+				.findByUser_UserId(userId);
+		if (!userRoleProgramBatchMaps.isEmpty()) {
 			List<UserProgramBatchSlimDto> userProgramBatchSlimDtoList = new ArrayList<>();
-			Map<Program,List<UserRoleProgramBatchMap>> convertedMap = userRoleProgramBatchMaps.stream()
+			Map<Program, List<UserRoleProgramBatchMap>> convertedMap = userRoleProgramBatchMaps.stream()
 					.collect(Collectors.groupingBy(UserRoleProgramBatchMap::getProgram));
-			for (Map.Entry<Program,List<UserRoleProgramBatchMap>> entrySet : convertedMap.entrySet()) {
+			for (Map.Entry<Program, List<UserRoleProgramBatchMap>> entrySet : convertedMap.entrySet()) {
 				UserProgramBatchSlimDto userProgramBatchSlimDto = UserProgramBatchSlimDto.builder()
-						.programId(entrySet.getKey().getProgramId())
-						.programName(entrySet.getKey().getProgramName())
-						.batchSlimDto(batchMapper.toBatchSlimDtoList(entrySet.getValue()))
-						.build();
+						.programId(entrySet.getKey().getProgramId()).programName(entrySet.getKey().getProgramName())
+						.batchSlimDto(batchMapper.toBatchSlimDtoList(entrySet.getValue())).build();
 				userProgramBatchSlimDtoList.add(userProgramBatchSlimDto);
 			}
 			userAllDto.setUserProgramBatchSlimDtos(userProgramBatchSlimDtoList);
 		}
 
 		List<UserSkill> userSkills = userSkillRepository.findByUserId(userId);
-		if(!userSkills.isEmpty())
+		if (!userSkills.isEmpty())
 			userAllDto.setUserSkillSlimDtos(userSkillMapper.toUserSkillSlimDtoList(userSkills));
 
 		List<UserPictureEntity> userPictureEntityList = userPictureRepository.findByUser_UserId(userId);
-		if(!userPictureEntityList.isEmpty())
+		if (!userPictureEntityList.isEmpty())
 			userAllDto.setUserPictureSlimDtos(userPictureMapper.toUserPictureSlimDtoList(userPictureEntityList));
 
 		return userAllDto;
 	}
+
 	@Transactional
 	public UserDto createUserWithRole(UserAndRoleDTO newUserRoleDto)
 			throws InvalidDataException, DuplicateResourceFoundException {
@@ -243,7 +233,6 @@ public class UserServices implements UserDetailsService {
 			throw new InvalidDataException("User Data not valid ");
 		}
 
-
 		// UserRoleMap createdUserRole = userRoleMapRepository.save(newUserRoleMap);
 
 		// How to return createdUSerRoleDTO
@@ -253,10 +242,9 @@ public class UserServices implements UserDetailsService {
 		return createdUserdto;
 	}
 
-
-
 	@Transactional
-	public UserDto createUserLoginWithRole(UserLoginRoleDTO newUserLoginRoleDto) throws InvalidDataException, DuplicateResourceFoundException {
+	public UserDto createUserLoginWithRole(UserLoginRoleDTO newUserLoginRoleDto)
+			throws InvalidDataException, DuplicateResourceFoundException {
 		User newUser = null;
 		UserRoleMap newUserRoleMap = null;
 		Role userRole = null;
@@ -270,7 +258,8 @@ public class UserServices implements UserDetailsService {
 			/** Checking phone number to prevent duplicate entry **/
 			List<User> userList = userRepository.findAll();
 			if (userList.size() > 0) {
-				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserLoginRoleDto.getUserPhoneNumber());
+				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList,
+						newUserLoginRoleDto.getUserPhoneNumber());
 				if (isPhoneNumberExists) {
 					throw new DuplicateResourceFoundException("Failed to create new User as phone number "
 							+ newUserLoginRoleDto.getUserPhoneNumber() + " already exists !!");
@@ -290,7 +279,6 @@ public class UserServices implements UserDetailsService {
 
 			newUser.setCreationTime(new Timestamp(utilDate.getTime()));
 			newUser.setLastModTime(new Timestamp(utilDate.getTime()));
-
 
 			/** Creating a new user **/
 			createdUser = userRepository.save(newUser);
@@ -326,20 +314,25 @@ public class UserServices implements UserDetailsService {
 		} else {
 			throw new InvalidDataException("User Data not valid ");
 		}
-		//UserLoginEmail
+		// UserLoginEmail
 		if (newUserLoginRoleDto.getUserLogin() != null) {
 			UserLoginDto userLoginDto = newUserLoginRoleDto.getUserLogin();
 			UserLogin userLogin = userMapper.toUserLogin(userLoginDto);
 
 			// Check for existing user logins with the same email
-			Optional<UserLogin> existingUserLogins = userLoginRepository.findByUserLoginEmailIgnoreCase(userLogin.getUserLoginEmail());
+			Optional<UserLogin> existingUserLogins = userLoginRepository
+					.findByUserLoginEmailIgnoreCase(userLogin.getUserLoginEmail());
 
 			if (!existingUserLogins.isEmpty()) {
-				// If there are existing user logins, check if any of them have the same password
-				if (existingUserLogins.stream().anyMatch(existingUserLogin -> existingUserLogin.getPassword().equals(userLogin.getPassword()))) {
-					throw new DuplicateResourceFoundException("Failed to create new UserLogin as email and password combination already exists!");
+				// If there are existing user logins, check if any of them have the same
+				// password
+				if (existingUserLogins.stream().anyMatch(
+						existingUserLogin -> existingUserLogin.getPassword().equals(userLogin.getPassword()))) {
+					throw new DuplicateResourceFoundException(
+							"Failed to create new UserLogin as email and password combination already exists!");
 				}
-				// If none of them have the same password, throw an exception for duplicate email
+				// If none of them have the same password, throw an exception for duplicate
+				// email
 				throw new DuplicateResourceFoundException("Failed to create new UserLogin as email already exists!");
 			}
 
@@ -349,28 +342,25 @@ public class UserServices implements UserDetailsService {
 			userLogin.setLastModTime(new Timestamp(utilDate.getTime()));
 			createdUserLogin = userLoginRepository.save(userLogin);
 
-
 		} else {
 			throw new InvalidDataException("User Data not valid - Email is missing");
 		}
 
-		//sending welcome email after user creation
+		// sending welcome email after user creation
 		try {
 			Map<String, Object> model = new HashMap<>();
 			model.put("firstName", newUserLoginRoleDto.getUserFirstName());
 			model.put("lastName", newUserLoginRoleDto.getUserLastName());
-			//get the url link
+			// get the url link
 			String url = createEmailUrlWithToken(createdUserLogin.getUserLoginEmail());
-			System.out.println("email URL:"+url);
+			System.out.println("email URL:" + url);
 			model.put("regLink", url);
 
-			String emailMessage = emailSender.sendEmailUsingTemplate(new EmailDetails
-					(newUserLoginRoleDto.getUserLogin().getUserLoginEmail(), "", "", "Welcome to Numpy Ninja!", model));
+			String emailMessage = emailSender.sendEmailUsingTemplate(new EmailDetails(
+					newUserLoginRoleDto.getUserLogin().getUserLoginEmail(), "", "", "Welcome to Numpy Ninja!", model));
 			System.out.println(emailMessage);
 
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -406,36 +396,35 @@ public class UserServices implements UserDetailsService {
 				}
 
 				toBeupdatedUser = userMapper.user(updateuserDto);
-				if(StringUtils.hasLength(updateuserDto.getUserLinkedinUrl()))
+				if (StringUtils.hasLength(updateuserDto.getUserLinkedinUrl()))
 					toBeupdatedUser.setUserLinkedinUrl(updateuserDto.getUserLinkedinUrl());
 				else
 					toBeupdatedUser.setUserLinkedinUrl(userById.get().getUserLinkedinUrl());
 
-				if(StringUtils.hasLength(updateuserDto.getUserLocation()))
+				if (StringUtils.hasLength(updateuserDto.getUserLocation()))
 					toBeupdatedUser.setUserLocation(updateuserDto.getUserLocation());
 				else
 					toBeupdatedUser.setUserLocation(userById.get().getUserLocation());
 
-				if(StringUtils.hasLength(updateuserDto.getUserEduPg()))
+				if (StringUtils.hasLength(updateuserDto.getUserEduPg()))
 					toBeupdatedUser.setUserEduPg(updateuserDto.getUserEduPg());
 				else
 					toBeupdatedUser.setUserEduPg(userById.get().getUserEduPg());
 
-				if(StringUtils.hasLength(updateuserDto.getUserEduUg()))
+				if (StringUtils.hasLength(updateuserDto.getUserEduUg()))
 					toBeupdatedUser.setUserEduUg(updateuserDto.getUserEduUg());
 				else
 					toBeupdatedUser.setUserEduUg(userById.get().getUserEduUg());
 
-				if(StringUtils.hasLength(updateuserDto.getUserComments()))
+				if (StringUtils.hasLength(updateuserDto.getUserComments()))
 					toBeupdatedUser.setUserComments(updateuserDto.getUserComments());
 				else
 					toBeupdatedUser.setUserComments(userById.get().getUserComments());
 
-				if(StringUtils.hasLength(updateuserDto.getUserMiddleName()))
+				if (StringUtils.hasLength(updateuserDto.getUserMiddleName()))
 					toBeupdatedUser.setUserMiddleName(updateuserDto.getUserMiddleName());
 				else
 					toBeupdatedUser.setUserMiddleName(userById.get().getUserMiddleName());
-
 
 				toBeupdatedUser.setUserId(userId);
 				toBeupdatedUser.setCreationTime(userById.get().getCreationTime());
@@ -519,18 +508,17 @@ public class UserServices implements UserDetailsService {
 			sb.append(" \n ");
 		});
 
-		if(StringUtils.hasLength(sb)){
+		if (StringUtils.hasLength(sb)) {
 			throw new InvalidDataException(sb.toString());
 		}
 	}
 
 	private void assignUpdateUserRoleProgramBatch(User existingUser, Role existingUserRole, Program existingProgram,
-												  Batch existingBatch, UserRoleProgramBatchSlimDto dto) {
+			Batch existingBatch, UserRoleProgramBatchSlimDto dto) {
 		UserRoleProgramBatchMap userRoleProgramBatchMap;
 		Optional<UserRoleProgramBatchMap> optionalMap = userRoleProgramBatchMapRepository
-				.findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId
-						(existingUser.getUserId(), existingUserRole.getRoleId(),
-								existingProgram.getProgramId(), existingBatch.getBatchId());
+				.findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId(existingUser.getUserId(),
+						existingUserRole.getRoleId(), existingProgram.getProgramId(), existingBatch.getBatchId());
 		if (optionalMap.isEmpty()) {
 			// assign Program/Batch mapping to user
 			userRoleProgramBatchMap = userMapper.toUserRoleProgramBatchMap(dto);
@@ -540,8 +528,7 @@ public class UserServices implements UserDetailsService {
 			userRoleProgramBatchMap.setBatch(existingBatch);
 			userRoleProgramBatchMap.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
 			userRoleProgramBatchMap.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
-		}
-		else {
+		} else {
 			// update existing Program/Batch mapping of user
 			userRoleProgramBatchMap = optionalMap.get();
 			userRoleProgramBatchMap.setUserRoleProgramBatchStatus(dto.getUserRoleProgramBatchStatus());
@@ -551,7 +538,7 @@ public class UserServices implements UserDetailsService {
 	}
 
 	public String assignUpdateUserRoleProgramBatchStatus(UserRoleProgramBatchDto userRoleProgramBatchDto,
-														 String userId) {
+			String userId) {
 
 		Boolean isBatchValid;
 		StringBuffer message = new StringBuffer();
@@ -567,61 +554,67 @@ public class UserServices implements UserDetailsService {
 		Role existingUserRole = roleRepository.findById(roleId)
 				.orElseThrow(() -> new ResourceNotFoundException("Role", "Id", roleId));
 
-		boolean isPresentUserAndRole = userRoleMapRepository.
-				existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(userId, roleId,
+		boolean isPresentUserAndRole = userRoleMapRepository
+				.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(userId, roleId,
 						"Active");
 		if (!isPresentUserAndRole) // Active User-Role mapping should be present
 			throw new ResourceNotFoundException("User", "Role", roleId);
 
 		// Active Program should be present
-		Program existingProgram = programRepository.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(
-						programId, "Active")
+		Program existingProgram = programRepository
+				.findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(programId, "Active")
 				.orElseThrow(() -> new ResourceNotFoundException("Program " + programId, "Program Status", "Active"));
 
-		// User with roleId 'R03' i.e. Student should be assigned to single program/batch
+		// User with roleId 'R03' i.e. Student should be assigned to single
+		// program/batch
 		if (roleProgramBatchList.size() != 1 && ROLE_STUDENT.equals(roleId))
 			throw new InvalidDataException("User with Role " + roleId + " can be assigned to single program/batch");
 
 		int msgCount = 0;
-		for(UserRoleProgramBatchSlimDto dto : roleProgramBatchList) {
+		for (UserRoleProgramBatchSlimDto dto : roleProgramBatchList) {
 
-			//Active Program-Batch mapping should be present
+			// Active Program-Batch mapping should be present
 			Integer batchId = dto.getBatchId();
-			Optional<Batch> optionalBatch = progBatchRepository.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase
-					(batchId, programId, "Active");
+			Optional<Batch> optionalBatch = progBatchRepository
+					.findBatchByBatchIdAndProgram_ProgramIdAndBatchStatusEqualsIgnoreCase(batchId, programId, "Active");
 
-			if(optionalBatch.isPresent())
+			if (optionalBatch.isPresent())
 				isBatchValid = true;
 			else
 				isBatchValid = false;
 
 			if (isBatchValid) {
 				if (ROLE_STUDENT.equals(roleId)) { // Validations only for Student users
-					/* Check for existing assigned program/batch with Active status for given user */
+					/*
+					 * Check for existing assigned program/batch with Active status for given user
+					 */
 					Optional<UserRoleProgramBatchMap> optionalExistingMap = userRoleProgramBatchMapRepository
-							.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase
-									(userId, roleId, "Active");
+							.findByUser_UserIdAndRoleRoleIdAndUserRoleProgramBatchStatusEqualsIgnoreCase(userId, roleId,
+									"Active");
 
 					if (optionalExistingMap.isPresent()) {
 						UserRoleProgramBatchMap existingMap = optionalExistingMap.get();
 						Long existingProgramId = existingMap.getProgram().getProgramId();
 						Integer existingBatchId = existingMap.getBatch().getBatchId();
 
-						/* Check whether received request for another program OR same program with another batch */
+						/*
+						 * Check whether received request for another program OR same program with
+						 * another batch
+						 */
 						if ((existingProgramId != programId) || (existingBatchId != batchId))
-							throw new InvalidDataException
-									("Please deactivate User from existing program/batch and then activate for another program/batch");
+							throw new InvalidDataException(
+									"Please deactivate User from existing program/batch and then activate for another program/batch");
 						else
-							assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
-					}
-					else
-						assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
-				}
-				else
-					assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram, optionalBatch.get(), dto);
-			}
-			else {
-				message.append(String.format("%s not found with %s for %s ","Batch " + batchId, "Status as Active",
+							assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram,
+									optionalBatch.get(), dto);
+					} else
+						assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram,
+								optionalBatch.get(), dto);
+				} else
+					assignUpdateUserRoleProgramBatch(existingUser, existingUserRole, existingProgram,
+							optionalBatch.get(), dto);
+			} else {
+				message.append(String.format("%s not found with %s for %s ", "Batch " + batchId, "Status as Active",
 						"Program " + programId));
 				message.append(" \n ");
 				msgCount++;
@@ -680,72 +673,58 @@ public class UserServices implements UserDetailsService {
 		return isVisaStatusValid;
 	}
 
-	public List<Object> getAllStaff()
-	{
-		List<Object> result=userRepository.getAllStaffList();
-		if(!(result.size()<=0))
-		{
-			//return (userMapper.toUserStaffDTO(result));
+	public List<Object> getAllStaff() {
+		List<Object> result = userRepository.getAllStaffList();
+		if (!(result.size() <= 0)) {
+			// return (userMapper.toUserStaffDTO(result));
 			return result;
-		}else
-		{
+		} else {
 			throw new ResourceNotFoundException("No staff data is available in database");
 		}
 	}
-	
-	
+
 //get users by batchid
 	public List<UserDto> getUserByProgramBatch(Integer batchid) {
-	
-	Batch batch= progBatchRepository.findById(batchid)
-				.orElseThrow(() -> new ResourceNotFoundException("batchid " + batchid + " not found"));
-	
-	List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByBatch_BatchId(batchid);
-	
-	if (userRoleProgramBatchMapList.isEmpty()) 
-	{
-		   throw new ResourceNotFoundException("No Users found for the given Batch ID: " + batchid);
-	}
-	
-	  List<UserDto> userDtoList = userRoleProgramBatchMapList.stream()
-	    .map(UserRoleProgramBatchMap::getUser)
-	    .map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
-	    .collect(Collectors.toList());
 
-	  return userDtoList;
-	
-}
-	
-	
-	
-	
+		Batch batch = progBatchRepository.findById(batchid)
+				.orElseThrow(() -> new ResourceNotFoundException("batchid " + batchid + " not found"));
+
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository
+				.findByBatch_BatchId(batchid);
+
+		if (userRoleProgramBatchMapList.isEmpty()) {
+			throw new ResourceNotFoundException("No Users found for the given Batch ID: " + batchid);
+		}
+
+		List<UserDto> userDtoList = userRoleProgramBatchMapList.stream().map(UserRoleProgramBatchMap::getUser)
+				.map(user -> userMapper.userDtos(Arrays.asList(user)).get(0)).collect(Collectors.toList());
+
+		return userDtoList;
+
+	}
+
 	public List<UserDto> getUsersByProgram(Long programId) {
 		Program program = programRepository.findById(programId)
 				.orElseThrow(() -> new ResourceNotFoundException("programId " + programId + " not found"));
-		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByProgram_ProgramId(programId);
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository
+				.findByProgram_ProgramId(programId);
 		if (userRoleProgramBatchMapList.isEmpty()) {
 			throw new ResourceNotFoundException("No Users found for the given program ID: " + programId);
 		}
-		// Use the UserMapper to directly map each User object to its corresponding UserDto object
-		List<UserDto> userDtoList = userRoleProgramBatchMapList.stream()
-				.map(UserRoleProgramBatchMap::getUser)
-				.map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
-				.collect(Collectors.toList());
+		// Use the UserMapper to directly map each User object to its corresponding
+		// UserDto object
+		List<UserDto> userDtoList = userRoleProgramBatchMapList.stream().map(UserRoleProgramBatchMap::getUser)
+				.map(user -> userMapper.userDtos(Arrays.asList(user)).get(0)).collect(Collectors.toList());
 		return userDtoList;
 	}
 
-
-	public String  createEmailUrlWithToken(String loginEmail){
+	public String createEmailUrlWithToken(String loginEmail) {
 
 		String token = jwtUtils.generateEmailUrlToken(loginEmail);
-		final String url= UriComponentsBuilder.fromHttpUrl(frontendUrl)
-				.path("/reset-password")
-				.queryParam("accAct","yes")
-				.queryParam("token", token).toUriString();
-
+		final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl).path("/reset-password")
+				.queryParam("accAct", "yes").queryParam("token", token).toUriString();
 
 		return url;
-
 
 	}
 
@@ -755,166 +734,199 @@ public class UserServices implements UserDetailsService {
 			throw new InvalidDataException("UserId cannot be blank/null");
 		} else {
 			Optional<User> userById = userRepository.findById(userId);
-			System.out.println("userById"+ userById);
+			System.out.println("userById" + userById);
 			if (userById.isEmpty()) {
 				throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
 			} else {
 				Optional<UserLogin> userLogin = userLoginRepository.findByUserUserId(userId);
-				System.out.println("userLogin"+ userLogin);
+				System.out.println("userLogin" + userLogin);
 
 				if (userLogin == null) {
 					throw new ResourceNotFoundException("UserLogin not found for the UserID: " + userId);
 				} else {
 					// Check for existing user logins with the same email
-					Optional<UserLogin> existingUserLogins = userLoginRepository.findByUserLoginEmailIgnoreCase(updateUserLogin.getUserLoginEmail());
-					System.out.println("existingUserLogins"+ existingUserLogins);
+					Optional<UserLogin> existingUserLogins = userLoginRepository
+							.findByUserLoginEmailIgnoreCase(updateUserLogin.getUserLoginEmail());
+					System.out.println("existingUserLogins" + existingUserLogins);
 					// Update the userLoginEmail and userLoginStatus for the current user
 					String userEmailToUpdate = updateUserLogin.getUserLoginEmail();
-					System.out.println("userEmailToUpdate"+ userEmailToUpdate);
+					System.out.println("userEmailToUpdate" + userEmailToUpdate);
 					String userLoginStatusToUpdate = updateUserLogin.getLoginStatus();
-					System.out.println("userLoginStatusToUpdate"+ userLoginStatusToUpdate);
+					System.out.println("userLoginStatusToUpdate" + userLoginStatusToUpdate);
 					if (!existingUserLogins.isEmpty() && !existingUserLogins.get().getUserId().equals(userId)) {
-						// If there are existing user logins, and it's not the current user's login, throw an exception for duplicate email
-						throw new DuplicateResourceFoundException("Failed to update UserLogin as email already exists!");
+						// If there are existing user logins, and it's not the current user's login,
+						// throw an exception for duplicate email
+						throw new DuplicateResourceFoundException(
+								"Failed to update UserLogin as email already exists!");
 					}
-					userLoginRepository.updateUserLogin(userId, userEmailToUpdate ,userLoginStatusToUpdate);
+					userLoginRepository.updateUserLogin(userId, userEmailToUpdate, userLoginStatusToUpdate);
 				}
 			}
-			System.out.println("userId11"+ userId);
+			System.out.println("userId11" + userId);
 			return "UserLogin updated successfully";
 		}
 	}
 
+	public ForgotPasswordResponseDto forgotPasswordConfirmEmail(EmailDto emailDto) {
+		String userLoginEmail = emailDto.getUserLoginEmailId();
+		Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEmail);
+		ForgotPasswordResponseDto forgotPwdDto = new ForgotPasswordResponseDto();
+		if (userOptional.isPresent()) { // User is present in database
+			UserLogin userLogin = userOptional.get();
+			String userId = userLogin.getUserId();
+            Optional<User> user = userRepository.findById(userId);
+           User userDetails = user.get();
+           
+			if ("active".equalsIgnoreCase(userLogin.getLoginStatus())) {
+				// emailDto.setStatus("active");
+
+				// sending welcome email after user creation
+				try {
+					Map<String, Object> model = new HashMap<>();
+					model.put("firstName", userDetails.getUserFirstName());
+					System.out.println("FirstName"+userDetails.getUserFirstName());
+					model.put("lastName", userDetails.getUserLastName());
+					String token = jwtUtils.generateEmailUrlToken(userLogin.getUserLoginEmail());
+					String url = createEmailUrlConfirmPwdWithToken(userLogin.getUserLoginEmail(), token);
+					System.out.println("email URL:" + url);
+					model.put("regLink", url);
+
+					String emailMessage = emailSender
+							.sendEmailUsingTemplateForgotPassword(new EmailDetails(userLogin.getUserLoginEmail(), "", "",
+									"Please click on link to generate new password", model));
+					System.out.println(emailMessage);
+					forgotPwdDto.setUserLoginEmailId(userLoginEmail);
+					forgotPwdDto.setToken(token);
+					forgotPwdDto.setStatus("Email sent to your registered email Id");
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			} else {
+				forgotPwdDto.setUserLoginEmailId(userLoginEmail);
+				forgotPwdDto.setStatus("login inactive");
+				forgotPwdDto.setToken("null");
+
+			}
+		} else {
+			forgotPwdDto.setUserLoginEmailId("null");
+			forgotPwdDto.setStatus("Invalid Email");
+			forgotPwdDto.setToken("null");
+		}
+
+		return forgotPwdDto;
+	}
+
+	public String createEmailUrlConfirmPwdWithToken(String loginEmail, String token) {
+
+		final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl).path("/reset-password")
+				.queryParam("accAct", "no").queryParam("token", token).toUriString();
+
+		return url;
+
+	}
+	
+		
+	
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
 	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
 	 * { throw new ResourceNotFoundException("User Id " + Id +" not found"); } else
 	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
-
-
-
-
-
-	
-	
-	
-	
-	
-	
-	/**
-	 * Check if the code below this comment are needed or not from front end. - The
-	 * controller endpoints for these are commented out for now.
->>>>>>> LMSPhase2
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * 
+	 * /** Check if the code below this comment are needed or not from front end. -
+	 * The controller endpoints for these are commented out for now. >>>>>>>
+	 * LMSPhase2
 	 */
 
-/*
-	// Displays Users Info with their user status, role
-	public List<UserRoleMap> getAllUsersWithRoles() {
-		// List<UserRoleMap> list = userRoleMapRepository.findAll();
-		return userRoleMapRepository.findAll();
-	}
-	public UserDto createUser(UserDto newUserDto) throws InvalidDataException, DuplicateResourceFoundException {
-		User newUser = null;
-		Date utilDate = new Date();
-		if (newUserDto != null) {
-			List<User> userList = userRepository.findAll();
-			if (userList.size() > 0) {
-				boolean isPhoneNumberExists = checkDuplicatePhoneNumber(userList, newUserDto.getUserPhoneNumber());
-				if (isPhoneNumberExists) {
-					throw new DuplicateResourceFoundException("Failed to create new User as phone number "
-							+ newUserDto.getUserPhoneNumber() + " already exists !!");
-				}
-			}
-			if (!isTimeZoneValid(newUserDto.getUserTimeZone())) {
-				throw new InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
-			}
-			if (!isVisaStatusValid(newUserDto.getUserVisaStatus())) {
-				throw new InvalidDataException("Failed to create user, as 'Visa Status' is invalid !! ");
-			}
-			newUser = userMapper.user(newUserDto);
-			newUser.setCreationTime(new Timestamp(utilDate.getTime()));
-			newUser.setLastModTime(new Timestamp(utilDate.getTime()));
-		} else {
-			throw new InvalidDataException("User Data not valid ");
-		}
-		User createdUser = userRepository.save(newUser);
-		UserDto createdUserdto = userMapper.userDto(createdUser);
-		return createdUserdto;
-	}
-	public List<User> getAllUsersByRole(String roleName) {
-		return userRoleMapRepository.findUserRoleMapsByRoleRoleName(roleName).stream()
-				.map(userRoleMap -> userRoleMap.getUser()).collect(Collectors.toList());
-	}
-	public UserDto updateUserWithRole(UserAndRoleDTO updateUserRoleDto, String userId) throws InvalidDataException {
-		User toBeupdatedUser = null;
-		Date utilDate = new Date();
-		List<UserRoleMap> UpdatedUserRoleMapList = null;
-		if (userId == null) {
-			throw new InvalidDataException("UserId cannot be blank/null");
-		}
-		else {
-			Optional<User> userById = userRepository.findById(userId);
-			// System.out.println("updateUserRoleDto " + updateUserRoleDto);
-			if (userById.isEmpty()) {
-				throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
-			} else {
-				if (!isTimeZoneValid(updateUserRoleDto.getUserTimeZone())) {
-					throw new InvalidDataException("Failed to update user, as 'TimeZone' is invalid !! ");
-				}
-				if (!isVisaStatusValid(updateUserRoleDto.getUserVisaStatus())) {
-					throw new InvalidDataException("Failed to update user, as 'Visa Status' is invalid !! ");
-				}
-				toBeupdatedUser = userMapper.toUser(updateUserRoleDto);
-				toBeupdatedUser.setUserId(userId);
-				toBeupdatedUser.setCreationTime(userById.get().getCreationTime());
-				toBeupdatedUser.setLastModTime(new Timestamp(utilDate.getTime()));
-			}
-			User updatedUser = userRepository.save(toBeupdatedUser);
-			// Update Role Info
-			List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
-			// System.out.println("existingUserRoles " + existingUserRoles);
-			if (existingUserRoles != null) {
-				for (int userRoleCnt = 0; userRoleCnt <= existingUserRoles.size(); userRoleCnt++) {
-					Long existingUserRoleId = existingUserRoles.get(userRoleCnt).getUserRoleId();
-					String existingRoleId = existingUserRoles.get(userRoleCnt).getRole().getRoleId();
-					if (updateUserRoleDto.getUserRoleMaps() != null) {
-						for (int i = 0; i < updateUserRoleDto.getUserRoleMaps().size(); i++) {
-							String roleName = null;
-							String roleId = null;
-							String roleStatus = null;
-							// String userId = null;
-							// System.out.println(newUserRoleDto.getUserRoleMaps().get(i).getRoleName());
-							roleId = updateUserRoleDto.getUserRoleMaps().get(i).getRoleId();
-							// System.out.println("roleId " + roleId);
-							Role roleUser = roleRepository.getById(roleId);
-							// uncommented the below line
-							roleStatus = updateUserRoleDto.getUserRoleMaps().get(i).getUserRoleStatus();
-							System.out.println("roleStatus " + roleStatus);
-							// userId = createdUser.getUserId();
-							// System.out.println("userId " + userId);
-							UpdatedUserRoleMapList = userMapper.userRoleMapList(updateUserRoleDto.getUserRoleMaps());
-							System.out.println("UpdatedUserRoleMapList " + UpdatedUserRoleMapList);
-							if (roleId == existingRoleId) {
-								UpdatedUserRoleMapList.get(i).setUserRoleId(existingUserRoleId);
-							}
-							UpdatedUserRoleMapList.get(i).setUserRoleStatus(roleStatus);
-							UpdatedUserRoleMapList.get(i).setUser(updatedUser);
-							UpdatedUserRoleMapList.get(i).setRole(roleUser);
-							UpdatedUserRoleMapList.get(i).setCreationTime(new Timestamp(utilDate.getTime()));
-							UpdatedUserRoleMapList.get(i).setLastModTime(new Timestamp(utilDate.getTime()));
-							UserRoleMap updatedUserRole = userRoleMapRepository.save(UpdatedUserRoleMapList.get(i));
-						}
-					} else {
-						throw new InvalidDataException("User Data not valid - Missing Role information");
-					}
-				}
-			}
-			UserDto updatedUserDto = userMapper.userDto(updatedUser);
-			return updatedUserDto;
-		}
-	}
-*/
-
+	/*
+	 * // Displays Users Info with their user status, role public List<UserRoleMap>
+	 * getAllUsersWithRoles() { // List<UserRoleMap> list =
+	 * userRoleMapRepository.findAll(); return userRoleMapRepository.findAll(); }
+	 * public UserDto createUser(UserDto newUserDto) throws InvalidDataException,
+	 * DuplicateResourceFoundException { User newUser = null; Date utilDate = new
+	 * Date(); if (newUserDto != null) { List<User> userList =
+	 * userRepository.findAll(); if (userList.size() > 0) { boolean
+	 * isPhoneNumberExists = checkDuplicatePhoneNumber(userList,
+	 * newUserDto.getUserPhoneNumber()); if (isPhoneNumberExists) { throw new
+	 * DuplicateResourceFoundException("Failed to create new User as phone number "
+	 * + newUserDto.getUserPhoneNumber() + " already exists !!"); } } if
+	 * (!isTimeZoneValid(newUserDto.getUserTimeZone())) { throw new
+	 * InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
+	 * } if (!isVisaStatusValid(newUserDto.getUserVisaStatus())) { throw new
+	 * InvalidDataException("Failed to create user, as 'Visa Status' is invalid !! "
+	 * ); } newUser = userMapper.user(newUserDto); newUser.setCreationTime(new
+	 * Timestamp(utilDate.getTime())); newUser.setLastModTime(new
+	 * Timestamp(utilDate.getTime())); } else { throw new
+	 * InvalidDataException("User Data not valid "); } User createdUser =
+	 * userRepository.save(newUser); UserDto createdUserdto =
+	 * userMapper.userDto(createdUser); return createdUserdto; } public List<User>
+	 * getAllUsersByRole(String roleName) { return
+	 * userRoleMapRepository.findUserRoleMapsByRoleRoleName(roleName).stream()
+	 * .map(userRoleMap -> userRoleMap.getUser()).collect(Collectors.toList()); }
+	 * public UserDto updateUserWithRole(UserAndRoleDTO updateUserRoleDto, String
+	 * userId) throws InvalidDataException { User toBeupdatedUser = null; Date
+	 * utilDate = new Date(); List<UserRoleMap> UpdatedUserRoleMapList = null; if
+	 * (userId == null) { throw new
+	 * InvalidDataException("UserId cannot be blank/null"); } else { Optional<User>
+	 * userById = userRepository.findById(userId); //
+	 * System.out.println("updateUserRoleDto " + updateUserRoleDto); if
+	 * (userById.isEmpty()) { throw new ResourceNotFoundException("UserID: " +
+	 * userId + " Not Found"); } else { if
+	 * (!isTimeZoneValid(updateUserRoleDto.getUserTimeZone())) { throw new
+	 * InvalidDataException("Failed to update user, as 'TimeZone' is invalid !! ");
+	 * } if (!isVisaStatusValid(updateUserRoleDto.getUserVisaStatus())) { throw new
+	 * InvalidDataException("Failed to update user, as 'Visa Status' is invalid !! "
+	 * ); } toBeupdatedUser = userMapper.toUser(updateUserRoleDto);
+	 * toBeupdatedUser.setUserId(userId);
+	 * toBeupdatedUser.setCreationTime(userById.get().getCreationTime());
+	 * toBeupdatedUser.setLastModTime(new Timestamp(utilDate.getTime())); } User
+	 * updatedUser = userRepository.save(toBeupdatedUser); // Update Role Info
+	 * List<UserRoleMap> existingUserRoles =
+	 * userRoleMapRepository.findUserRoleMapsByUserUserId(userId); //
+	 * System.out.println("existingUserRoles " + existingUserRoles); if
+	 * (existingUserRoles != null) { for (int userRoleCnt = 0; userRoleCnt <=
+	 * existingUserRoles.size(); userRoleCnt++) { Long existingUserRoleId =
+	 * existingUserRoles.get(userRoleCnt).getUserRoleId(); String existingRoleId =
+	 * existingUserRoles.get(userRoleCnt).getRole().getRoleId(); if
+	 * (updateUserRoleDto.getUserRoleMaps() != null) { for (int i = 0; i <
+	 * updateUserRoleDto.getUserRoleMaps().size(); i++) { String roleName = null;
+	 * String roleId = null; String roleStatus = null; // String userId = null; //
+	 * System.out.println(newUserRoleDto.getUserRoleMaps().get(i).getRoleName());
+	 * roleId = updateUserRoleDto.getUserRoleMaps().get(i).getRoleId(); //
+	 * System.out.println("roleId " + roleId); Role roleUser =
+	 * roleRepository.getById(roleId); // uncommented the below line roleStatus =
+	 * updateUserRoleDto.getUserRoleMaps().get(i).getUserRoleStatus();
+	 * System.out.println("roleStatus " + roleStatus); // userId =
+	 * createdUser.getUserId(); // System.out.println("userId " + userId);
+	 * UpdatedUserRoleMapList =
+	 * userMapper.userRoleMapList(updateUserRoleDto.getUserRoleMaps());
+	 * System.out.println("UpdatedUserRoleMapList " + UpdatedUserRoleMapList); if
+	 * (roleId == existingRoleId) {
+	 * UpdatedUserRoleMapList.get(i).setUserRoleId(existingUserRoleId); }
+	 * UpdatedUserRoleMapList.get(i).setUserRoleStatus(roleStatus);
+	 * UpdatedUserRoleMapList.get(i).setUser(updatedUser);
+	 * UpdatedUserRoleMapList.get(i).setRole(roleUser);
+	 * UpdatedUserRoleMapList.get(i).setCreationTime(new
+	 * Timestamp(utilDate.getTime()));
+	 * UpdatedUserRoleMapList.get(i).setLastModTime(new
+	 * Timestamp(utilDate.getTime())); UserRoleMap updatedUserRole =
+	 * userRoleMapRepository.save(UpdatedUserRoleMapList.get(i)); } } else { throw
+	 * new InvalidDataException("User Data not valid - Missing Role information"); }
+	 * } } UserDto updatedUserDto = userMapper.userDto(updatedUser); return
+	 * updatedUserDto; } }
+	 */
 
 }

@@ -31,7 +31,11 @@ public class JwtUtils {
 
     @Value("${security.app.jwtAcctActiveExpMs}")
     private int jwtAcctActiveExpMs;
-
+    
+    @Value("${security.app.jwtAcctActiveExpMs}")
+    private int jwtForgotPasswordExpMs;
+    
+    
     public String generateJwtToken(Authentication authentication) {
 
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
@@ -114,7 +118,15 @@ public class JwtUtils {
         return validity;
     }
 
-
+    public String generateJwtTokenForgotPwd(String  emailId)
+    {
+    	   return Jwts.builder()
+                   .setSubject(emailId)
+                   .setIssuedAt(new Date())
+                   .setExpiration(new Date((new Date()).getTime() + jwtForgotPasswordExpMs))
+                   .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                   .compact();
+    }
 
 
 /*
