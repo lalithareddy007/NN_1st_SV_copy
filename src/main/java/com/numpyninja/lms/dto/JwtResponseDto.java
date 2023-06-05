@@ -19,6 +19,7 @@ public class JwtResponseDto {
 
     private String email;
     private List<String> roles;
+    private String status;
 
     public JwtResponseDto(String accessToken, String userId, String email, List<String> roles) {
         this.token = accessToken;
