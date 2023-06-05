@@ -86,6 +86,36 @@ public class EmailSender{
 
         return emailSuccessMsg;
     }
+    
+    
+    public String sendEmailUsingTemplateForgotPassword(EmailDetails emailDetails)
+			throws MessagingException, TemplateException, IOException {
+		try {
+			MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+			Map<String, Object> model = emailDetails.getModel();
+
+			Template t = freeMarkerConfigurer.getTemplate("ConfirmEmail.ftl");
+			String htmlEmail = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
+
+			mimeMessageHelper.setTo(emailDetails.getRecipient());
+			mimeMessageHelper.setSubject(emailDetails.getSubject());
+
+			if (!emailDetails.getCc().isEmpty())
+				mimeMessageHelper.setCc(emailDetails.getCc());
+
+			mimeMessageHelper.setText(htmlEmail, true);
+
+			System.out.println(javaMailSender.toString());
+			javaMailSender.send(mimeMessageHelper.getMimeMessage());
+		} catch (MessagingException | TemplateException | IOException e) {
+			System.out.println("Exception while sending email:" + e);
+			e.printStackTrace();
+			return "Email could not be delivered!";
+		}
+
+		return emailSuccessMsg;
+	}
 
 
 }
