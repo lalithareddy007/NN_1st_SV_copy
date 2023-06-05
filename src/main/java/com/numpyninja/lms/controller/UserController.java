@@ -147,8 +147,8 @@ public class UserController {
 	//create user with Role
 	@PostMapping("/users/confirmEmail")
 	@ApiOperation("ForgotPassword Confirm Email")
-	public ResponseEntity<ForgotPasswordResponseDto> forgotPasswordConfirmEmail(@Valid @RequestBody EmailDto emailDto) throws InvalidDataException {
-		ForgotPasswordResponseDto forgotPassResDto = userServices.forgotPasswordConfirmEmail(emailDto);
+	public ResponseEntity<JwtResponseDto> forgotPasswordConfirmEmail(@Valid @RequestBody EmailDto userLoginEmail) throws InvalidDataException {
+		JwtResponseDto forgotPassResDto = userServices.forgotPasswordConfirmEmail(userLoginEmail);
 		return ResponseEntity.status(HttpStatus.CREATED).body(forgotPassResDto);
 	}
 }

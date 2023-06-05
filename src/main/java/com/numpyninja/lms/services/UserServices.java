@@ -767,10 +767,10 @@ public class UserServices implements UserDetailsService {
 		}
 	}
 
-	public ForgotPasswordResponseDto forgotPasswordConfirmEmail(EmailDto emailDto) {
+	public JwtResponseDto forgotPasswordConfirmEmail(EmailDto emailDto) {
 		String userLoginEmail = emailDto.getUserLoginEmailId();
 		Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEmail);
-		ForgotPasswordResponseDto forgotPwdDto = new ForgotPasswordResponseDto();
+		JwtResponseDto forgotPwdDto = new JwtResponseDto();
 		if (userOptional.isPresent()) { // User is present in database
 			UserLogin userLogin = userOptional.get();
 			String userId = userLogin.getUserId();
@@ -786,7 +786,7 @@ public class UserServices implements UserDetailsService {
 					model.put("firstName", userDetails.getUserFirstName());
 					System.out.println("FirstName"+userDetails.getUserFirstName());
 					model.put("lastName", userDetails.getUserLastName());
-					String token = jwtUtils.generateEmailUrlToken(userLogin.getUserLoginEmail());
+					String token = jwtUtils.generateJwtTokenForgotPwd(userLogin.getUserLoginEmail());
 					String url = createEmailUrlConfirmPwdWithToken(userLogin.getUserLoginEmail(), token);
 					System.out.println("email URL:" + url);
 					model.put("regLink", url);
@@ -795,7 +795,7 @@ public class UserServices implements UserDetailsService {
 							.sendEmailUsingTemplateForgotPassword(new EmailDetails(userLogin.getUserLoginEmail(), "", "",
 									"Please click on link to generate new password", model));
 					System.out.println(emailMessage);
-					forgotPwdDto.setUserLoginEmailId(userLoginEmail);
+					forgotPwdDto.setEmail(userLoginEmail);
 					forgotPwdDto.setToken(token);
 					forgotPwdDto.setStatus("Email sent to your registered email Id");
 
@@ -804,13 +804,13 @@ public class UserServices implements UserDetailsService {
 				}
 
 			} else {
-				forgotPwdDto.setUserLoginEmailId(userLoginEmail);
+				forgotPwdDto.setEmail(userLoginEmail);
 				forgotPwdDto.setStatus("login inactive");
 				forgotPwdDto.setToken("null");
 
 			}
 		} else {
-			forgotPwdDto.setUserLoginEmailId("null");
+			forgotPwdDto.setEmail(userLoginEmail);
 			forgotPwdDto.setStatus("Invalid Email");
 			forgotPwdDto.setToken("null");
 		}
@@ -821,7 +821,7 @@ public class UserServices implements UserDetailsService {
 	public String createEmailUrlConfirmPwdWithToken(String loginEmail, String token) {
 
 		final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl).path("/reset-password")
-				.queryParam("accAct", "no").queryParam("token", token).toUriString();
+				.queryParam("token", token).toUriString();
 
 		return url;
 
