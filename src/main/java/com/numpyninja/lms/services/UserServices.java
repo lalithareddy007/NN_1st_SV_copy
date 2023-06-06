@@ -247,6 +247,8 @@ public class UserServices implements UserDetailsService {
 
             userLogin.setUserId(createdUser.getUserId());
             userLogin.setUser(createdUser);
+            //setting password as blank as first time user with login creation does not have password
+            userLogin.setPassword("");
             userLogin.setCreationTime(new Timestamp(utilDate.getTime()));
             userLogin.setLastModTime(new Timestamp(utilDate.getTime()));
             createdUserLogin = userLoginRepository.save(userLogin);

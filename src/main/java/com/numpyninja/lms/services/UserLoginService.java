@@ -2,29 +2,21 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
-import com.numpyninja.lms.dto.UserLoginDto;
+import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserLogin;
-import com.numpyninja.lms.entity.UserRoleMap;
-import com.numpyninja.lms.exception.InvalidDataException;
-import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.repository.UserLoginRepository;
+import com.numpyninja.lms.repository.UserRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
 import com.numpyninja.lms.security.UserDetailsImpl;
-import com.numpyninja.lms.security.jwt.AuthTokenFilter;
 import com.numpyninja.lms.security.jwt.JwtUtils;
-import io.jsonwebtoken.*;
-import org.springframework.beans.PropertyBatchUpdateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,6 +30,8 @@ import org.springframework.util.StringUtils;
 public class UserLoginService {
     private UserLoginRepository userLoginRepository;
     private UserRoleMapRepository userRoleMapRepository;
+
+    private UserRepository userRepository;
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
@@ -46,6 +40,8 @@ public class UserLoginService {
     JwtUtils jwtUtils;
     @Autowired
     private UserCache userCache;
+
+
 
     public UserLoginService(UserLoginRepository userLoginRepository,
                             UserRoleMapRepository userRoleMapRepository) {
@@ -140,8 +136,9 @@ public class UserLoginService {
         String validity = jwtUtils.validateAccountActivationToken(tokenparse);
 
         //checking if its first login or account already exist
+        String userLoginEMail = null;
         if (validity.equalsIgnoreCase("Valid")) {
-            String userLoginEMail = jwtUtils.getUserNameFromJwtToken(tokenparse);
+            userLoginEMail = jwtUtils.getUserNameFromJwtToken(tokenparse);
             Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEMail);
             if (userOptional.isPresent()) { // User is present in database
                 UserLogin userLogin = userOptional.get();
@@ -153,7 +150,40 @@ public class UserLoginService {
                 }
             }
         }
-        return validity;
+       // Front end will send this emailid with password when they click
+        // submit button on reset password page
+        return userLoginEMail;
+        // return validity;
+    }
+
+    public String resetPassword(LoginDto loginDto,String token) {
+          String status ="inactive";
+        //check if token is valid and return valid_email to front end
+            String valid_email = validateTokenAtAccountActivation(token);
+
+            //after clicking on resetlink or forgot password or change password
+           // Front end will send the email and new password to be saved in db
+            String Password = loginDto.getPassword();
+            String userLoginEmail = loginDto.getUserLoginEmailId();
+
+        Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEmail);
+        // encrypt password
+        String encryptedPassword =  encoder.encode(Password);
+
+        if (userOptional.isPresent()) { // User is present in database
+            UserLogin userLogin = userOptional.get();
+           // String userId = userLogin.getUserId();
+//            //email returned from validation token is same as one sent by dto
+//            if(!valid_email.equalsIgnoreCase(userLoginEmail))
+//                return "email not valid or not present in DB";
+          //  else
+
+                userLogin.setPassword(encryptedPassword);
+                userLogin.setLoginStatus("active");
+                userLoginRepository.save(userLogin);
+                status = "activated";
+        }
+        return status;
     }
 }
 
