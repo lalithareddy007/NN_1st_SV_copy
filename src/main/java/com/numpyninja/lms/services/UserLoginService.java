@@ -148,6 +148,10 @@ public class UserLoginService {
                 if (!password.isEmpty()) {
                     validity = "acctActivated";
                 }
+                    else {
+                    validity = "firstLogin";
+
+                }
             }
         }
        // Front end will send this emailid with password when they click
