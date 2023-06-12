@@ -73,12 +73,12 @@ public class UserLoginController {
 
     @PostMapping("/resetPassowrd")
     public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody LoginDto logindto,
-                                                     @RequestHeader(value = "Authorization") String token)
-    {
-        String status = this.userLoginService.resetPassword(logindto,token);
-       if(status.equalsIgnoreCase("activated"))
-           return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
-           else
-           return new ResponseEntity<ApiResponse>(new ApiResponse(status, false), HttpStatus.BAD_REQUEST);
+                                                     @RequestHeader(value = "Authorization") String token) {
+        String status = this.userLoginService.resetPassword(logindto, token);
+        if (status.equalsIgnoreCase("Password saved"))
+            return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
+        else if (status.equalsIgnoreCase("Invalid"))
+            return new ResponseEntity<ApiResponse>(new ApiResponse(status, false), HttpStatus.BAD_REQUEST);
+        return null;
     }
 }
