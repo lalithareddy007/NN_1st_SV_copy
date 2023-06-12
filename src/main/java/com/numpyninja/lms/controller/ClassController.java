@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -31,6 +32,7 @@ public class ClassController {
 	//createClass
 	@PostMapping(path="/CreateClassSchedule",consumes = "application/json", produces = "application/json")  
 	@ResponseBody
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Create new Class")
 	private ResponseEntity<ClassDto> createAndSaveClass(@Valid @RequestBody ClassDto classDTO)throws DuplicateResourceFoundException
 	{  
@@ -99,6 +101,7 @@ public class ClassController {
 	//Update Class Schedule by Id
 	@PutMapping(path="updateClass/{classId}", consumes = "application/json", produces = "application/json")  
 	@ResponseBody
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Update Class Schedule by Class ID")
 	private ResponseEntity <ClassDto> updateClassScheduleById(@PathVariable @NotBlank @Positive Long classId ,@Valid @RequestBody ClassDto modifyClassSchedule) throws ResourceNotFoundException
 	{  
@@ -108,6 +111,7 @@ public class ClassController {
 	//DeleteClassById
 	@DeleteMapping(path="deletebyClass/{classId}",produces = "application/json")  
 	@ResponseBody
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Delete Class by Class ID")
 	private ResponseEntity<?>  deleteByClassId(@PathVariable("classId")@NotBlank @Positive Long classId) throws ResourceNotFoundException  
 	{  
@@ -123,6 +127,7 @@ public class ClassController {
 	////Update Class Recording by ClassId
 	@PutMapping(path="updateClassrecording/{classId}", consumes = "application/json", produces = "application/json")  
 	@ResponseBody
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Update Class Recordings By Class ID")
 	private ResponseEntity <ClassDto> updateClassRecordingByClassId(@PathVariable @NotBlank @Positive Long classId ,@Valid @RequestBody ClassRecordingDTO classRecordingDTO) throws ResourceNotFoundException
 	{  
