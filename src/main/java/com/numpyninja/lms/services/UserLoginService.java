@@ -137,7 +137,7 @@ public class UserLoginService {
             tokenparse = token.substring(7, token.length());
         }
         String validity = jwtUtils.validateAccountActivationToken(tokenparse);
-        //checking if its first login or account already exist
+        //checking if its first login or account activated already
         String userLoginEMail = null;
         if (validity.equalsIgnoreCase("Valid")) {
             userLoginEMail = jwtUtils.getUserNameFromJwtToken(tokenparse);
@@ -146,24 +146,16 @@ public class UserLoginService {
                 UserLogin userLogin = userOptional.get();
                 String password = userLogin.getPassword();
                 //if password is present in table for forgot/reset password
-                if (!password.isEmpty())
-                {
-                    validity = "acctActivated Already ";
+                if (!password.isEmpty()){   // Presence of password means, Token is valid, but Account is already Activated
+                    validity = "acctActivated already";
                 }
-                else
-                {
-                    validity = "first-login";
-                }
-
+                else return userLoginEMail;
+                // Token is valid, account is not already activated
+                // we shd send the email to FrontEnd, they will store it and when user types in new password, and click submit
+                // they will sendback the emailid with password to /resetPassword endpoint.
             }
         }
-        else
-        if(validity.equalsIgnoreCase("Invalid")){
-            validity = "Invalid token /expired token";
-            return validity;
-        }
-        return userLoginEMail;// Front end will send this emailid with password when they click
-                              // submit button on reset password page
+        return validity;
     }
 
 

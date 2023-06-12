@@ -61,26 +61,14 @@ public class UserLoginController {
     @GetMapping("/login/AccountActivation")
     public ResponseEntity<ApiResponse> validateAccountActToken(
             @RequestHeader(value = "Authorization") String token) {
-//        String status = this.userLoginService.validateTokenAtAccountActivation(token);
-//
-//        if (status.equalsIgnoreCase("Valid"))
-//            return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
-//        else if (status.equalsIgnoreCase("Invalid"))
-//            return new ResponseEntity<ApiResponse>(new ApiResponse(status, false), HttpStatus.BAD_REQUEST);
-//        else if (status.equalsIgnoreCase("acctActivated"))
-//            return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
-//
-//        return null;
+        String validity = this.userLoginService.validateTokenAtAccountActivation(token);
 
-        String email = this.userLoginService.validateTokenAtAccountActivation(token);
-
-        if(email.isEmpty())
-            return new ResponseEntity<ApiResponse>(new ApiResponse("Invalid token/email is empty"+email, false), HttpStatus.BAD_REQUEST);
-        else if(email.equalsIgnoreCase("Invalid"))
-            return new ResponseEntity<ApiResponse>(new ApiResponse("Token Expired/Invalid token", false), HttpStatus.BAD_REQUEST);
-        else if(!email.isEmpty())
-            return new ResponseEntity<ApiResponse>(new ApiResponse("Valid token/token present for "+email  , true), HttpStatus.OK);
-        return null;
+        if(validity.equalsIgnoreCase("Invalid"))
+            return new ResponseEntity<ApiResponse>(new ApiResponse("Invalid/Expired Token", false), HttpStatus.BAD_REQUEST);
+        else if(validity.equalsIgnoreCase("acctActivated already"))
+            return new ResponseEntity<ApiResponse>(new ApiResponse(validity, false), HttpStatus.BAD_REQUEST);
+        else
+            return new ResponseEntity<ApiResponse>(new ApiResponse(validity, true), HttpStatus.OK); // validity has email id in this case
     }
 
     @PostMapping("/resetPassowrd")
