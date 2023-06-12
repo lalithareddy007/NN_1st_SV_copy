@@ -98,7 +98,8 @@ public class UserLoginControllerTest extends AbstractTestController {
 //       //then
 //        response.andDo(print()).andExpect(status().isOk());
 //        //response.andExpect(jsonPath("token", is(jwtResponseDto.getToken())))
-//          //      .andExpect(jsonPath("email", is(jwtResponseDto.getEmail())))
+//          //      .andExpect(jsonPath("email
+//          ", is(jwtResponseDto.getEmail())))
 //            //    .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
 //    }
 

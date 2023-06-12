@@ -2,6 +2,7 @@ package com.numpyninja.lms.controller;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,7 @@ public class AttendanceController{
 	}
 
 	@DeleteMapping(path = "/{id}")
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Delete Attendance")
 	public ResponseEntity<String> deleteAttendance(@PathVariable Long id) {
 		attendanceServices.deleteAttendance(id);
@@ -81,6 +83,7 @@ public class AttendanceController{
 	}
 
 	@PostMapping(path = "", consumes = "application/json", produces = "application/json")
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Create new Attendance")
 	public ResponseEntity<AttendanceDto> createAttendance(@Valid @RequestBody AttendanceDto attendanceDto) {
 		AttendanceDto newAttendance = attendanceServices.createAttendance(attendanceDto);
@@ -89,6 +92,7 @@ public class AttendanceController{
 
 	// update an Attendance
 	@PutMapping(path="/{id}",consumes = "application/json", produces = "application/json")
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Update Attendance")
 	public ResponseEntity<AttendanceDto> updateAttendance(@RequestBody AttendanceDto attendanceDto,
 			@PathVariable Long id) {
