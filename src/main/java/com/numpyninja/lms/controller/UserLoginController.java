@@ -71,12 +71,16 @@ public class UserLoginController {
 //            return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
 //
 //        return null;
+
         String email = this.userLoginService.validateTokenAtAccountActivation(token);
 
         if(email.isEmpty())
-            return new ResponseEntity<ApiResponse>(new ApiResponse(email, false), HttpStatus.BAD_REQUEST);
-        else
-            return new ResponseEntity<ApiResponse>(new ApiResponse(email, true), HttpStatus.OK);
+            return new ResponseEntity<ApiResponse>(new ApiResponse("Invalid token/email is empty"+email, false), HttpStatus.BAD_REQUEST);
+        else if(email.equalsIgnoreCase("Invalid"))
+            return new ResponseEntity<ApiResponse>(new ApiResponse("Token Expired/Invalid token", false), HttpStatus.BAD_REQUEST);
+        else if(!email.isEmpty())
+            return new ResponseEntity<ApiResponse>(new ApiResponse("Valid token/token present for "+email  , true), HttpStatus.OK);
+        return null;
     }
 
     @PostMapping("/resetPassowrd")
