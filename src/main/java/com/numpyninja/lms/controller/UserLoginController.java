@@ -13,10 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserCache;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.validation.Valid;
 
@@ -64,15 +61,24 @@ public class UserLoginController {
     @GetMapping("/login/AccountActivation")
     public ResponseEntity<ApiResponse> validateAccountActToken(
             @RequestHeader(value = "Authorization") String token) {
-        String status = this.userLoginService.validateTokenAtAccountActivation(token);
+        String validity = this.userLoginService.validateTokenAtAccountActivation(token);
 
-        if (status.equalsIgnoreCase("Valid"))
+        if(validity.equalsIgnoreCase("Invalid"))
+            return new ResponseEntity<ApiResponse>(new ApiResponse("Invalid/Expired Token", false), HttpStatus.BAD_REQUEST);
+        else if(validity.equalsIgnoreCase("acctActivated already"))
+            return new ResponseEntity<ApiResponse>(new ApiResponse(validity, false), HttpStatus.BAD_REQUEST);
+        else
+            return new ResponseEntity<ApiResponse>(new ApiResponse(validity, true), HttpStatus.OK); // validity has email id in this case
+    }
+
+    @PostMapping("/resetPassowrd")
+    public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody LoginDto logindto,
+                                                     @RequestHeader(value = "Authorization") String token) {
+        String status = this.userLoginService.resetPassword(logindto, token);
+        if (status.equalsIgnoreCase("Password saved"))
             return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
         else if (status.equalsIgnoreCase("Invalid"))
             return new ResponseEntity<ApiResponse>(new ApiResponse(status, false), HttpStatus.BAD_REQUEST);
-        else if (status.equalsIgnoreCase("acctActivated"))
-            return new ResponseEntity<ApiResponse>(new ApiResponse(status, true), HttpStatus.OK);
-
         return null;
     }
 }
