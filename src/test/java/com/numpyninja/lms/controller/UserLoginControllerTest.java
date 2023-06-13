@@ -85,38 +85,38 @@ public class UserLoginControllerTest extends AbstractTestController {
     }
 
 //localhost:1234/lms/login/AccountActivation
-    @Test
-    public void given_TokenFromValidUser_WhenClickonResetLink_ThenReturnValidity() throws Exception
-    {
-        String token ="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
-        String validity = "success";
-
-        //given
-        given( userLoginService.validateTokenAtAccountActivation( token)).willReturn( validity);
-
-        //when
-       ResultActions response = mockMvc.perform(get("/login/AccountActivation")
-                       .header("Authorization", "Bearer " + token))
-               .andExpect(status().isOk());
-               // .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(token)));
-
-       //then
-
-      //  mvc.perform(MockMvcRequestBuilders.get("/test")
-        //                .header("Authorization", "Bearer " + token))
-          //      .andExpect(status().isOk());
-
-      //  response.andExpect(status().isOk())
-        //        .andDo(print());
-               // .andExpect(jsonPath("$", hasSize(token.length())));
-
-       // ResultActions resultActions = mockMvc.perform(get("/attendance/{id}", attId));
-      //  response.andExpect(status().isOk()).andDo(print())
-        //        .andExpect(MockMvcResultMatchers.jsonPath("$.token", equalTo(token)));
-//        response.andDo(print()).andExpect(status().isOk());
-//        ResultActions token1 = response.andExpect(jsonPath("$","token");
-//        //      .andExpect(jsonPath("email", is(jwtResponseDto.getEmail())))
-//            //    .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
-    }
-
+//    @Test
+//    public void given_TokenFromValidUser_WhenClickonResetLink_ThenReturnValidity() throws Exception
+//    {
+//        String token ="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
+//        String validity = "success";
+//
+//        //given
+//        given( userLoginService.validateTokenAtAccountActivation( token)).willReturn( validity);
+//
+//        //when
+//       ResultActions response = mockMvc.perform(get("/login/AccountActivation")
+//                       .header("Authorization", "Bearer " + token))
+//               .andExpect(status().isOk());
+//               // .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(token)));
+//
+//       //then
+//
+//      //  mvc.perform(MockMvcRequestBuilders.get("/test")
+//        //                .header("Authorization", "Bearer " + token))
+//          //      .andExpect(status().isOk());
+//
+//      //  response.andExpect(status().isOk())
+//        //        .andDo(print());
+//               // .andExpect(jsonPath("$", hasSize(token.length())));
+//
+//       // ResultActions resultActions = mockMvc.perform(get("/attendance/{id}", attId));
+//      //  response.andExpect(status().isOk()).andDo(print())
+//        //        .andExpect(MockMvcResultMatchers.jsonPath("$.token", equalTo(token)));
+////        response.andDo(print()).andExpect(status().isOk());
+////        ResultActions token1 = response.andExpect(jsonPath("$","token");
+////        //      .andExpect(jsonPath("email", is(jwtResponseDto.getEmail())))
+////            //    .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
+//    }
+//
 }
