@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,26 +84,47 @@ public class UserLoginControllerTest extends AbstractTestController {
                 .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
     }
 
-////localhost:1234/lms/login/AccountActivation
+//localhost:1234/lms/login/AccountActivation
 //    @Test
-//    public void given_TokenFromValidUser_WhenClickonResetLink_ThenReturnApiResponse() throws Exception
+//    public void given_TokenFromValidUser_WhenClickonResetLink_ThenReturnValidity() throws Exception
 //    {
 //        String token ="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
-//        String Apiresponse = "success";
+//        String validity = "success";
 //
 //        //given
-//        given( userLoginService.validateTokenAtAccountActivation( token)).willReturn( Apiresponse);
+//        given( userLoginService.validateTokenAtAccountActivation( token)).willReturn( validity);
 //
 //        //when
 //       ResultActions response = mockMvc.perform(get("/login/AccountActivation")
-//                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(token)));
+//                       .header("Authorization", "Bearer " + token))
+//               .andExpect(status().isOk());
+//               // .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(token)));
 //
 //       //then
+
 //        response.andDo(print()).andExpect(status().isOk());
 //        //response.andExpect(jsonPath("token", is(jwtResponseDto.getToken())))
 //          //      .andExpect(jsonPath("email
 //          ", is(jwtResponseDto.getEmail())))
 //            //    .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
-//    }
 
+//
+//      //  mvc.perform(MockMvcRequestBuilders.get("/test")
+//        //                .header("Authorization", "Bearer " + token))
+//          //      .andExpect(status().isOk());
+//
+//      //  response.andExpect(status().isOk())
+//        //        .andDo(print());
+//               // .andExpect(jsonPath("$", hasSize(token.length())));
+//
+//       // ResultActions resultActions = mockMvc.perform(get("/attendance/{id}", attId));
+//      //  response.andExpect(status().isOk()).andDo(print())
+//        //        .andExpect(MockMvcResultMatchers.jsonPath("$.token", equalTo(token)));
+////        response.andDo(print()).andExpect(status().isOk());
+////        ResultActions token1 = response.andExpect(jsonPath("$","token");
+////        //      .andExpect(jsonPath("email", is(jwtResponseDto.getEmail())))
+////            //    .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
+
+//    }
+//
 }

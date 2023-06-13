@@ -10,6 +10,7 @@ import com.numpyninja.lms.repository.UserRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
 import com.numpyninja.lms.security.UserDetailsImpl;
 import com.numpyninja.lms.security.jwt.JwtUtils;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserCache;
@@ -137,7 +138,7 @@ public class UserLoginService {
             tokenparse = token.substring(7, token.length());
         }
         String validity = jwtUtils.validateAccountActivationToken(tokenparse);
-        //checking if its first login or account already exist
+        //checking if its first login or account activated already
         String userLoginEMail = null;
         if (validity.equalsIgnoreCase("Valid")) {
             userLoginEMail = jwtUtils.getUserNameFromJwtToken(tokenparse);
@@ -146,51 +147,48 @@ public class UserLoginService {
                 UserLogin userLogin = userOptional.get();
                 String password = userLogin.getPassword();
                 //if password is present in table for forgot/reset password
-                if (!password.isEmpty())
-                {
-                    validity = "acctActivated Already ";
+                if (!password.isEmpty()){   // Presence of password means, Token is valid, but Account is already Activated
+                    validity = "acctActivated already";
                 }
-                else
-                {
-                    validity = "first-login";
-                }
-
+                else return userLoginEMail;
+                // Token is valid, account is not already activated
+                // we shd send the email to FrontEnd, they will store it and when user types in new password, and click submit
+                // they will sendback the emailid with password to /resetPassword endpoint.
             }
         }
-        else
-        if(validity.equalsIgnoreCase("Invalid")){
-            validity = "Invalid token /expired token";
-            return validity;
-        }
-        return userLoginEMail;// Front end will send this emailid with password when they click
-                              // submit button on reset password page
+        return validity;
     }
 
 
 
 
-   //changePassword or forgotPassword or resetPassword_firstLogin calls this method
+   //Regular users changePassword or forgotPassword or resetPassword_accountActivation calls this method
     public String resetPassword(LoginDto loginDto,String token) {
-          String status ="inactive";
-        //check if token is valid and return valid_email to front end
-            String valid_email = validateTokenAtAccountActivation(token);
-            if(valid_email.isEmpty())
-                throw new ResourceNotFoundException("Email does not exist for this token or invalid token : "+valid_email);
-            //after clicking on resetlink or forgot password or change password
-           // Front end will send the email and new password to be saved in db
-            String password = loginDto.getPassword();
-           // encrypt password
-            String encryptedPassword =  encoder.encode(password);
+        String status = "Invalid";
+        String tokenparse = null;
 
-            String userLoginEmail = loginDto.getUserLoginEmailId();
-            Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEmail);
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            tokenparse = token.substring(7, token.length());
+        }
 
-            if (userOptional.isPresent()) { // User is present in database
-                UserLogin userLogin = userOptional.get();
-                userLogin.setPassword(encryptedPassword);
-                userLogin.setLoginStatus("active");
-                userLoginRepository.save(userLogin);
-                status = "activated";
+        boolean valid = jwtUtils.validateJwtToken(tokenparse);
+        if (!valid)
+            return status;
+
+        //after clicking on account activation link or forgot password or reset password
+        // Front end will send the email and new password to be saved in db
+        String password = loginDto.getPassword();
+        // encrypt password
+        String encryptedPassword = encoder.encode(password);
+
+        String userLoginEmail = loginDto.getUserLoginEmailId();
+        Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEmail);
+
+        if (userOptional.isPresent()) { // User is present in database
+            UserLogin userLogin = userOptional.get();
+            userLogin.setPassword(encryptedPassword);
+            userLoginRepository.save(userLogin);
+            status = "Password saved";
         }
         return status;
     }

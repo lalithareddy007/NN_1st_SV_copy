@@ -16,7 +16,7 @@ public interface UserLoginRepository extends JpaRepository<UserLogin, String> {
 
     Optional<UserLogin> findByUserUserId(String userId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("update UserLogin u set u.userLoginEmail = :userEmailToUpdate,u.loginStatus = :userLoginStatusToUpdate , u.lastModTime= CURRENT_TIMESTAMP where u.userId = :userId")
     void updateUserLogin(@Param(value = "userId") String userId, @Param(value = "userEmailToUpdate")String userEmailToUpdate,@Param(value = "userLoginStatusToUpdate") String userLoginStatusToUpdate);
 

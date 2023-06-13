@@ -13,44 +13,59 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 public class UserPictureRepositoryTest {
-    @Autowired
-    private UserPictureRepository userPictureRepo;
+	@Autowired
+	private UserPictureRepository userPictureRepo;
 
-    private UserPictureEntity mockUserPictureEntity;
-    private User mockUser;
-    private UserRepository userRepo;
+	@Autowired
+	private UserRepository userRepo;
 
-    @BeforeEach
-    public void setUp() {
-        mockUserPictureEntity = setMockUserPictureEntity();
-    }
+	private UserPictureEntity mockUserPictureEntity;
+	private User mockUser;
 
-    private UserPictureEntity  setMockUserPictureEntity() {
-        mockUser = new User("U01", "John1", "K", " ", 1234123457L, "USA", "EST", "www.linkedin.com/John",
-                "MS", "MBA", "Professor", "GC", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
-        UserPictureEntity  userPictureEntity= new UserPictureEntity(2L, "Resume", mockUser, "/path/to/picture1.jpg");
-        return userPictureEntity ;
-    }
+	@BeforeEach
+	public void setUp() {
+		setMockUserPictureEntity();
+	}
 
-    @Test
-    @DisplayName("Test get User picture by user Id and User File Type")
-    public void testFindByUserAndUserFileType() {
+	private void setMockUserPictureEntity() {
+		// Insert a user record
+		mockUser = new User();
+		mockUser.setUserFirstName("John1");
+		mockUser.setUserLastName("K");
+		mockUser.setUserPhoneNumber(1234123457L);
+		mockUser.setUserLocation("USA");
+		mockUser.setUserTimeZone("EST");
+		mockUser.setUserLinkedinUrl("www.linkedin.com/John");
+		mockUser.setUserEduUg("MS");
+		mockUser.setUserEduPg("MBA");
+		mockUser.setUserComments("");
+		mockUser.setUserVisaStatus("US-Citizen");
+		mockUser.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
+		mockUser.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+		userRepo.save(mockUser);
 
-        // given
-        userPictureRepo.save(mockUserPictureEntity);
+		// Insert a Picture entity
+		mockUserPictureEntity = new UserPictureEntity(1L, "Resume", mockUser, "C:/Document");
+		userPictureRepo.save(mockUserPictureEntity);
 
-        // when
-        UserPictureEntity result = userPictureRepo.findByuserAnduserFileType(mockUser.getUserId(), mockUserPictureEntity.getUserFileType());
+	}
 
-        // then
-        assertNotNull(result);
-    }
+	@Test
+	@DisplayName("Test get User picture by user Id and User File Type")
+	public void testFindByUserAndUserFileType() {
+
+		// given
+		String userId = mockUser.getUserId();
+		String userFieldType = mockUserPictureEntity.getUserFileType();
+		// when
+		UserPictureEntity result = userPictureRepo.findByuserAnduserFileType(userId, userFieldType);
+
+		// then
+		assertNotNull(result);
+	}
 }
