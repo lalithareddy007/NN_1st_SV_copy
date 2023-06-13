@@ -1,6 +1,7 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdminStaff;
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.AssignmentSubmitService;
@@ -238,6 +239,7 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
     @Test
     @SneakyThrows
     @DisplayName("Test for  ResubmitAssignment")
+    @WithMockAdminStaff
     public void testResubmitAssignment() {
         Long submissionId = 4L;
         AssignmentSubmitDTO updateAssignmentDTO = mockAssignmentSubmitDTO1;
@@ -266,6 +268,7 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
     @Test
     @SneakyThrows
     @DisplayName("Test to grade submissions")
+    @WithMockAdminStaff
     public void testGradeSubmissions() {
         long submissionId = 8L;
         given(assignmentSubmitService.gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId)))
