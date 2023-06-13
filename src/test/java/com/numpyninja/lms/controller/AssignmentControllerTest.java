@@ -1,6 +1,8 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdmin;
+import com.numpyninja.lms.config.WithMockAdminStaff;
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.services.AssignmentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +72,7 @@ class AssignmentControllerTest extends AbstractTestController {
     }
 
     @DisplayName("test for creating a new assignment")
+    @WithMockAdminStaff
     @Test
     void testCreateAssignment() throws Exception {
         //given
@@ -89,6 +92,7 @@ class AssignmentControllerTest extends AbstractTestController {
 
     @DisplayName("test for updating an assignment")
     @Test
+    @WithMockAdmin
     void testUpdateAssignment() throws Exception {
         //given
         Long assignmentId = 1L;
@@ -111,6 +115,7 @@ class AssignmentControllerTest extends AbstractTestController {
 
     @DisplayName("test for deleting an assignment")
     @Test
+    @WithMockAdmin
     void testDeleteAssignment() throws Exception {
         //given
         Long assignmentId = 1L;

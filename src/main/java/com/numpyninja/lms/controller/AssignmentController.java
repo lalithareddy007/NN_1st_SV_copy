@@ -21,6 +21,7 @@ import com.numpyninja.lms.services.AssignmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 @RestController
@@ -33,6 +34,7 @@ public class AssignmentController {
 	
 	//create an assignment
 	@PostMapping("")
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Create New Assignment")
 	public ResponseEntity<AssignmentDto> createAssignment(@Valid @RequestBody AssignmentDto assignmentDto) {
 		AssignmentDto createdAssignmentDto =  this.assignmentService.createAssignment(assignmentDto);
@@ -41,6 +43,7 @@ public class AssignmentController {
 	
 	//update an assignment
 	@PutMapping("/{id}")
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Update existing Assignment")
 	public ResponseEntity<AssignmentDto> updateAssignment(@Valid @RequestBody AssignmentDto assignmentDto, @PathVariable Long id) {
 		AssignmentDto updatedAssignmentDto =  this.assignmentService.updateAssignment(assignmentDto, id);
@@ -49,6 +52,7 @@ public class AssignmentController {
 	
 	//delete an assignment
 	@DeleteMapping("/{id}")
+	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Delete existing Assignment")
 	public ResponseEntity<ApiResponse> deleteAssignment(@PathVariable Long id) {
 		this.assignmentService.deleteAssignment(id);

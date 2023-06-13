@@ -37,7 +37,6 @@ public class AssignmentSubmitController {
     }
 
     @PostMapping(path="", consumes="application/json", produces="application/json")
-    @RolesAllowed({"ROLE_ADMIN"})
     @ApiOperation("Create New Submission")
     public ResponseEntity<AssignmentSubmitDTO> submitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
     {
@@ -63,7 +62,6 @@ public class AssignmentSubmitController {
 
 
     @PutMapping(path="/{id}", consumes="application/json", produces="application/json")
-    @RolesAllowed({"ROLE_ADMIN"})
     @ApiOperation("Update details of Submission")
     public ResponseEntity<AssignmentSubmitDTO> resubmitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                   @PathVariable Long id)
@@ -73,7 +71,6 @@ public class AssignmentSubmitController {
     }
 
     @DeleteMapping(path="/{id}")
-    @RolesAllowed({"ROLE_ADMIN"})
     @ApiOperation("Delete Submission")
     public ResponseEntity<ApiResponse> deleteSubmission(@PathVariable Long id)
     {
@@ -97,7 +94,6 @@ public class AssignmentSubmitController {
     }
 
     @PutMapping(path="/gradesubmission/{submissionId}",consumes="application/json", produces="application/json" )
-    @RolesAllowed({"ROLE_ADMIN"})
     @ApiOperation("Grade Assignment Submission")
     public ResponseEntity<AssignmentSubmitDTO> gradeAssignmentSubmission(@RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                      @PathVariable Long submissionId){
