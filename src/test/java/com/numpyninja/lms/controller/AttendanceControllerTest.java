@@ -1,6 +1,8 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdminStaff;
+import com.numpyninja.lms.config.WithMockStaff;
 import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.repository.AttendanceRepository;
@@ -198,6 +200,7 @@ class AttendanceControllerTest extends AbstractTestController {
 
     @DisplayName("test to delete attendance")
     @Test
+    @WithMockAdminStaff
     @SneakyThrows
     void testDeleteAttendance() throws Exception {
         //given
@@ -216,6 +219,7 @@ class AttendanceControllerTest extends AbstractTestController {
 
 
     @DisplayName("test to create  attendance")
+    @WithMockAdminStaff
     @Test
     @SneakyThrows
     void testCreateAttendance() {
@@ -233,6 +237,7 @@ class AttendanceControllerTest extends AbstractTestController {
 
 
     @DisplayName("test to update attendance")
+    @WithMockAdminStaff
     @Test
     @SneakyThrows
     void testUpdateAttendance() throws Exception {

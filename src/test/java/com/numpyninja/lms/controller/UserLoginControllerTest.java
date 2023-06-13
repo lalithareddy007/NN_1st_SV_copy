@@ -101,6 +101,13 @@ public class UserLoginControllerTest extends AbstractTestController {
 //               // .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(token)));
 //
 //       //then
+
+//        response.andDo(print()).andExpect(status().isOk());
+//        //response.andExpect(jsonPath("token", is(jwtResponseDto.getToken())))
+//          //      .andExpect(jsonPath("email
+//          ", is(jwtResponseDto.getEmail())))
+//            //    .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
+
 //
 //      //  mvc.perform(MockMvcRequestBuilders.get("/test")
 //        //                .header("Authorization", "Bearer " + token))
@@ -117,6 +124,7 @@ public class UserLoginControllerTest extends AbstractTestController {
 ////        ResultActions token1 = response.andExpect(jsonPath("$","token");
 ////        //      .andExpect(jsonPath("email", is(jwtResponseDto.getEmail())))
 ////            //    .andExpect(jsonPath("userId", is(jwtResponseDto.getUserId())));
+
 //    }
 //
 }
