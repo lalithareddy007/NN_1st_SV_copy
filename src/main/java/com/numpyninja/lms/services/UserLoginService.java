@@ -1,7 +1,9 @@
 package com.numpyninja.lms.services;
 
+import com.numpyninja.lms.dto.EmailDto;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
+import com.numpyninja.lms.entity.EmailDetails;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserLogin;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
@@ -10,14 +12,19 @@ import com.numpyninja.lms.repository.UserRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
 import com.numpyninja.lms.security.UserDetailsImpl;
 import com.numpyninja.lms.security.jwt.JwtUtils;
+import com.numpyninja.lms.util.EmailSender;
+
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,12 +34,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class UserLoginService {
     private UserLoginRepository userLoginRepository;
     private UserRoleMapRepository userRoleMapRepository;
-
+   
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     AuthenticationManager authenticationManager;
@@ -42,7 +51,12 @@ public class UserLoginService {
     JwtUtils jwtUtils;
     @Autowired
     private UserCache userCache;
-
+   
+    @Autowired
+    private EmailSender emailSender;
+    
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
 
     public UserLoginService(UserLoginRepository userLoginRepository,
@@ -192,6 +206,86 @@ public class UserLoginService {
         }
         return status;
     }
+        
+    public JwtResponseDto forgotPasswordConfirmEmail(EmailDto emailDto) {
+		String userLoginEmail = emailDto.getUserLoginEmailId();
+		Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEmail);
+		JwtResponseDto forgotPwdDto = new JwtResponseDto();
+		if (userOptional.isPresent()) { // User is present in database
+			UserLogin userLogin = userOptional.get();
+			String userId = userLogin.getUserId();
+            Optional<User> user = userRepository.findById(userId);
+           User userDetails = user.get();
+           
+			if ("active".equalsIgnoreCase(userLogin.getLoginStatus())) {
+			
+				// sending email to change password
+				try {
+					Map<String, Object> model = new HashMap<>();
+					model.put("firstName", userDetails.getUserFirstName());
+					System.out.println("FirstName"+userDetails.getUserFirstName());
+					model.put("lastName", userDetails.getUserLastName());
+					String token = jwtUtils.generateJwtTokenForgotPwd(userLogin.getUserLoginEmail());
+					String url = createEmailUrlConfirmPwdWithToken(userLogin.getUserLoginEmail(), token);
+					System.out.println("email URL:" + url);
+					model.put("regLink", url);
+
+					String emailMessage = emailSender.sendEmailUsingTemplateForgotPassword(new EmailDetails(userLogin.getUserLoginEmail(), "", "",
+									"Please click on link to generate new password", model));
+					System.out.println(emailMessage);
+					forgotPwdDto.setEmail(userLoginEmail);
+					forgotPwdDto.setToken(token);
+					forgotPwdDto.setStatus("Email sent to your registered email Id");
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			} else {
+				forgotPwdDto.setEmail(userLoginEmail);
+				forgotPwdDto.setStatus("login inactive");
+				forgotPwdDto.setToken("null");
+			}
+		} else {
+			forgotPwdDto.setEmail(userLoginEmail);
+			forgotPwdDto.setStatus("Invalid Email");
+			forgotPwdDto.setToken("null");
+		}
+
+		return forgotPwdDto;
+	}
+
+	public String createEmailUrlConfirmPwdWithToken(String loginEmail, String token) {
+		final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl).path("/reset-password")
+				.queryParam("token", token).toUriString();
+
+		return url;
+	}
+	
+	//validate token 
+    public boolean validateToken(String token) {
+        String tokenparse = null;
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            tokenparse = token.substring(7, token.length());
+        }
+        Boolean validity = jwtUtils.validateJwtToken(tokenparse);
+
+        if (validity == true) {
+            String userLoginEMail = jwtUtils.getUserNameFromJwtToken(tokenparse);
+            Optional<UserLogin> userOptional = userLoginRepository.findByUserLoginEmailIgnoreCase(userLoginEMail);
+            if (userOptional.isPresent()) { 
+            	// User is present in database
+                UserLogin userLogin = userOptional.get();
+                validity = true;
+            }
+            else{
+            	validity = false;
+            }
+        }
+        return validity;
+    }
+
+
 }
 
 
