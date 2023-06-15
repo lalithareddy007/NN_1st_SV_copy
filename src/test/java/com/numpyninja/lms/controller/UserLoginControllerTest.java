@@ -92,7 +92,7 @@ public class UserLoginControllerTest extends AbstractTestController {
 //        String validity = "success";
 //
 //        //given
-//        given( userLoginService.validateTokenAtAccountActivation( token)).willReturn( validity);
+//        given( userLoginService.validateAccountActToken( token)).willReturn( "validity");
 //
 //        //when
 //       ResultActions response = mockMvc.perform(get("/login/AccountActivation")
@@ -101,7 +101,7 @@ public class UserLoginControllerTest extends AbstractTestController {
 //               // .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(token)));
 //
 //       //then
-
+//
 //        response.andDo(print()).andExpect(status().isOk());
 //        //response.andExpect(jsonPath("token", is(jwtResponseDto.getToken())))
 //          //      .andExpect(jsonPath("email
