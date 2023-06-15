@@ -102,6 +102,7 @@ public class ProgramControllerTest extends AbstractTestController {
 
     @DisplayName("Test for Creating a Program")
     @Test
+    @WithMockAdmin
     @SneakyThrows
     public void testCreateProgram() {
         given(programServices.createAndSaveProgram(ArgumentMatchers.any(ProgramDTO.class)))
