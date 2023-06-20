@@ -89,4 +89,5 @@ public class UserLoginServiceTest  {
         Assertions.assertEquals(jwtResponseDtoGot.getRoles(), Collections.singletonList("ROLE_STAFF"));
     }
 
+
 }
