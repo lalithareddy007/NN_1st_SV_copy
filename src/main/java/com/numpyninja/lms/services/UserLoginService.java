@@ -38,6 +38,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class UserLoginService {
+	
+	@Autowired
     private UserLoginRepository userLoginRepository;
     private UserRoleMapRepository userRoleMapRepository;
    
@@ -58,6 +60,9 @@ public class UserLoginService {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
+    public String getFrontendURL() {
+    	return frontendUrl;
+    }
 
     public UserLoginService(UserLoginRepository userLoginRepository,
                             UserRoleMapRepository userRoleMapRepository) {
@@ -215,7 +220,8 @@ public class UserLoginService {
 			UserLogin userLogin = userOptional.get();
 			String userId = userLogin.getUserId();
             Optional<User> user = userRepository.findById(userId);
-           User userDetails = user.get();
+            if (user.isPresent()) { 
+            User userDetails = user.get();
            
 			if ("active".equalsIgnoreCase(userLogin.getLoginStatus())) {
 			
@@ -239,6 +245,9 @@ public class UserLoginService {
 
 				} catch (Exception e) {
 					e.printStackTrace();
+					forgotPwdDto.setEmail(userLoginEmail);
+	                forgotPwdDto.setStatus("Failed to send email");
+	                forgotPwdDto.setToken(null);
 				}
 
 			} else {
@@ -246,7 +255,12 @@ public class UserLoginService {
 				forgotPwdDto.setStatus("login inactive");
 				forgotPwdDto.setToken("null");
 			}
-		} else {
+            }else {
+	            forgotPwdDto.setEmail(userLoginEmail);
+	            forgotPwdDto.setStatus("User not found");
+	            forgotPwdDto.setToken(null);
+	        }
+		}else {
 			forgotPwdDto.setEmail(userLoginEmail);
 			forgotPwdDto.setStatus("Invalid Email");
 			forgotPwdDto.setToken("null");
@@ -256,7 +270,7 @@ public class UserLoginService {
 	}
 
 	public String createEmailUrlConfirmPwdWithToken(String loginEmail, String token) {
-		final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl).path("/reset-password")
+		final String url = UriComponentsBuilder.fromHttpUrl(getFrontendURL()).path("/reset-password")
 				.queryParam("token", token).toUriString();
 
 		return url;
