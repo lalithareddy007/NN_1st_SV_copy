@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserPictureSlimDto {
+public class UserFileSlimDto {
 
     private Long userFileId;
 

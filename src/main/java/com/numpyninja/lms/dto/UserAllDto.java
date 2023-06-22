@@ -29,5 +29,5 @@ public class UserAllDto {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("documents")
-    private List<UserPictureSlimDto> userPictureSlimDtos;
+    private List<UserFileSlimDto> userFileSlimDtos;
 }

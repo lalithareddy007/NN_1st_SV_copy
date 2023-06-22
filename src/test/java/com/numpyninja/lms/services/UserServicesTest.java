@@ -2,12 +2,10 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.*;
-import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.*;
 import com.numpyninja.lms.repository.*;
-import com.numpyninja.lms.security.UserDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +56,7 @@ class UserServicesTest {
     private UserSkillMapper userSkillMapper;
 
     @Mock
-    private UserPictureMapper userPictureMapper;
+    private UserFileMapper userFileMapper;
 
     @Mock
     private ProgramRepository programRepository;
@@ -74,7 +72,7 @@ class UserServicesTest {
 
 
     @Mock
-    private UserPictureRepository userPictureRepository;
+    private UserFileRepository userFileRepository;
 
     private User mockUser, mockUser2, mockUser3;
 
@@ -401,9 +399,9 @@ class UserServicesTest {
         List<UserSkillSlimDto> mockUserSkillSlimDtos = List.of(new UserSkillSlimDto(mockSkillMaster.getSkillId(),
                 mockSkillMaster.getSkillName(), 36));
 
-        List<UserPictureEntity> mockUserPictureEntityList = List.of(new UserPictureEntity(1L, "ProfilePic",
+        List<UserFileEntity> mockUserFileEntityList = List.of(new UserFileEntity(1L, "ProfilePic",
                 mockUser2, "C:\\Images"));
-        List<UserPictureSlimDto> mockUserPictureSlimDtos = List.of(new UserPictureSlimDto(1L, "ProfilePic",
+        List<UserFileSlimDto> mockUserFileSlimDtos = List.of(new UserFileSlimDto(1L, "ProfilePic",
                 "C:\\Images"));
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(mockUser2));
@@ -414,15 +412,15 @@ class UserServicesTest {
         when(batchMapper.toBatchSlimDtoList(anyList())).thenReturn(mockBatchslimDtos);
         when(userSkillRepository.findByUserId(userId)).thenReturn(mockUserSkills);
         when(userSkillMapper.toUserSkillSlimDtoList(mockUserSkills)).thenReturn(mockUserSkillSlimDtos);
-        when(userPictureRepository.findByUser_UserId(userId)).thenReturn(mockUserPictureEntityList);
-        when(userPictureMapper.toUserPictureSlimDtoList(mockUserPictureEntityList)).thenReturn(mockUserPictureSlimDtos);
+        when(userFileRepository.findByUser_UserId(userId)).thenReturn(mockUserFileEntityList);
+        when(userFileMapper.toUserFileSlimDtoList(mockUserFileEntityList)).thenReturn(mockUserFileSlimDtos);
 
         UserAllDto responseUserAllDto = userService.getUserInfoById(userId);
 
         assertThat(responseUserAllDto).isNotNull();
         assertEquals(2L, responseUserAllDto.getUserProgramBatchSlimDtos().get(0).getProgramId());
         assertEquals("Java", responseUserAllDto.getUserSkillSlimDtos().get(0).getSkillName());
-        assertEquals("ProfilePic", responseUserAllDto.getUserPictureSlimDtos().get(0).getUserFileType());
+        assertEquals("ProfilePic", responseUserAllDto.getUserFileSlimDtos().get(0).getUserFileType());
     }
 
     @DisplayName("test for getting User Info for a given userId with role Staff")
@@ -445,9 +443,9 @@ class UserServicesTest {
                 new BatchSlimDto(mockBatch.getBatchId(), mockBatch.getBatchName(), "Active"),
                 new BatchSlimDto(mockBatch2.getBatchId(), mockBatch2.getBatchName(), "Active"));
 
-        List<UserPictureEntity> mockUserPictureEntityList = List.of(new UserPictureEntity(2L, "Resume",
+        List<UserFileEntity> mockUserFileEntityList = List.of(new UserFileEntity(2L, "Resume",
                 mockUser2, "C:\\Documents"));
-        List<UserPictureSlimDto> mockUserPictureSlimDtos = List.of(new UserPictureSlimDto(2L, "Resume",
+        List<UserFileSlimDto> mockUserFileSlimDtos = List.of(new UserFileSlimDto(2L, "Resume",
                 "C:\\Documents"));
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(mockUser2));
@@ -457,14 +455,14 @@ class UserServicesTest {
         when(userRoleProgramBatchMapRepository.findByUser_UserId(userId)).thenReturn(mockUserRoleProgramBatchMaps);
         when(batchMapper.toBatchSlimDtoList(anyList())).thenReturn(mockBatchslimDtos);
         when(userSkillRepository.findByUserId(userId)).thenReturn(Collections.emptyList());
-        when(userPictureRepository.findByUser_UserId(userId)).thenReturn(mockUserPictureEntityList);
-        when(userPictureMapper.toUserPictureSlimDtoList(mockUserPictureEntityList)).thenReturn(mockUserPictureSlimDtos);
+        when(userFileRepository.findByUser_UserId(userId)).thenReturn(mockUserFileEntityList);
+        when(userFileMapper.toUserFileSlimDtoList(mockUserFileEntityList)).thenReturn(mockUserFileSlimDtos);
 
         UserAllDto responseUserAllDto = userService.getUserInfoById(userId);
 
         assertThat(responseUserAllDto).isNotNull();
         assertEquals(2L, responseUserAllDto.getUserProgramBatchSlimDtos().get(0).getProgramId());
-        assertEquals("Resume", responseUserAllDto.getUserPictureSlimDtos().get(0).getUserFileType());
+        assertEquals("Resume", responseUserAllDto.getUserFileSlimDtos().get(0).getUserFileType());
 
     }
 

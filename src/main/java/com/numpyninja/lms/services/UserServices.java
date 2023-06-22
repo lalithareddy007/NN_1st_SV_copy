@@ -69,10 +69,10 @@ public class UserServices implements UserDetailsService {
     UserSkillMapper userSkillMapper;
 
     @Autowired
-    UserPictureRepository userPictureRepository;
+    UserFileRepository userFileRepository;
 
     @Autowired
-    UserPictureMapper userPictureMapper;
+    UserFileMapper userFileMapper;
 
     @Autowired
     UserLoginMapper userLoginMapper;
@@ -149,9 +149,9 @@ public class UserServices implements UserDetailsService {
         if (!userSkills.isEmpty())
             userAllDto.setUserSkillSlimDtos(userSkillMapper.toUserSkillSlimDtoList(userSkills));
 
-        List<UserPictureEntity> userPictureEntityList = userPictureRepository.findByUser_UserId(userId);
-        if (!userPictureEntityList.isEmpty())
-            userAllDto.setUserPictureSlimDtos(userPictureMapper.toUserPictureSlimDtoList(userPictureEntityList));
+        List<UserFileEntity> userFileEntityList = userFileRepository.findByUser_UserId(userId);
+        if (!userFileEntityList.isEmpty())
+            userAllDto.setUserFileSlimDtos(userFileMapper.toUserFileSlimDtoList(userFileEntityList));
 
         return userAllDto;
     }

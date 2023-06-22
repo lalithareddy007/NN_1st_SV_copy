@@ -1,7 +1,5 @@
 package com.numpyninja.lms.entity;
 
-import java.math.BigInteger;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,16 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
-
-import com.numpyninja.lms.config.UserIDGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,7 +29,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @Table(name = "tbl_lms_user_files")
 
-public class UserPictureEntity {
+public class UserFileEntity {
 
 	@Id
 	@GeneratedValue (strategy = GenerationType.AUTO)

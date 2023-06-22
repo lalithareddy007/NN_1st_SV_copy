@@ -1,8 +1,8 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.numpyninja.lms.dto.UserPictureEntityDTO;
-import com.numpyninja.lms.services.UserPictureService;
+import com.numpyninja.lms.dto.UserFileEntityDTO;
+import com.numpyninja.lms.services.UserFileService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,24 +28,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(UserPictureController.class)
+@WebMvcTest(UserFileController.class)
 @WithMockUser
-public class UserPictureControllerTest extends AbstractTestController {
+public class UserFileControllerTest extends AbstractTestController {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    UserPictureService userPictureService;
+    UserFileService userFileService;
 
-    UserPictureEntityDTO userPicEntityDto;
+    UserFileEntityDTO userPicEntityDto;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     private void setUp() {
-        userPicEntityDto = new UserPictureEntityDTO(1L, "Resume", "U01", "C:/");
+        userPicEntityDto = new UserFileEntityDTO(1L, "Resume", "U01", "C:/");
     }
 
     @Test
@@ -53,10 +53,10 @@ public class UserPictureControllerTest extends AbstractTestController {
         final String userId = userPicEntityDto.getUserId();
         final String userFileType = userPicEntityDto.getUserFileType();
 
-        given(userPictureService.download(userId, userFileType)).willReturn(userPicEntityDto);
+        given(userFileService.download(userId, userFileType)).willReturn(userPicEntityDto);
         System.out.println(userPicEntityDto.toString());
 
-        ResultActions response = mockMvc.perform(get("/file/userpicture/{userid}", userId)
+        ResultActions response = mockMvc.perform(get("/file/userFile/{userid}", userId)
                 .param("userfiletype", userFileType).contentType(MediaType.APPLICATION_JSON));
 
         response.andDo(print()).andExpect(status().isOk());
@@ -72,10 +72,10 @@ public class UserPictureControllerTest extends AbstractTestController {
     @Test
     public void testSave() throws Exception {
 
-        given(userPictureService.uploadtoDB(ArgumentMatchers.any(UserPictureEntityDTO.class)))
+        given(userFileService.uploadtoDB(ArgumentMatchers.any(UserFileEntityDTO.class)))
                 .willAnswer((i) -> i.getArgument(0));
         // when
-        ResultActions resultActions = mockMvc.perform(post("/file/userpicture").contentType(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(post("/file/userFile").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userPicEntityDto)));
         // then
         resultActions.andExpect(status().isCreated()).andDo(print())
@@ -87,10 +87,10 @@ public class UserPictureControllerTest extends AbstractTestController {
     @Test
     public void testUpdate() throws Exception {
         final String userId = userPicEntityDto.getUserId();
-        UserPictureEntityDTO updatePicEntityDto = userPicEntityDto;
-        when(userPictureService.updateFile(updatePicEntityDto, userId)).thenReturn(updatePicEntityDto);
+        UserFileEntityDTO updatePicEntityDto = userPicEntityDto;
+        when(userFileService.updateFile(updatePicEntityDto, userId)).thenReturn(updatePicEntityDto);
 
-        ResultActions response = mockMvc.perform(put("/file/userpicture/{userid}", userId)
+        ResultActions response = mockMvc.perform(put("/file/userFile/{userid}", userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatePicEntityDto)));
         response.andExpect(MockMvcResultMatchers.status().isOk())
@@ -105,9 +105,9 @@ public class UserPictureControllerTest extends AbstractTestController {
         final String userId = userPicEntityDto.getUserId();
         final String userFileType = userPicEntityDto.getUserFileType();
 
-        doNothing().when(userPictureService).DeleteFile(userId, userFileType);
+        doNothing().when(userFileService).DeleteFile(userId, userFileType);
 
-        ResultActions response = mockMvc.perform(delete("/file/userpicture/{userid}", userId).param("userfiletype", userFileType)
+        ResultActions response = mockMvc.perform(delete("/file/userFile/{userid}", userId).param("userfiletype", userFileType)
                 .contentType(MediaType.APPLICATION_JSON));
         response.andExpect(MockMvcResultMatchers.status().isOk());
 
