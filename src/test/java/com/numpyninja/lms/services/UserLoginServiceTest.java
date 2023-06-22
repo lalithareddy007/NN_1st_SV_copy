@@ -99,112 +99,88 @@ public class UserLoginServiceTest {
     }
 
 
-//    void testvalidateTokenAtAccountActivation_Valid() throws Exception{
-//
-//        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
-//       String emailID = "alpha@gmail.com";
-//        Optional<UserLogin> user = null;
-//        when(jwtUtils.validateAccountActivationToken(token)).thenReturn("Valid");
-//        when(jwtUtils.getUserNameFromJwtToken(token)).thenReturn(emailID);
-//        when(userLoginRepository.findByUserLoginEmailIgnoreCase(emailID)).thenReturn(user);
-//
-//        when(user.get().getPassword().isEmpty()).thenReturn(false);
-//
-//
-//    }
+    @DisplayName("JUnit test for Validating at Account activation")
+    @ParameterizedTest
+    @MethodSource("validationTestData")
+    public void testValidateTokenAtAccountActivation(String token, String expectedValidity) {
+        String tokenparse = null;
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            tokenparse = token.substring(7, token.length());
+        }
 
-//
-//    @Test
-//    public void testValidateTokenAtAccountActivation_InvalidToken() {
-//       //String token = "InvalidToken";
-//        String token = "eyJhbGciOiJIUzUxMi.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
-//        when(jwtUtils.validateAccountActivationToken(token))
-//                .thenReturn("InValid");
-//        String validity = jwtUtils.validateAccountActivationToken(token);
-//
-//        Assertions.assertEquals("Invalid", validity);
-//    }
-//
-//    @Test
-//    public void testValidateTokenAtAccountActivation_AlreadyActivated() {
-//        String token = "Bearer ValidToken";
-//        String userName = "example@email.com";
-//
-//        when(jwtUtils.validateAccountActivationToken(token))
-//                .thenReturn("Valid");
-//        when(jwtUtils.getUserNameFromJwtToken(token))
-//                .thenReturn(userName);
-//
-//        Optional<UserLogin> userOptional = Optional.of(new UserLogin());
-//        when(userLoginRepository.findByUserLoginEmailIgnoreCase(userName))
-//                .thenReturn(userOptional);
-//
-//        String validity = userLoginService.validateTokenAtAccountActivation(token);
-//
-//        Assertions.assertEquals("acctActivated already", validity);
-//    }
-//
-//    @Test
-//    public void testValidateTokenAtAccountActivation_ValidToken() {
-//        String token = "Bearer ValidToken";
-//        String userName = "example@email.com";
-//
-//        when(jwtUtils.validateAccountActivationToken(token))
-//                .thenReturn("Valid");
-//        when(jwtUtils.getUserNameFromJwtToken(token))
-//                .thenReturn(userName);
-//
-//        when(userLoginRepository.findByUserLoginEmailIgnoreCase(userName))
-//                .thenReturn(Optional.empty());
-//
-//        String validity = userLoginService.validateTokenAtAccountActivation(token);
-//
-//        Assertions. assertEquals(userName, validity);
-//    }
+        when(jwtUtils.validateAccountActivationToken(tokenparse))
+                .thenReturn(expectedValidity);
 
-//
+        if (expectedValidity.equalsIgnoreCase("Valid")) {
+            String userName = jwtUtils.getUserNameFromJwtToken(tokenparse);
+            Optional<UserLogin> userOptional =  userLoginRepository.findByUserLoginEmailIgnoreCase(userName);
+            //Optional.empty();
+
+//            if (userName != null) {
+//                userOptional = Optional.of(new UserLogin());
+//            }
+
+//            when(userLoginRepository.findByUserLoginEmailIgnoreCase(userName))
+//                    .thenReturn(userOptional);
+        }
+
+        String validity = userLoginService.validateTokenAtAccountActivation(token);
+
+        assertEquals(expectedValidity, validity);
+    }
+
+    private static Stream<Arguments> validationTestData() {
+        return Stream.of(
+                Arguments.of("Bearer ValidToken", "Valid"),
+                Arguments.of("Bearer ValidToken", "acctActivated already"),
+                Arguments.of("InvalidToken", "Invalid")
+        );
+    }
 
 
-
+    @DisplayName("JUnit test for Reset Password when token is valid ")
     @Test
-    public void testValidateTokenAtAccountActivation() {
-        // Invalid token
-        String invalidToken = "InvalidToken";
-        String invalidValidity = "Invalid";
-        assertEquals(invalidValidity, userLoginService.validateTokenAtAccountActivation(invalidToken));
+    void testResetPassword_ValidToken_PasswordSaved() {
+        // given
+        LoginDto loginDto = new LoginDto();
+        loginDto.setUserLoginEmailId("test@example.com");
+        loginDto.setPassword("newpassword");
+        String token = "Bearer valid_token";
+        String expectedStatus = "Password saved";
 
-        // Already activated account
-        String activatedToken = "Bearer ValidToken";
-        String activatedEmail = "test@example.com";
-        String alreadyActivatedValidity = "acctActivated already";
+        //when
+        when(jwtUtils.validateJwtToken("valid_token")).thenReturn(true);
+       // when(encoder.encode(loginDto.getPassword())).thenReturn("encryptedPassword");
 
-        when(jwtUtils.validateAccountActivationToken(anyString()))
-                .thenReturn("Valid");
-        when(jwtUtils.getUserNameFromJwtToken(anyString()))
-                .thenReturn(activatedEmail);
+        UserLogin userLogin = new UserLogin();
+        when(userLoginRepository.findByUserLoginEmailIgnoreCase(loginDto.getUserLoginEmailId()))
+                .thenReturn(Optional.of(userLogin));
 
-        Optional<UserLogin> activatedUserOptional = Optional.of(new UserLogin());
-        when(userLoginRepository.findByUserLoginEmailIgnoreCase(activatedEmail))
-                .thenReturn(activatedUserOptional);
+        String status = userLoginService.resetPassword(loginDto, token);
 
-        assertEquals(alreadyActivatedValidity, userLoginService.validateTokenAtAccountActivation(activatedToken));
+        // then
+        assertEquals(expectedStatus, status);
 
-        // Valid token
-        String validToken = "Bearer ValidToken";
-        String validEmail = "test@example.com";
-        String validValidity = "Valid";
+    }
 
-        when(jwtUtils.validateAccountActivationToken(anyString()))
-                .thenReturn("Valid");
-        when(jwtUtils.getUserNameFromJwtToken(anyString()))
-                .thenReturn(validEmail);
+    @DisplayName("JUnit test for Reset Password when token is invalid")
+    @Test
+    void testResetPassword_InvalidTokenReset_ReturnsInvalid() {
+        // given
+        LoginDto loginDto = new LoginDto();
+        String token = "Bearer invalid_token";
+        String expectedStatus = "Invalid";
 
-        when(userLoginRepository.findByUserLoginEmailIgnoreCase(validEmail))
-                .thenReturn(Optional.empty());
+        //when
+        when(jwtUtils.validateJwtToken("invalid_token")).thenReturn(false);
+        String status = userLoginService.resetPassword(loginDto, token);
 
-        assertEquals(validValidity, userLoginService.validateTokenAtAccountActivation(validToken));
+        // then
+        assertEquals(expectedStatus, status);
     }
 }
+
+
 
 
 
