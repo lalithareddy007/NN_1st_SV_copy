@@ -3,12 +3,14 @@ package com.numpyninja.lms.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.config.ApiResponse;
+import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.entity.UserLogin;
 import com.numpyninja.lms.security.jwt.JwtUtils;
 import com.numpyninja.lms.services.ProgBatchServices;
 import com.numpyninja.lms.services.UserLoginService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,10 +45,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(UserLoginController.class)
@@ -62,6 +63,37 @@ public class UserLoginControllerTest extends AbstractTestController {
 
     @Autowired
     JwtUtils jwutils;
+
+    LoginDto mockLoginDto;
+
+    //mocking
+    @BeforeEach
+    public void setup() {
+        setMockLoginAndDto();
+    }
+
+    private void setMockLoginAndDto() {
+        String sDate = "05/25/2022";
+        Date dueDate = null;
+        try {
+            dueDate = new SimpleDateFormat("dd/mm/yyyy").parse(sDate);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        mockLoginDto = new LoginDto("alpha@gmail.com","password");
+    }
+
+
+
+
+
+
+
+
+
+
     @Test
     public void given_NonExistingUser_WhenLogin_ThenThrowException( ) throws Exception {
         LoginDto loginDto = new LoginDto();
@@ -163,25 +195,28 @@ public class UserLoginControllerTest extends AbstractTestController {
 
     @Test
     void testResetPassword_ValidToken_ReturnsOk() throws Exception {
-        LoginDto loginDto = new LoginDto();
-        loginDto.setUserLoginEmailId("alpha@gmail.com");
-        loginDto.setPassword("password");
+//        LoginDto loginDto = new LoginDto();
+//        loginDto.setUserLoginEmailId("alpha@gmail.com");
+//        loginDto.setPassword("password");
+     String email=   mockLoginDto.getUserLoginEmailId();
+        String password = mockLoginDto.getPassword();
+
         //String token = "valid_token";
-        String token ="Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
+        String token ="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJSb2JlcnQuTG91aXNAZ21haWwuY29tIiwiaWF0IjoxNjg3NTQ0ODQ2LCJleHAiOjE2ODc1NzM2NDZ9.8xMH-a4-dax7V7-JU0IdoYZ4y9sWto3jFddy4lqAjwPReIfn3DFPavgNoIssop6_BaevkfBdbRGIfk346kmUdg";
 
         String tokenparse = null;
 
-        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
-            tokenparse = token.substring(7, token.length());
-        }
+//        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+//            tokenparse = token.substring(7, token.length());
+//        }
 
-        when(userLoginService.resetPassword(loginDto, token)).thenReturn("Password Saved");
-        when(jwutils.validateJwtToken(tokenparse)).thenReturn(true);
+        given(userLoginService.resetPassword(mockLoginDto, token)).willReturn("Password Saved");
+        given(jwutils.validateJwtToken(tokenparse)).willReturn(true);
 
         ResultActions response =mockMvc.perform(post("/resetPassowrd")
                 .header("Authorization", "valid_token")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginDto)));
+                .content(objectMapper.writeValueAsString(mockLoginDto)));
 
         response.andExpect(status().isOk());
 
