@@ -211,7 +211,7 @@ public class UserLoginControllerTest extends AbstractTestController {
 //        }
 
         given(userLoginService.resetPassword(mockLoginDto, token)).willReturn("Password Saved");
-        given(jwutils.validateJwtToken(tokenparse)).willReturn(true);
+        given(jwutils.validateJwtToken(org.mockito.ArgumentMatchers.any() )).willReturn(true);
 
         ResultActions response =mockMvc.perform(post("/resetPassowrd")
                 .header("Authorization", "valid_token")
