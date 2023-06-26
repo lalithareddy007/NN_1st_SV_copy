@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Data
 @Entity
+
 @Table(name = "tbl_lms_user_role_program_batch_map")
 public class UserRoleProgramBatchMap {
     @Id
@@ -21,19 +22,19 @@ public class UserRoleProgramBatchMap {
     @Column(name ="ur_pb_id")
     private Long userRoleProgramBatchId;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.REMOVE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.REMOVE)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.REMOVE)
     @JoinColumn(name = "program_id", nullable = false)
     private Program program;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.REMOVE)
     @JoinColumn(name = "batch_id", nullable = false)
     private Batch batch;
 
