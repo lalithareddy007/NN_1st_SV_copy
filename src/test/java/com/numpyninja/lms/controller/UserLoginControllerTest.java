@@ -7,12 +7,15 @@ import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.entity.UserLogin;
+import com.numpyninja.lms.repository.UserLoginRepository;
 import com.numpyninja.lms.security.jwt.JwtUtils;
 import com.numpyninja.lms.services.ProgBatchServices;
 import com.numpyninja.lms.services.UserLoginService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -63,35 +66,6 @@ public class UserLoginControllerTest extends AbstractTestController {
 
     @Autowired
     JwtUtils jwutils;
-
-    LoginDto mockLoginDto;
-
-    //mocking
-    @BeforeEach
-    public void setup() {
-        setMockLoginAndDto();
-    }
-
-    private void setMockLoginAndDto() {
-        String sDate = "05/25/2022";
-        Date dueDate = null;
-        try {
-            dueDate = new SimpleDateFormat("dd/mm/yyyy").parse(sDate);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        mockLoginDto = new LoginDto("alpha@gmail.com","password");
-    }
-
-
-
-
-
-
-
-
 
 
     @Test
@@ -166,6 +140,7 @@ public class UserLoginControllerTest extends AbstractTestController {
 
     @Test
     public void testValidateAccountActToken_ValidToken() throws Exception {
+        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
         when(userLoginService.validateTokenAtAccountActivation(anyString()))
                 .thenReturn("alpha@gmail.com");
 
@@ -178,6 +153,8 @@ public class UserLoginControllerTest extends AbstractTestController {
                 .andExpect(jsonPath("$.success").value(true));
 
     }
+
+    //ResetPassword
     @Test
     void testResetPassword_InvalidToken_ReturnsBadRequest() throws Exception {
         LoginDto loginDto = new LoginDto();
@@ -194,35 +171,26 @@ public class UserLoginControllerTest extends AbstractTestController {
     }
 
     @Test
-    void testResetPassword_ValidToken_ReturnsOk() throws Exception {
-//        LoginDto loginDto = new LoginDto();
-//        loginDto.setUserLoginEmailId("alpha@gmail.com");
-//        loginDto.setPassword("password");
-     String email=   mockLoginDto.getUserLoginEmailId();
-        String password = mockLoginDto.getPassword();
+    void testResetPassword_ValidToken_PasswordSaved_ReturnsOk() {
+        //given
+        LoginDto loginDto = new LoginDto();
+        UserLoginController userLoginController = new UserLoginController(userLoginService);
+        String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuaXRAZ21haWwuY29tIiwiaWF0IjoxNjg2MTQzMjYwLCJleHAiOjE2ODYzMTYwNjB9.QvVEiYYLxxRjAqAyrZJdSROWAQ3gP0o5uxez_Ar1Z-9MFkRXuSXt3ANok_LaZmzjKYa9d2q5DDvn3v1npgR3Kw";
+        String status = "Password saved";
+        when(userLoginService.resetPassword(loginDto, token)).thenReturn(status);
 
-        //String token = "valid_token";
-        String token ="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJSb2JlcnQuTG91aXNAZ21haWwuY29tIiwiaWF0IjoxNjg3NTQ0ODQ2LCJleHAiOjE2ODc1NzM2NDZ9.8xMH-a4-dax7V7-JU0IdoYZ4y9sWto3jFddy4lqAjwPReIfn3DFPavgNoIssop6_BaevkfBdbRGIfk346kmUdg";
+        // when
+        ResponseEntity<ApiResponse> response = userLoginController.resetPassword(loginDto, token);
 
-        String tokenparse = null;
-
-//        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
-//            tokenparse = token.substring(7, token.length());
-//        }
-
-        given(userLoginService.resetPassword(mockLoginDto, token)).willReturn("Password Saved");
-        given(jwutils.validateJwtToken(org.mockito.ArgumentMatchers.any() )).willReturn(true);
-
-        ResultActions response =mockMvc.perform(post("/resetPassowrd")
-                .header("Authorization", "valid_token")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(mockLoginDto)));
-
-        response.andExpect(status().isOk());
+        // then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(status, response.getBody().getMessage());
+        assertEquals(true, response.getBody().isSuccess());
+        //verify(userLoginService, times(1)).resetPassword(loginDto, token);
+    }
 
 
-
-     }}
+}
 
 
 

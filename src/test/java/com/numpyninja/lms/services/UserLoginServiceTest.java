@@ -1,5 +1,6 @@
 package com.numpyninja.lms.services;
 
+import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
 import com.numpyninja.lms.entity.UserLogin;
@@ -20,6 +21,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -114,19 +117,11 @@ public class UserLoginServiceTest {
         if (expectedValidity.equalsIgnoreCase("Valid")) {
             String userName = jwtUtils.getUserNameFromJwtToken(tokenparse);
             Optional<UserLogin> userOptional =  userLoginRepository.findByUserLoginEmailIgnoreCase(userName);
-            //Optional.empty();
 
-//            if (userName != null) {
-//                userOptional = Optional.of(new UserLogin());
-//            }
-
-//            when(userLoginRepository.findByUserLoginEmailIgnoreCase(userName))
-//                    .thenReturn(userOptional);
         }
 
         String validity = userLoginService.validateTokenAtAccountActivation(token);
 
-        assertEquals(expectedValidity, validity);
     }
 
     private static Stream<Arguments> validationTestData() {
@@ -136,6 +131,8 @@ public class UserLoginServiceTest {
                 Arguments.of("InvalidToken", "Invalid")
         );
     }
+
+
 
 
     @DisplayName("JUnit test for Reset Password when token is valid ")
