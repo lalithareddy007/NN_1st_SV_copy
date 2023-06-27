@@ -101,7 +101,6 @@ public class UserLoginServiceTest {
         assertEquals(jwtResponseDtoGot.getRoles(), Collections.singletonList("ROLE_STAFF"));
     }
 
-
     @DisplayName("JUnit test for Validating at Account activation")
     @ParameterizedTest
     @MethodSource("validationTestData")
@@ -123,7 +122,6 @@ public class UserLoginServiceTest {
         String validity = userLoginService.validateTokenAtAccountActivation(token);
 
     }
-
     private static Stream<Arguments> validationTestData() {
         return Stream.of(
                 Arguments.of("Bearer ValidToken", "Valid"),
@@ -131,9 +129,6 @@ public class UserLoginServiceTest {
                 Arguments.of("InvalidToken", "Invalid")
         );
     }
-
-
-
 
     @DisplayName("JUnit test for Reset Password when token is valid ")
     @Test
@@ -144,17 +139,12 @@ public class UserLoginServiceTest {
         loginDto.setPassword("newpassword");
         String token = "Bearer valid_token";
         String expectedStatus = "Password saved";
-
         //when
         when(jwtUtils.validateJwtToken("valid_token")).thenReturn(true);
-       // when(encoder.encode(loginDto.getPassword())).thenReturn("encryptedPassword");
-
         UserLogin userLogin = new UserLogin();
         when(userLoginRepository.findByUserLoginEmailIgnoreCase(loginDto.getUserLoginEmailId()))
                 .thenReturn(Optional.of(userLogin));
-
         String status = userLoginService.resetPassword(loginDto, token);
-
         // then
         assertEquals(expectedStatus, status);
 
@@ -167,11 +157,9 @@ public class UserLoginServiceTest {
         LoginDto loginDto = new LoginDto();
         String token = "Bearer invalid_token";
         String expectedStatus = "Invalid";
-
         //when
         when(jwtUtils.validateJwtToken("invalid_token")).thenReturn(false);
         String status = userLoginService.resetPassword(loginDto, token);
-
         // then
         assertEquals(expectedStatus, status);
     }
