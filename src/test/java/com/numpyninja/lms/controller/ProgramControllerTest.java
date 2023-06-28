@@ -1,6 +1,7 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.dto.ProgramDTO;
 import com.numpyninja.lms.services.ProgramServices;
 import lombok.SneakyThrows;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.annotation.security.RolesAllowed;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

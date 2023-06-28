@@ -1,8 +1,10 @@
 package com.numpyninja.lms.controller;
 
 import com.numpyninja.lms.config.ApiResponse;
+import com.numpyninja.lms.dto.EmailDto;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
+import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.services.UserLoginService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,5 +82,22 @@ public class UserLoginController {
         else if (status.equalsIgnoreCase("Invalid"))
             return new ResponseEntity<ApiResponse>(new ApiResponse(status, false), HttpStatus.BAD_REQUEST);
         return null;
+    }
+    
+    @PostMapping("/login/forgotpassword/confirmEmail")
+	@ApiOperation("ForgotPassword Confirm Email")
+	public ResponseEntity<JwtResponseDto> forgotPasswordConfirmEmail(@Valid @RequestBody EmailDto userLoginEmail) throws InvalidDataException {
+		JwtResponseDto forgotPassResDto = userLoginService.forgotPasswordConfirmEmail(userLoginEmail);
+		return ResponseEntity.status(HttpStatus.CREATED).body(forgotPassResDto);
+	}
+    
+    @GetMapping("/validateToken")
+    public ResponseEntity<ApiResponse> validateToken(@RequestHeader(value = "Authorization") String token) {
+        boolean status = this.userLoginService.validateToken(token);
+
+        if (status)
+            return new ResponseEntity<ApiResponse>(new ApiResponse("Valid", true), HttpStatus.OK);
+        else
+            return new ResponseEntity<ApiResponse>(new ApiResponse("InValid", false), HttpStatus.BAD_REQUEST);
     }
 }
