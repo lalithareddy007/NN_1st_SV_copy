@@ -18,6 +18,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -30,12 +33,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -105,10 +111,10 @@ public class UserLoginServiceTest {
 		JwtResponseDto jwtResponseDtoGot = userLoginService.signin(loginDto);
 
 		// then
-		Assertions.assertEquals(jwtResponseDtoGot.getEmail(), loginDto.getUserLoginEmailId());
-		Assertions.assertEquals(jwtResponseDtoGot.getToken(), jwtToken);
-		Assertions.assertEquals(jwtResponseDtoGot.getUserId(), "U11");
-		Assertions.assertEquals(jwtResponseDtoGot.getRoles(), Collections.singletonList("ROLE_STAFF"));
+		assertEquals(jwtResponseDtoGot.getEmail(), loginDto.getUserLoginEmailId());
+		assertEquals(jwtResponseDtoGot.getToken(), jwtToken);
+		assertEquals(jwtResponseDtoGot.getUserId(), "U11");
+		assertEquals(jwtResponseDtoGot.getRoles(), Collections.singletonList("ROLE_STAFF"));
 	}
 
 	@Mock
@@ -129,7 +135,7 @@ public class UserLoginServiceTest {
 
 		// Assert
 		String expectedUrl = frontendUrl + "/reset-password?token=" + token;
-		Assertions.assertEquals(expectedUrl, url);
+		assertEquals(expectedUrl, url);
 	}
 
 	@Test
@@ -144,9 +150,9 @@ public class UserLoginServiceTest {
 		JwtResponseDto result = userLoginService.forgotPasswordConfirmEmail(emailDto);
 
 		// Assert
-		Assertions.assertEquals("varun@gmail.com", result.getEmail());
-		Assertions.assertEquals("null", result.getToken());
-		Assertions.assertEquals("Invalid Email", result.getStatus());
+		assertEquals("varun@gmail.com", result.getEmail());
+		assertEquals("null", result.getToken());
+		assertEquals("Invalid Email", result.getStatus());
 	}
 
 	@Test
@@ -171,10 +177,75 @@ public class UserLoginServiceTest {
 		JwtResponseDto result = userLoginService.forgotPasswordConfirmEmail(emailDto);
 
 		//assert
-		Assertions.assertEquals("varun@gmail.com", result.getEmail().toString());
-		Assertions.assertEquals("null", result.getToken());
-		Assertions.assertEquals("login inactive", result.getStatus());
+		assertEquals("varun@gmail.com", result.getEmail().toString());
+		assertEquals("null", result.getToken());
+		assertEquals("login inactive", result.getStatus());
 	}
 
 
+	@DisplayName("JUnit test for Validating at Account activation")
+	@ParameterizedTest
+	@MethodSource("validationTestData")
+	public void testValidateTokenAtAccountActivation(String token, String expectedValidity) {
+		String tokenparse = null;
+		if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+			tokenparse = token.substring(7, token.length());
+		}
+
+		when(jwtUtils.validateAccountActivationToken(tokenparse))
+				.thenReturn(expectedValidity);
+
+		if (expectedValidity.equalsIgnoreCase("Valid")) {
+			String userName = jwtUtils.getUserNameFromJwtToken(tokenparse);
+			Optional<UserLogin> userOptional =  userLoginRepository.findByUserLoginEmailIgnoreCase(userName);
+
+		}
+
+		String validity = userLoginService.validateTokenAtAccountActivation(token);
+
+	}
+	private static Stream<Arguments> validationTestData() {
+		return Stream.of(
+				Arguments.of("Bearer ValidToken", "Valid"),
+				Arguments.of("Bearer ValidToken", "acctActivated already"),
+				Arguments.of("InvalidToken", "Invalid")
+		);
+	}
+
+	@DisplayName("JUnit test for Reset Password when token is valid ")
+	@Test
+	void testResetPassword_ValidToken_PasswordSaved() {
+		// given
+		LoginDto loginDto = new LoginDto();
+		loginDto.setUserLoginEmailId("test@example.com");
+		loginDto.setPassword("newpassword");
+		String token = "Bearer valid_token";
+		String expectedStatus = "Password saved";
+		//when
+		when(jwtUtils.validateJwtToken("valid_token")).thenReturn(true);
+		UserLogin userLogin = new UserLogin();
+		when(userLoginRepository.findByUserLoginEmailIgnoreCase(loginDto.getUserLoginEmailId()))
+				.thenReturn(Optional.of(userLogin));
+		String status = userLoginService.resetPassword(loginDto, token);
+		// then
+		assertEquals(expectedStatus, status);
+
+	}
+
+	@DisplayName("JUnit test for Reset Password when token is invalid")
+	@Test
+	void testResetPassword_InvalidTokenReset_ReturnsInvalid() {
+		// given
+		LoginDto loginDto = new LoginDto();
+		String token = "Bearer invalid_token";
+		String expectedStatus = "Invalid";
+		//when
+		when(jwtUtils.validateJwtToken("invalid_token")).thenReturn(false);
+		String status = userLoginService.resetPassword(loginDto, token);
+		// then
+		assertEquals(expectedStatus, status);
+	}
 }
+
+
+
