@@ -2,6 +2,7 @@ package com.numpyninja.lms.security;
 
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserLogin;
+import com.numpyninja.lms.exception.ResourceNotFoundException;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,6 +32,11 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
     public static UserDetailsImpl build(User user, UserLogin userLogin, List<String> roles) {
+
+        if(!userLogin.getLoginStatus().equalsIgnoreCase("ACTIVE")){
+            throw new ResourceNotFoundException(userLogin.getUserLoginEmail(),"Status",userLogin.getLoginStatus());
+        }
+
         List<GrantedAuthority> authorities = roles.stream()
                 .map( SimpleGrantedAuthority::new )
                 .collect(Collectors.toList());
