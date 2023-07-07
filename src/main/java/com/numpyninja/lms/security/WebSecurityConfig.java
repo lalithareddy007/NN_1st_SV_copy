@@ -75,7 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/login/**").permitAll()
+                .authorizeRequests().antMatchers("/**/**").permitAll()
                 .antMatchers(PUBLIC_URLS).permitAll()
                 .anyRequest().authenticated();        // ”permitAll” will configure the authorization so that all requests are allowed on that particular path ; '/login'
 
