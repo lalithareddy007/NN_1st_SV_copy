@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.numpyninja.lms.dto.*;
+import com.numpyninja.lms.entity.UserRoleMap;
 import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +144,11 @@ public class UserController {
 		String responseDto = userServices.updateUserLogin(updateUserLogin,userId);
 		return ResponseEntity.status(HttpStatus.OK).body("UserLoginEmail/Status Updated for User: " + userId);
 	}
-		
+
+    @GetMapping("/users/roles")
+    protected List<UserRoleMap> getAllUsersWithRoles() {
+        return userServices.getAllUsersWithRoles();
+    }
 }
 		
 		
