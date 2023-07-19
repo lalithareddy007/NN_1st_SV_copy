@@ -3,6 +3,7 @@ package com.numpyninja.lms.entity;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;

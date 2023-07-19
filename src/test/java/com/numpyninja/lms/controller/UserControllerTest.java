@@ -3,6 +3,7 @@ package com.numpyninja.lms.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.config.TestWebSecurityConfig;
+import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
@@ -357,8 +358,8 @@ public class UserControllerTest {
 	}
 
 	//changed name because there was conflict for get by programid and get by batchid
-@DisplayName("test to get user by program/batches batchid ")
-@SneakyThrows
+    @DisplayName("test to get user by program/batches batchid ")
+    @SneakyThrows
 	@Test
 	void testGetUserByProgramBatchesBatchid() {
 
