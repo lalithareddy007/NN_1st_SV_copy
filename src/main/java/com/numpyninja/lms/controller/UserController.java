@@ -2,6 +2,7 @@ package com.numpyninja.lms.controller;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 import com.numpyninja.lms.dto.*;
