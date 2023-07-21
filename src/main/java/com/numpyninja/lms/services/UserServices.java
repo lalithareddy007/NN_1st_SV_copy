@@ -693,6 +693,9 @@ public class UserServices implements UserDetailsService {
     
    
 
+    public List<UserRoleMap> getAllUsersWithRoles() {
+        return userRoleMapRepository.findAll();
+    }
 
 
 	/*
