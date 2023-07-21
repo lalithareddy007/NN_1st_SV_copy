@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository< User, String>{
         		"tbl_lms_userrole_map m, "+
         		" tbl_lms_role r  "+
         		"where m.role_id=r.role_id" +
-        		" and r.role_name='Staff' and m.user_role_status='Active' and u.user_id = m.user_id", nativeQuery=true)
+        		" and r.role_name='ROLE_STAFF' and m.user_role_status='Active' and u.user_id = m.user_id", nativeQuery=true)
         
          List<Object> getAllStaffList();
 
