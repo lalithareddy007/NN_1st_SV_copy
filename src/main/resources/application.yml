@@ -4,7 +4,7 @@ server:
     context-path: /lms
 spring:
   profiles:
-    active: dev
+    active: local
   #datasource:
     #url: jdbc:postgresql://localhost:5432/LMS_DB
     #username: postgres  #changed as per Local DB
@@ -31,11 +31,13 @@ spring:
       
   project:
   image: images/
-      
+  application:
+    name: NumPyNinja-Learning Management System/1.0    
 
 logging:
   file:
     name: lmsservice.log
     path: ./
 
-
+google:
+  calendar-id-lms: 42jsfha8fh5t0k9vem1gg8t7fc@group.calendar.google.com

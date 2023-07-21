@@ -61,4 +61,46 @@ public class GlobalExceptionHandler {
 		ApiResponse apiResponse = new ApiResponse(message, false);
 		return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
 	}
+	
+	@ExceptionHandler(CalendarAccessDeniedException.class)
+	public ResponseEntity<ApiResponse> calendarAccessDeniedExceptionExceptionHandler(CalendarAccessDeniedException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(GCalendarSecurityException.class)
+	public ResponseEntity<ApiResponse> calendarSecurityExceptionExceptionHandler(GCalendarSecurityException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(GCalendarCreateEventException.class)
+	public ResponseEntity<ApiResponse> calendarEventCreateExceptionExceptionHandler(GCalendarCreateEventException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(GCalendarGetEventsException.class)
+	public ResponseEntity<ApiResponse> calendarEventGetExceptionExceptionHandler(GCalendarGetEventsException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(GCalendarIOException.class)
+	public ResponseEntity<ApiResponse> calendarIOExceptionExceptionHandler(GCalendarIOException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(GCalendarEventNotFoundException.class)
+	public ResponseEntity<ApiResponse> calendarEventNotFoundExceptionExceptionHandler(GCalendarEventNotFoundException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+	}
 }
