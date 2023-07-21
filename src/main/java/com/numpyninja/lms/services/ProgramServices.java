@@ -10,7 +10,9 @@ import com.numpyninja.lms.mappers.ProgramMapper;
 import com.numpyninja.lms.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -68,7 +70,12 @@ public class ProgramServices {
 		Timestamp timestamp = Timestamp.valueOf(now);
 		newProgramEntity.setCreationTime(timestamp);
 		newProgramEntity.setLastModTime(timestamp);
-
+		//Bug5 Prog/Batch Module,Prog description not accepting integers only but accepts alphanumeric with spaces
+		String regexp = "^[a-z0-9][a-z0-9_ ]*(?:-[a-z0-9]+)*$";
+		if(program.getProgramDescription().matches(regexp))
+			newProgramEntity.setProgramDescription(program.getProgramDescription());
+		else
+			throw new InvalidDataException("give the correct format of description consisting of alphanumeric charcter with spaces");
 		List<Program>result= programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(newProgramEntity.getProgramName());
 		if(result.size()>0) {
 			throw new DuplicateResourceFoundException("cannot create program , since already exists");
