@@ -29,7 +29,7 @@ public class Program {
 
     @NotBlank(message = "Program Name is mandatory")
 
-    @Pattern(regexp = "([a-zA-Z0-9 ]+$)", message = "Program Name can contain only alphabets and numbers")
+    @Pattern(regexp = "(^[a-zA-Z][a-zA-Z0-9 ]+$)", message = "Program Name can contain only alphabets and numbers")
     @Length(min = 4, max = 25, message = "Program Name must be of min length 4 and max length 25")
     @Column(name="program_name")
     @NotNull
