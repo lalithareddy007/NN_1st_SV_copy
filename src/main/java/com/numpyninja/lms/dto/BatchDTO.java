@@ -4,6 +4,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import com.numpyninja.lms.config.ValidateStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +24,8 @@ public class BatchDTO {
 	
 	private String batchDescription;
 	
-	
+	//custom annotation to validate status( accepts only "Active" and "Inactive")
+	@ValidateStatus
 	@NotBlank ( message = "Batch status is needed"  )
 	private String batchStatus;
 	
