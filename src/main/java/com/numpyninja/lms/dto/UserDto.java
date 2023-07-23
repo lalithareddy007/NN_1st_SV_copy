@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.numpyninja.lms.config.PhoneNumberConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class UserDto {
 	
 	@NotNull(message = "Phone Number is required")
 	@JsonProperty("userPhoneNumber")
+	@PhoneNumberConstraint
 	private Long userPhoneNumber;
 	
 	@JsonProperty("userLocation")

@@ -179,14 +179,14 @@ public class UserServices implements UserDetailsService {
                             + newUserLoginRoleDto.getUserPhoneNumber() + " already exists !!");
                 }
             }
-            //Check if the Phone no is Long and does not accept String and accept in specified format(Example :+91 1234567890)
-            String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
-            if (Pattern.compile(allCountryRegex).matcher(newUserLoginRoleDto.getUserPhoneNumber().toString()).matches()) {
-                System.out.println("yes its a valid format");
-            } else {
-                System.out.println("Enter phone no correct format");
-                throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
-            }
+//            //Check if the Phone no is Long and does not accept String and accept in specified format(Example :+91 1234567890)
+//            String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
+//            if (Pattern.compile(allCountryRegex).matcher(newUserLoginRoleDto.getUserPhoneNumber().toString()).matches()) {
+//                System.out.println("yes its a valid format");
+//            } else {
+//                System.out.println("Enter phone no correct format");
+//                throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
+//            }
 
             /** Checking for valid TimeZone **/
             if (!isTimeZoneValid(newUserLoginRoleDto.getUserTimeZone())) {
