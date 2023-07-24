@@ -18,7 +18,7 @@ public class BatchSlimDto {
 
     private String batchName;
 
-    //custom annotation to validate status( accepts only "Active" and "Inactive")
+    //created custom annotation to validate status( accepts only "Active" and "Inactive")
     @ValidateStatus
     @JsonProperty("userBatchStatus")
     private String userRoleProgramBatchStatus;

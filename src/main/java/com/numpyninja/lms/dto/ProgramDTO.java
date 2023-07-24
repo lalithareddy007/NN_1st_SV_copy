@@ -24,7 +24,7 @@ public class ProgramDTO {
 		private String programName;
 		private String programDescription;
 		
-		//custom annotation to validate status( accepts only "Active" and "Inactive")
+		//created custom annotation to validate status(accepts only active and inactive)
 		@ValidateStatus
 		private String programStatus;
 		

@@ -24,7 +24,7 @@ public class BatchDTO {
 	
 	private String batchDescription;
 	
-	//custom annotation to validate status( accepts only "Active" and "Inactive")
+	//created custom annotation to validate status( accepts only "Active" and "Inactive")
 	@ValidateStatus
 	@NotBlank ( message = "Batch status is needed"  )
 	private String batchStatus;
