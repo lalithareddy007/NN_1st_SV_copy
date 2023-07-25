@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,27 +71,13 @@ public class ProgramServices {
 		Timestamp timestamp = Timestamp.valueOf(now);
 		newProgramEntity.setCreationTime(timestamp);
 		newProgramEntity.setLastModTime(timestamp);
-		//Bug5 Prog/Batch Module
-		// Resolved - Prog description does not accept integers only but accepts alphanumeric with spaces
-		String regexp = "^[a-z0-9][a-z0-9_ ]*(?:-[a-z0-9]+)*$";
-		if(program.getProgramDescription().matches(regexp))
-			newProgramEntity.setProgramDescription(program.getProgramDescription());
-		else
-			throw new InvalidDataException("give the correct format of description consisting of alphanumeric charcter with spaces");
-		//Bug6 Prog/Batch Module
-		// Resolved - Prog name does not accept integer only but accepts alphanumeric without spaces
-		String regexp1=	"^[a-zA-Z][a-zA-Z0-9 ]+$";
-		if(program.getProgramName().matches(regexp1))
-			newProgramEntity.setProgramName(program.getProgramName());
-		else
-			throw new InvalidDataException("give the correct format of description consisting of alphanumeric charcter");
 		List<Program>result= programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(newProgramEntity.getProgramName());
 		if(result.size()>0) {
 			throw new DuplicateResourceFoundException("cannot create program , since already exists");
 		}else {
 
 			savedEntity = programRepository.save(newProgramEntity);
-			savedProgramDTO= programMapper.INSTANCE.toProgramDTO(savedEntity);
+			savedProgramDTO= programMapper.toProgramDTO(savedEntity);
 			return (savedProgramDTO);
 		}
 
@@ -114,8 +101,9 @@ public class ProgramServices {
 			updateLMSProgramEntity.setProgramName(program.getProgramName());
 			updateLMSProgramEntity.setProgramDescription(program.getProgramDescription());
 			updateLMSProgramEntity.setProgramStatus(program.getProgramStatus());
-			updateLMSProgramEntity.setCreationTime(program.getCreationTime());
-			updateLMSProgramEntity.setLastModTime(program.getLastModTime());
+
+			updateLMSProgramEntity.setCreationTime(savedProgramEntity.getCreationTime());
+			updateLMSProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 
 			savedProgramEntity = programRepository.save(updateLMSProgramEntity);
 			savedProgramDTO =programMapper.INSTANCE.toProgramDTO(savedProgramEntity);
@@ -146,8 +134,8 @@ public class ProgramServices {
 				updateProgramEntity.setProgramName(program.getProgramName());
 				updateProgramEntity.setProgramDescription(program.getProgramDescription());
 				updateProgramEntity.setProgramStatus(program.getProgramStatus());
-				updateProgramEntity.setCreationTime(program.getCreationTime());
-				updateProgramEntity.setLastModTime(program.getLastModTime());
+				updateProgramEntity.setCreationTime(updateProgramEntity.getCreationTime());
+				updateProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 				//updateProgramEntity= programMapper.INSTANCE.toProgramEntity(program);
 				programRepository.save(updateProgramEntity);
 
