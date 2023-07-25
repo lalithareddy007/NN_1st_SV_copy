@@ -3,6 +3,7 @@ package com.numpyninja.lms.dto;
 import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.numpyninja.lms.config.ValidateStatus;
 import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.User;
 
@@ -25,6 +26,8 @@ public class UserRoleMapSlimDTO {
 	//@JsonProperty("roleName")
 	//private String roleName;
 	
+	//created custom annotation to validate status( accepts only "Active" and "Inactive")
+    @ValidateStatus
 	@NotEmpty(message = "Role Status is Mandatory")
 	@JsonProperty("userRoleStatus")
 	private String userRoleStatus;
