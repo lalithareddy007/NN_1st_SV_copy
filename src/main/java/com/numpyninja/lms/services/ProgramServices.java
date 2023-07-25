@@ -10,9 +10,12 @@ import com.numpyninja.lms.mappers.ProgramMapper;
 import com.numpyninja.lms.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,14 +71,13 @@ public class ProgramServices {
 		Timestamp timestamp = Timestamp.valueOf(now);
 		newProgramEntity.setCreationTime(timestamp);
 		newProgramEntity.setLastModTime(timestamp);
-
 		List<Program>result= programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(newProgramEntity.getProgramName());
 		if(result.size()>0) {
 			throw new DuplicateResourceFoundException("cannot create program , since already exists");
 		}else {
 
 			savedEntity = programRepository.save(newProgramEntity);
-			savedProgramDTO= programMapper.INSTANCE.toProgramDTO(savedEntity);
+			savedProgramDTO= programMapper.toProgramDTO(savedEntity);
 			return (savedProgramDTO);
 		}
 
@@ -99,8 +101,9 @@ public class ProgramServices {
 			updateLMSProgramEntity.setProgramName(program.getProgramName());
 			updateLMSProgramEntity.setProgramDescription(program.getProgramDescription());
 			updateLMSProgramEntity.setProgramStatus(program.getProgramStatus());
-			updateLMSProgramEntity.setCreationTime(program.getCreationTime());
-			updateLMSProgramEntity.setLastModTime(program.getLastModTime());
+
+			updateLMSProgramEntity.setCreationTime(savedProgramEntity.getCreationTime());
+			updateLMSProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 
 			savedProgramEntity = programRepository.save(updateLMSProgramEntity);
 			savedProgramDTO =programMapper.INSTANCE.toProgramDTO(savedProgramEntity);
@@ -131,8 +134,8 @@ public class ProgramServices {
 				updateProgramEntity.setProgramName(program.getProgramName());
 				updateProgramEntity.setProgramDescription(program.getProgramDescription());
 				updateProgramEntity.setProgramStatus(program.getProgramStatus());
-				updateProgramEntity.setCreationTime(program.getCreationTime());
-				updateProgramEntity.setLastModTime(program.getLastModTime());
+				updateProgramEntity.setCreationTime(updateProgramEntity.getCreationTime());
+				updateProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 				//updateProgramEntity= programMapper.INSTANCE.toProgramEntity(program);
 				programRepository.save(updateProgramEntity);
 
