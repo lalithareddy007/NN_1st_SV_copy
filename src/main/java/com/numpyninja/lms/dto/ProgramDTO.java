@@ -2,9 +2,12 @@ package com.numpyninja.lms.dto;
 
 import java.sql.Timestamp;
 
+import javax.validation.constraints.Pattern;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.numpyninja.lms.config.ValidateStatus;
+import com.numpyninja.lms.util.Constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +24,7 @@ import lombok.Setter;
 public class ProgramDTO {
 
 		private Long programId;
+		@Pattern(regexp = Constants.REGEX_MIN_2_ALPHA_NUMERIC, message = "programName " + Constants.MSG_ALPHANUMERIC_ONLY_MIN_2)
 		private String programName;
 		private String programDescription;
 		
