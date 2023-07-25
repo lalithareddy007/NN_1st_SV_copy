@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.numpyninja.lms.config.ValidateStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,9 @@ public class ProgramDTO {
 		private Long programId;
 		private String programName;
 		private String programDescription;
+		
+		//created custom annotation to validate status(accepts only active and inactive)
+		@ValidateStatus
 		private String programStatus;
 		
 		private Timestamp creationTime;
