@@ -36,7 +36,8 @@ public class ProgramDTO {
 		private String programDescription;
 
 		private String programStatus;
-
+	    private Timestamp creationTime;
+	    private Timestamp lastModTime;
 
 }
 
