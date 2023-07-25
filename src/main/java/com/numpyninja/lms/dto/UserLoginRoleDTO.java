@@ -1,22 +1,21 @@
 package com.numpyninja.lms.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.numpyninja.lms.config.AllowAlphabetsOnly;
-import com.numpyninja.lms.entity.UserLogin;
-import com.numpyninja.lms.util.Constants;
+import java.util.List;
 
-import lombok.*;
-
-import javax.persistence.Column;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.numpyninja.lms.util.Constants;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -29,7 +28,6 @@ public class UserLoginRoleDTO {
 
     @NotEmpty(message = "User First Name is cannot be null or empty")
     @JsonProperty("userFirstName")
-    //@AllowAlphabetsOnly()
     @Pattern(regexp = Constants.REGEX_MIN_2_ALPHABET, 
     	message = "userFirstName " + Constants.MSG_ALPHABET_ONLY_MIN_2)
     private String userFirstName;
