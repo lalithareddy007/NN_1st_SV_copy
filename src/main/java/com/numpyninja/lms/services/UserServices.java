@@ -360,7 +360,7 @@ public class UserServices implements UserDetailsService {
 
     public String updateUserRoleStatus(UserRoleMapSlimDTO updateUserRoleStatus, String userId)
             throws InvalidDataException {
-
+    	
         if (userId == null) {
             throw new InvalidDataException("UserId cannot be blank/null");
         } else {
@@ -384,15 +384,11 @@ public class UserServices implements UserDetailsService {
                     if (roleIdToUpdate.equals(existingRoleId)) {
                         roleFound = true;
 
-                        // if role id exists - update role status
                         Long userRoleId = existingUserRoles.get(roleCount).getUserRoleId();
-
-                        // using Update custom query
+                       	
                         userRoleMapRepository.updateUserRole(userRoleId, roleStatusToUpdate);
-                        break;
                     }
                 }
-
                 if (!roleFound) {
                     throw new ResourceNotFoundException(
                             "RoleID: " + roleIdToUpdate + " not found for the " + "UserID: " + userId);
@@ -693,6 +689,9 @@ public class UserServices implements UserDetailsService {
     
    
 
+    public List<UserRoleMap> getAllUsersWithRoles() {
+        return userRoleMapRepository.findAll();
+    }
 
 
 	/*

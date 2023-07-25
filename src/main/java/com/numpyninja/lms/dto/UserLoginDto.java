@@ -3,6 +3,8 @@ package com.numpyninja.lms.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.numpyninja.lms.config.ValidateStatus;
+
 import lombok.*;
 
 import javax.persistence.Column;
@@ -23,6 +25,8 @@ public class UserLoginDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String loginStatus;
 
+  //created custom annotation to validate status( accepts only "Active" and "Inactive")
+    @ValidateStatus
     @JsonIgnore
     private String status;
 

@@ -5,6 +5,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
+import com.numpyninja.lms.config.ValidateStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +30,11 @@ public class BatchDTO {
 	@Length(min = 4, max = 25, message = "Batch Description must be of min length 4 and max length 25")
 	private String batchDescription;
 	
+<<<<<<< HEAD
+=======
+	//created custom annotation to validate status( accepts only "Active" and "Inactive")
+	@ValidateStatus
+>>>>>>> LMSPhase2
 	@NotBlank ( message = "Batch status is needed"  )
 	private String batchStatus;
 	
