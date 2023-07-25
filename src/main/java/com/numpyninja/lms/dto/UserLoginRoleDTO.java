@@ -3,7 +3,10 @@ package com.numpyninja.lms.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.numpyninja.lms.config.AllowAlphabetsOnly;
 import com.numpyninja.lms.entity.UserLogin;
+import com.numpyninja.lms.util.Constants;
+
 import lombok.*;
 
 import javax.persistence.Column;
@@ -11,6 +14,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 import java.util.List;
 
 @Getter
@@ -24,14 +29,21 @@ public class UserLoginRoleDTO {
 
     @NotEmpty(message = "User First Name is cannot be null or empty")
     @JsonProperty("userFirstName")
+    //@AllowAlphabetsOnly()
+    @Pattern(regexp = Constants.REGEX_MIN_2_ALPHABET, 
+    	message = "userFirstName " + Constants.MSG_ALPHABET_ONLY_MIN_2)
     private String userFirstName;
 
     @NotEmpty(message = "User Last Name is cannot be null or empty")
     @JsonProperty("userLastName")
+    @Pattern(regexp = Constants.REGEX_MIN_1_ALPHABET, 
+	message = "userLastName " + Constants.MSG_ALPHABET_ONLY_MIN_1)
     private String userLastName;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("userMiddleName")
+    @Pattern(regexp = Constants.REGEX_MIN_1_ALPHABET, 
+	message = "userMiddleName " + Constants.MSG_ALPHABET_ONLY_MIN_1)
     private String userMiddleName;
 
     @NotNull(message = "Phone Number is required")
@@ -44,15 +56,23 @@ public class UserLoginRoleDTO {
     @JsonProperty("userTimeZone")
     private String userTimeZone;
 
+    @Pattern(regexp = Constants.REGEX_LINKEDIN_URL, 
+    		message = "userLinkedinUrl" + Constants.MSG_INVALID_LINKEDIN_URL)
     @JsonProperty("userLinkedinUrl")
     private String userLinkedinUrl;
 
+    @Pattern(regexp = Constants.REGEX_MIN_2_ALPHA_NUMERIC, 
+    		message = "userEduUg " + Constants.MSG_ALPHANUMERIC_ONLY_MIN_2)
     @JsonProperty("userEduUg")
     private String userEduUg;
 
+    @Pattern(regexp = Constants.REGEX_MIN_2_ALPHA_NUMERIC, 
+    		message = "userEduPg" + Constants.MSG_ALPHANUMERIC_ONLY_MIN_2)
     @JsonProperty("userEduPg")
     private String userEduPg;
-
+    
+    @Pattern(regexp = Constants.REGEX_MIN_2_ALPHA_NUMERIC, 
+    		message = "userComments " + Constants.MSG_ALPHANUMERIC_ONLY_MIN_2)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("userComments")
     private String userComments;
@@ -65,7 +85,7 @@ public class UserLoginRoleDTO {
     @JsonProperty("userRoleMaps")
     private List<UserRoleMapSlimDTO> userRoleMaps;
 
-    @Valid
+    //@Valid
     @JsonProperty("userLogin")
     private UserLoginDto userLogin;
 
