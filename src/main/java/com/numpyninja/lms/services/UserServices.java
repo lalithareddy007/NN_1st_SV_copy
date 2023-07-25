@@ -179,14 +179,16 @@ public class UserServices implements UserDetailsService {
                             + newUserLoginRoleDto.getUserPhoneNumber() + " already exists !!");
                 }
             }
-//            //Check if the Phone no is Long and does not accept String and accept in specified format(Example :+91 1234567890)
-//            String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
-//            if (Pattern.compile(allCountryRegex).matcher(newUserLoginRoleDto.getUserPhoneNumber().toString()).matches()) {
-//                System.out.println("yes its a valid format");
-//            } else {
-//                System.out.println("Enter phone no correct format");
-//                throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
-//            }
+            //Check if the Phone no is Long and does not accept String and accept in specified format(Example :+91 1234567890)
+        // String allCountryRegex="\\(?\\+[0-9]{1,3}\\)? ?-?[0-9]{1,3} ?-?[0-9]{3,5} ?-?[0-9]{4}( ?-?[0-9]{3})? ?(\\w{1,10}\\s?\\d{1,6})?";
+            // String allCountryRegex="^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$";
+             String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
+            if (Pattern.compile(allCountryRegex).matcher(newUserLoginRoleDto.getUserPhoneNumber().toString()).matches()) {
+                System.out.println("yes its a valid format");
+            } else {
+                System.out.println("Enter phone no correct format");
+                throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
+            }
 
             /** Checking for valid TimeZone **/
             if (!isTimeZoneValid(newUserLoginRoleDto.getUserTimeZone())) {
@@ -650,7 +652,8 @@ public class UserServices implements UserDetailsService {
 
         return url;
     }
-
+//    final String url = UriComponentsBuilder.fromHttpUrl(getFrontendURL()).path("/reset-password")
+//            .queryParam("token", token).toUriString();
     @Transactional
     public String updateUserLogin(UserLoginDto updateUserLogin, String userId) throws InvalidDataException {
         if (userId == null) {
