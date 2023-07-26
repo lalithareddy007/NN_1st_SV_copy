@@ -404,9 +404,11 @@ public class UserServices implements UserDetailsService {
     public String deleteUser(String userId) throws ResourceNotFoundException {
 
         boolean userExists = userRepository.existsById(userId);
-
-        if (!userExists) {
-            throw new ResourceNotFoundException("UserID: " + userId + " doesnot exist ");
+        boolean noBatchProgramForUser = userRoleProgramBatchMapRepository.findByUser_UserId(userId).isEmpty();
+        if (!userExists){
+            throw new ResourceNotFoundException("UserID: " + userId + " does not exist ");
+        } else if(!noBatchProgramForUser) {
+        	throw new ResourceNotFoundException("UserID: " + userId + " Cannot be deleted as the User is assigned to a Batch/Program ");
         } else {
             UserLogin userLogin = userLoginRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
             userRepository.deleteById(userId);
