@@ -179,6 +179,11 @@ public class UserServices implements UserDetailsService {
                             + newUserLoginRoleDto.getUserPhoneNumber() + " already exists !!");
                 }
             }
+            /*Check Role is valid*/
+            if(!isValidRole(newUserLoginRoleDto.getUserRoleMaps())) {
+            	throw new InvalidDataException("Failed to create user, as 'roleId' is invalid !! ");
+            }
+            
             //Check if the Phone no is Long and does not accept String and accept in specified format(Example :+91 1234567890)
             String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
             if (Pattern.compile(allCountryRegex).matcher(newUserLoginRoleDto.getUserPhoneNumber().toString()).matches()) {
@@ -295,7 +300,22 @@ public class UserServices implements UserDetailsService {
 
     }
 
-    public UserDto updateUser(UserDto updateuserDto, String userId)
+    private boolean isValidRole(List<UserRoleMapSlimDTO> userRoleMaps) {
+    	//Get all existing roles and check if the role passed matches to one of them
+    	List<Role> availableRoles = roleRepository.findAll();
+    	//Get  unique RoleIds present in DB
+    	Set<String> availableRoleIds = availableRoles.stream().map(avRole->avRole.getRoleId()).collect(Collectors.toSet());  
+    	//Get the input roleIds which are not in DB as invalidRole list 
+    	Set<UserRoleMapSlimDTO> invalidRole = userRoleMaps.stream().filter(urm-> !availableRoleIds.contains(urm.getRoleId())).collect(Collectors.toSet());
+    	//If no invalid Roles are  present then return true, else return false
+    	if(invalidRole.isEmpty()) {
+    		return true;
+    	}
+		return false;
+	}
+
+
+	public UserDto updateUser(UserDto updateuserDto, String userId)
             throws ResourceNotFoundException, InvalidDataException {
         User toBeupdatedUser = null;
         Date utilDate = new Date();
