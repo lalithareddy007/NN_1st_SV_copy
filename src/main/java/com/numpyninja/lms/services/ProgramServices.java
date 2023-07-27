@@ -86,7 +86,7 @@ public class ProgramServices {
 	//update based on programId
 	public ProgramDTO updateProgramById(Long programId,ProgramDTO program)throws ResourceNotFoundException
 	{
-		Program updateLMSProgramEntity =null;
+		//Program updateLMSProgramEntity =null;
 		Program savedProgramEntity =null;
 		ProgramDTO savedProgramDTO =null;
 
@@ -97,12 +97,12 @@ public class ProgramServices {
 		}
 		else {
 
-			updateLMSProgramEntity= programRepository.findById(programId).get();
+			Program updateLMSProgramEntity= programRepository.findById(programId).get();
 			updateLMSProgramEntity.setProgramName(program.getProgramName());
 			updateLMSProgramEntity.setProgramDescription(program.getProgramDescription());
 			updateLMSProgramEntity.setProgramStatus(program.getProgramStatus());
-
-			updateLMSProgramEntity.setCreationTime(savedProgramEntity.getCreationTime());
+//Bug8 ProgramBatch
+			updateLMSProgramEntity.setCreationTime(updateLMSProgramEntity.getCreationTime());
 			updateLMSProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 
 			savedProgramEntity = programRepository.save(updateLMSProgramEntity);
