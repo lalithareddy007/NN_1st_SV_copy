@@ -2,16 +2,21 @@ package com.numpyninja.lms.dto;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.numpyninja.lms.util.Constants;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -21,9 +26,13 @@ public class AssignmentDto {
 	private Long assignmentId;
 
 	@NotEmpty(message = "Assignment Name is mandatory")
+	@Pattern(regexp=Constants.REGEX_MIN_2_ALPHA_NUMERIC, message= "assignmentName " + Constants.MSG_ALPHANUMERIC_ONLY_MIN_2)
+	@Size(min = 4, max = 25, message = "assignmentName must contain minimum of 4 and maximum of 25 characters")
 	private String assignmentName;
 
 	@NotEmpty(message = "Assignment Description is mandatory")
+	@Pattern(regexp=Constants.REGEX_DESC_ALPHA_NUMERIC_SPCL, message= "assignmentDescription " + Constants.MSG_DESC_ALPHA_NUMERIC_SPCL)
+	@Size(min = 4, max = 25, message = "assignmentName must contain minimum of 4 and maximum of 25 characters")
 	private String assignmentDescription;
 
 	private String comments;
@@ -44,7 +53,7 @@ public class AssignmentDto {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String pathAttachment4;
-
+													
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String pathAttachment5;
 
