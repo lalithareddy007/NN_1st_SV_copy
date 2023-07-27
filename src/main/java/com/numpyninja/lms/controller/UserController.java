@@ -97,6 +97,7 @@ public class UserController {
 	@ApiOperation("Delete User")
 	public ResponseEntity<String> deleteUser(@PathVariable(value = "userId") String userId) throws ResourceNotFoundException {
 		String deletedUserId = userServices.deleteUser(userId);
+		System.out.println("Hi");
 		return ResponseEntity.status(HttpStatus.OK).body("Deleted User ID:  " + deletedUserId);
 		//return deletedUserId;
 	}
