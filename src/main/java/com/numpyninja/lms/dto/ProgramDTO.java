@@ -2,9 +2,12 @@ package com.numpyninja.lms.dto;
 
 import java.sql.Timestamp;
 
+import javax.validation.constraints.Pattern;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.numpyninja.lms.config.ValidateStatus;
+import com.numpyninja.lms.util.Constants;
 
 import com.numpyninja.lms.util.Constants;
 import lombok.AllArgsConstructor;
@@ -32,6 +35,7 @@ public class ProgramDTO {
 
 	    @Pattern(regexp = "(^[a-zA-Z][a-zA-Z0-9 ]+$)", message = "Program Name can contain only alphabets and numbers")
 	    @Length(min = 4, max = 25, message = "Program Name must be of min length 4 and max length 25")
+
 		private String programName;
 
 		//Bug5 Program Batch solved
