@@ -79,7 +79,7 @@ public class AssignmentSubmitController {
     public ResponseEntity<ApiResponse> deleteSubmission(@PathVariable Long id)
     {
         assignmentSubmitService.deleteSubmissions(id);
-        return new ResponseEntity(new ApiResponse("Submission deleted successfully", true),HttpStatus.OK);
+        return new ResponseEntity<ApiResponse>(new ApiResponse("Submission deleted successfully", true),HttpStatus.OK);
     }
     
     @GetMapping("/getGrades/{assignmentId}")
@@ -105,13 +105,14 @@ public class AssignmentSubmitController {
         AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitService.gradeAssignmentSubmission(assignmentSubmitDTO,submissionId);
         return ResponseEntity.status(HttpStatus.OK).body(gradedSubmissionDTO);
     }
+    
     @GetMapping("/grades/{batchId}")
     @ApiOperation("Get Grades by Batch Id")
     public ResponseEntity<List<AssignmentSubmitDTO>> getGradesByBatchId(@PathVariable Integer batchId) {
         List<AssignmentSubmitDTO> assignmentSubmitDTOs = assignmentSubmitService.getGradesByBatchId(batchId);
         return ResponseEntity.ok(assignmentSubmitDTOs);
     }
-
+    
     @GetMapping("/{assignmentId}")
     @ApiOperation("Get Submission by Assignment Id")
     public ResponseEntity<List<AssignmentSubmitDTO>> getSubmissionsByAssignmentId(@PathVariable Long assignmentId){
