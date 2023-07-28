@@ -24,6 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -183,15 +184,10 @@ public class UserServices implements UserDetailsService {
             if(!isValidRole(newUserLoginRoleDto.getUserRoleMaps())) {
             	throw new InvalidDataException("Failed to create user, as 'roleId' is invalid !! ");
             }
-            
-            //Check if the Phone no is Long and does not accept String and accept in specified format(Example :+91 1234567890)
-            String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
-            if (Pattern.compile(allCountryRegex).matcher(newUserLoginRoleDto.getUserPhoneNumber().toString()).matches()) {
-                System.out.println("yes its a valid format");
-            } else {
-                System.out.println("Enter phone no correct format");
-                throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
-            }
+
+            if(!isValidPhoneNo(newUserLoginRoleDto.getUserPhoneNumber()))
+                throw new InvalidDataException("Phone no is invalid !! ");
+
 
             /** Checking for valid TimeZone **/
             if (!isTimeZoneValid(newUserLoginRoleDto.getUserTimeZone())) {
@@ -300,6 +296,8 @@ public class UserServices implements UserDetailsService {
 
     }
 
+
+
     private boolean isValidRole(List<UserRoleMapSlimDTO> userRoleMaps) {
     	//Get all existing roles and check if the role passed matches to one of them
     	List<Role> availableRoles = roleRepository.findAll();
@@ -314,6 +312,24 @@ public class UserServices implements UserDetailsService {
 		return false;
 	}
 
+//
+//    //Check if the Phone no is Long and does not accept String and accept in specified format(Example :91 1234567890)
+    public boolean isValidPhoneNo(@NotNull(message = "Phone Number is required") Long PhoneNumber) {
+       // String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
+       // String allCountryRegex = "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$";
+        String allCountryRegex =   "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$";
+
+        if (Pattern.compile(allCountryRegex).matcher(PhoneNumber.toString()).matches())  {
+            if(PhoneNumber.toString().length()<14)
+            return true;
+           // System.out.println("yes its a valid format");
+        } else {
+            return false;
+           // System.out.println("Enter phone no correct format");
+            //throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
+        }
+       return false;
+    }
 
 	public UserDto updateUser(UserDto updateuserDto, String userId)
             throws ResourceNotFoundException, InvalidDataException {

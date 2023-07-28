@@ -46,6 +46,8 @@ public class UserLoginRoleDTO {
 
     @NotNull(message = "Phone Number is required")
     @JsonProperty("userPhoneNumber")
+    @Pattern(regexp = "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$",
+            message = "userPhoneno Invalid" )
     private Long userPhoneNumber;
 
     @JsonProperty("userLocation")
