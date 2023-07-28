@@ -3,6 +3,7 @@ package com.numpyninja.lms.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.numpyninja.lms.config.PhoneNumberConstraint;
 import com.numpyninja.lms.entity.UserLogin;
 import lombok.*;
 
@@ -36,6 +37,7 @@ public class UserLoginRoleDTO {
 
     @NotNull(message = "Phone Number is required")
     @JsonProperty("userPhoneNumber")
+    @PhoneNumberConstraint
     private Long userPhoneNumber;
 
     @JsonProperty("userLocation")
