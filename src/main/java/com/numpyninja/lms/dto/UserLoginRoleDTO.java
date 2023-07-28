@@ -3,6 +3,7 @@ package com.numpyninja.lms.dto;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -16,6 +17,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Setter
@@ -46,8 +49,9 @@ public class UserLoginRoleDTO {
 
     @NotNull(message = "Phone Number is required")
     @JsonProperty("userPhoneNumber")
-    @Pattern(regexp = "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$",
-            message = "userPhoneno Invalid" )
+    @Pattern(regexp = "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$", message = "userPhoneno Invalid" )
+    //@Length(min = 10, max = 13, message = "Phone no must be of min length 10 and max length 13")
+   // @Range(min = 10,max= 10, message = "phone_no should be exact 10 characters.")
     private Long userPhoneNumber;
 
     @JsonProperty("userLocation")

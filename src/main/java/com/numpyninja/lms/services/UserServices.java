@@ -185,8 +185,8 @@ public class UserServices implements UserDetailsService {
             	throw new InvalidDataException("Failed to create user, as 'roleId' is invalid !! ");
             }
 
-            if(!isValidPhoneNo(newUserLoginRoleDto.getUserPhoneNumber()))
-                throw new InvalidDataException("Phone no is invalid !! ");
+//            if(!isValidPhoneNo(newUserLoginRoleDto.getUserPhoneNumber()))
+//                throw new InvalidDataException("Phone no is invalid !! ");
 
 
             /** Checking for valid TimeZone **/
@@ -314,22 +314,22 @@ public class UserServices implements UserDetailsService {
 
 //
 //    //Check if the Phone no is Long and does not accept String and accept in specified format(Example :91 1234567890)
-    public boolean isValidPhoneNo(@NotNull(message = "Phone Number is required") Long PhoneNumber) {
-       // String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
-       // String allCountryRegex = "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$";
-        String allCountryRegex =   "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$";
-
-        if (Pattern.compile(allCountryRegex).matcher(PhoneNumber.toString()).matches())  {
-            if(PhoneNumber.toString().length()<14)
-            return true;
-           // System.out.println("yes its a valid format");
-        } else {
-            return false;
-           // System.out.println("Enter phone no correct format");
-            //throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
-        }
-       return false;
-    }
+//    public boolean isValidPhoneNo(@NotNull(message = "Phone Number is required") Long PhoneNumber) {
+//       // String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
+//       // String allCountryRegex = "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$";
+//        String allCountryRegex =   "^\\+(?:[0-9]?){1,3}\\s?(?:(?:\\([0-9]+\\))|(?:[0-9]+))[-\\s./0-9]*$";
+//
+//        if (Pattern.compile(allCountryRegex).matcher(PhoneNumber.toString()).matches())  {
+//          //  if(PhoneNumber.toString().length()<14)
+//            return true;
+//           // System.out.println("yes its a valid format");
+//        } else {
+//            return false;
+//           // System.out.println("Enter phone no correct format");
+//            //throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
+//        }
+//       return false;
+//    }
 
 	public UserDto updateUser(UserDto updateuserDto, String userId)
             throws ResourceNotFoundException, InvalidDataException {
