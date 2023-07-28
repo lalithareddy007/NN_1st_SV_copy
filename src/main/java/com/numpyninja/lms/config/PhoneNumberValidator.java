@@ -16,8 +16,8 @@ public class PhoneNumberValidator implements
     @Override
     public boolean isValid(Long contactField, ConstraintValidatorContext context) {
         String phoneNumberStr = contactField.toString();
-        String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
-        return phoneNumberStr != null && phoneNumberStr.equals(allCountryRegex)
+       // String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
+        return phoneNumberStr != null && phoneNumberStr.matches("[0-9]+")
              && (phoneNumberStr.length()> 8) && (phoneNumberStr.length() < 14);
 
 //        String phoneNumberStr = contactField.toString();
