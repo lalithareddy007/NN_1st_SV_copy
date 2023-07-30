@@ -1,16 +1,27 @@
 package com.numpyninja.lms.services.gcalendar;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +47,7 @@ import com.numpyninja.lms.exception.GCalendarEventNotFoundException;
 import com.numpyninja.lms.exception.GCalendarIOException;
 import com.numpyninja.lms.exception.GCalendarSecurityException;
 import com.numpyninja.lms.mappers.GCalendarEventsMapper;
+import com.numpyninja.lms.services.KeyService;
 
 @Service
 public class GoogleCalendarService {
@@ -45,15 +57,23 @@ public class GoogleCalendarService {
 
 	@Value("${google.calendar-id-lms}")
 	private String CALENDAR_ID;
-
+	
+	@Autowired
+	KeyService keyService;
 	private static final Logger logger = LoggerFactory.getLogger(GoogleCalendarService.class);
 
 	//Load credentials from file to GoogleCredentials Object
 	private GoogleCredentials getServiceCredentials() throws FileNotFoundException, IOException {
-		String fileName = "service_account/credentials.json";
-		GoogleCredentials credential = GoogleCredentials
-				.fromStream(java.util.Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(fileName)))
-				.createScoped(Collections.singletonList(CalendarScopes.CALENDAR));
+		GoogleCredentials credential;
+		try {
+			credential = GoogleCredentials
+					.fromStream(new FileInputStream(new File(keyService.getCredentials())))
+					.createScoped(Collections.singletonList(CalendarScopes.CALENDAR));
+			keyService.cleanup();
+		} catch (Exception e) {
+			logger.error("Error: ", e);
+			throw new GCalendarIOException(e.getLocalizedMessage());
+		}
 		// .createDelegated("numpyninja01@gmail.com");
 		credential.refreshIfExpired();
 		return credential;
@@ -236,4 +256,37 @@ public class GoogleCalendarService {
 		}
 
 	}
+	
+	public static void decrypt(Key key, File inputFile, File outputFile)
+            throws com.numpyninja.lms.exception.CryptoException {
+        doCrypto(Cipher.DECRYPT_MODE, key, inputFile, outputFile);
+    }
+ 
+//    private static void doCrypto(int cipherMode, String key, File inputFile,  
+    private static void doCrypto(int cipherMode, Key key, File inputFile,
+            File outputFile) throws com.numpyninja.lms.exception.CryptoException {
+        try {
+           // Key secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
+        	final String TRANSFORMATION = "AES";
+        	Key secretKey = key;
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            cipher.init(cipherMode, secretKey);
+             
+            FileInputStream inputStream = new FileInputStream(inputFile);
+            byte[] inputBytes = new byte[(int) inputFile.length()];
+            inputStream.read(inputBytes);
+             
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+             
+            FileOutputStream outputStream = new FileOutputStream(outputFile);
+            outputStream.write(outputBytes);
+            inputStream.close();
+            outputStream.close();
+             
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException
+                | InvalidKeyException | BadPaddingException
+                | IllegalBlockSizeException | IOException ex) {
+            throw new com.numpyninja.lms.exception.CryptoException("Error encrypting/decrypting file", ex);
+        }
+    }
 }

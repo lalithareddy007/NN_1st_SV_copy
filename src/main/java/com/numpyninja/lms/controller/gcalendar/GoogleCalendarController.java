@@ -52,7 +52,7 @@ public class GoogleCalendarController {
 		return new ResponseEntity<String>("Event creation success", HttpStatus.CREATED);
 	}
 	
-	//EVent update is currently not working 
+	//Event update is currently not working 
 	@PutMapping(path = "/gcalendar/event/{id}", produces = "application/json")
 	@ApiOperation("Gat all the calendars from given startDate to endDate")
 	public ResponseEntity<String> updateCalendarEvent(@PathVariable("id")String eventId, @Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
