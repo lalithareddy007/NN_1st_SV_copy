@@ -38,7 +38,7 @@ public class KeyService {
 	
 	private Logger logger = LoggerFactory.getLogger(KeyService.class);
 
-	public Key getKey() throws Exception {
+	private Key getKey() throws Exception {
 		Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
 		if (!encodedKey.isPresent()) {
 			throw new Exception("Key is not present");
@@ -48,15 +48,17 @@ public class KeyService {
 		return secret;
 	}
 
-//	public void storeKey() throws IOException {
-//		String inputFile = "service_account/secret";
-//		BufferedInputStream fis = (BufferedInputStream) ClassLoader.getSystemResourceAsStream(inputFile);
-//		byte[] content = fis.readAllBytes();
-//		com.numpyninja.lms.entity.Key key = new com.numpyninja.lms.entity.Key();
-//		key.setKey(content);
-//		key.setId(1);
-//		keyRepo.save(key);
-//	}
+	//This code should be used for storing the key in the database
+	//This is not used all the time but, incase key needs to be re-written to DB, it should be done through this
+	public void storeKey() throws IOException {
+		String inputFile = "service_account/secret";
+		BufferedInputStream fis = (BufferedInputStream) ClassLoader.getSystemResourceAsStream(inputFile);
+		byte[] content = fis.readAllBytes();
+		com.numpyninja.lms.entity.Key key = new com.numpyninja.lms.entity.Key();
+		key.setKey(content);
+		key.setId(1);
+		keyRepo.save(key);
+	}
 
 	public String getCredentials() throws Exception {
 		try {
