@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.AssignmentDto;
+import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.services.AssignmentService;
+import com.numpyninja.lms.services.AssignmentSubmitService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +33,9 @@ public class AssignmentController {
 	
 	@Autowired
 	private AssignmentService assignmentService;
+	
+	@Autowired
+	public AssignmentSubmitService assignmentSubmitService;
 	
 	//create an assignment
 	@PostMapping("")
@@ -55,8 +60,17 @@ public class AssignmentController {
 	@RolesAllowed({"ROLE_ADMIN"})
 	@ApiOperation("Delete existing Assignment")
 	public ResponseEntity<ApiResponse> deleteAssignment(@PathVariable Long id) {
-		this.assignmentService.deleteAssignment(id);
-		return new ResponseEntity<ApiResponse>(new ApiResponse("Assignment deleted successfully", true), HttpStatus.OK);
+		
+		List<AssignmentSubmitDTO> AssignmentsubmissionDTOs = assignmentSubmitService.getSubmissionsByAssignment(id); 
+		
+		if (AssignmentsubmissionDTOs.isEmpty())  {
+			this.assignmentService.deleteAssignment(id);
+		    return new ResponseEntity<ApiResponse>(new ApiResponse("Assignment deleted successfully", true), HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Cannot delete assignment after submission", true), HttpStatus.FORBIDDEN);
+
+		}
 	}
 	
 	//get all assignments
