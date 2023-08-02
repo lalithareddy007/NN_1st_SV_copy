@@ -97,6 +97,13 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@ExceptionHandler(GCalendarDeleteEventException.class)
+	public ResponseEntity<ApiResponse> calendarDeleteExceptionHandler(GCalendarDeleteEventException ex) {
+		String message = ex.getMessage();
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@ExceptionHandler(GCalendarEventNotFoundException.class)
 	public ResponseEntity<ApiResponse> calendarEventNotFoundExceptionExceptionHandler(GCalendarEventNotFoundException ex) {
 		String message = ex.getMessage();

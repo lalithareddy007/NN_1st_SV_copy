@@ -20,6 +20,7 @@ import com.numpyninja.lms.dto.gcalendar.GCalendarEventResponseDTO;
 import com.numpyninja.lms.exception.CalendarAccessDeniedException;
 import com.numpyninja.lms.exception.GCalendarCreateEventException;
 import com.numpyninja.lms.exception.GCalendarDeleteEventException;
+import com.numpyninja.lms.exception.GCalendarEventNotFoundException;
 import com.numpyninja.lms.exception.GCalendarIOException;
 import com.numpyninja.lms.exception.GCalendarSecurityException;
 import com.numpyninja.lms.services.gcalendar.GoogleCalendarService;
@@ -43,7 +44,7 @@ public class GoogleCalendarController {
 		return new ResponseEntity<List<GCalendarEventResponseDTO>>(caleResponse, HttpStatus.OK);
 	}
 
-	@PostMapping(path = "/gcalendar/newevent", produces = "application/json")
+	@PostMapping(path = "/gcalendar/event", produces = "application/json")
 	@ApiOperation("Gat all the calendars from given startDate to endDate")
 	public ResponseEntity<String> createCalendarEvent(@Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
 			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarCreateEventException, GCalendarSecurityException
@@ -56,7 +57,7 @@ public class GoogleCalendarController {
 	@PutMapping(path = "/gcalendar/event/{id}", produces = "application/json")
 	@ApiOperation("Gat all the calendars from given startDate to endDate")
 	public ResponseEntity<String> updateCalendarEvent(@PathVariable("id")String eventId, @Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
-			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarCreateEventException, GCalendarSecurityException
+			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarCreateEventException, GCalendarSecurityException, GCalendarEventNotFoundException
 	{
 			gCalendarService.updateEvent(eventId, eventRequest);
 			return new ResponseEntity<String>("Event update success", HttpStatus.OK);
