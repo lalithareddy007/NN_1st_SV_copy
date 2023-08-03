@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.numpyninja.lms.config.ApiResponse;
 
+import java.util.Date;
 
 import javax.validation.ConstraintViolationException;
 
@@ -70,7 +71,8 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(InvalidFormatException.class)
 	public ResponseEntity<ApiResponse> InvalidFormatExceptionExceptionHandler(InvalidFormatException ex) {
 		String message = ex.getMessage();
-		if(message.contains("java.util.Date")) {
+		if(ex.getTargetType().equals(Date.class)) //&& message.contains("Cannot deserialize value of type 'java.util.Date'")) 
+		{
 			message = "Invalid DateTime format";
 		}
 		ApiResponse apiResponse = new ApiResponse(message, false);
