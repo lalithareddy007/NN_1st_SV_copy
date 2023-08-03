@@ -2,8 +2,10 @@ package com.numpyninja.lms.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.numpyninja.lms.config.ApiResponse;
+
 
 import javax.validation.ConstraintViolationException;
 
@@ -60,5 +65,15 @@ public class GlobalExceptionHandler {
 		String message = ex.getMessage();
 		ApiResponse apiResponse = new ApiResponse(message, false);
 		return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(InvalidFormatException.class)
+	public ResponseEntity<ApiResponse> InvalidFormatExceptionExceptionHandler(InvalidFormatException ex) {
+		String message = ex.getMessage();
+		if(message.contains("java.util.Date")) {
+			message = "Invalid DateTime format";
+		}
+		ApiResponse apiResponse = new ApiResponse(message, false);
+		return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
 	}
 }
