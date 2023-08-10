@@ -19,10 +19,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class AssignmentSubmitService {
@@ -266,6 +263,16 @@ public class AssignmentSubmitService {
         else if(!userRoleMapRepository.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
                 gradedBy,"R03","Active"))//.isEmpty())
             throw new InvalidDataException("User "+gradedBy+" is not allowed to grade the submission");
+        //check for grading should not happen before due date.
+        Optional<Assignment> assSub = this.assignmentRepository.findById(assignmentSubmitDTO.getAssignmentId());
+        Date Assignment_Due_Date = assSub.get().getDueDate();
+        Timestamp Submission_Date=assignmentSubmitDTO.getSubDateTime();
+        if(Submission_Date.after(Assignment_Due_Date))
+            throw new InvalidDataException("Cannot grade assignment before due date");
+
+
+
+
 
         /**
          * Front-end should not allow grading user to change the following info

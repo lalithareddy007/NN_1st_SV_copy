@@ -47,8 +47,11 @@ public class ProgramDTO {
 	    @ValidateStatus
 		private String programStatus;
 
-	    private Timestamp creationTime;
-	    private Timestamp lastModTime;
+		//commenting creation and modification time as we are not displaying in FE but creation and modification
+	   // time are stored in database
+
+	     // private Timestamp creationTime;
+	     //private Timestamp lastModTime;
 
 }
 
