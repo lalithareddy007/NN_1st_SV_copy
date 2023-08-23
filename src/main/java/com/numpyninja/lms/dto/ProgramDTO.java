@@ -47,7 +47,6 @@ public class ProgramDTO {
 	    @ValidateStatus
 		private String programStatus;
 
-
 		private Timestamp creationTime;
 		private Timestamp lastModTime;
 
