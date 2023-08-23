@@ -715,6 +715,8 @@ public class UserServices implements UserDetailsService {
         return userRoleMapRepository.findAll();
     }
 
+
+
     //get users by roleid
     public List<UserDto> getUsersByRoleID(String roleId){
         Role role = roleRepository.findById(roleId)
@@ -729,6 +731,8 @@ public class UserServices implements UserDetailsService {
                 .collect(Collectors.toList());
         return userdto;
     }
+
+
 
 
 	/*

@@ -158,6 +158,8 @@ public class UserController {
 	public ResponseEntity<List<UserDto>> getUserByRoleId(@PathVariable String roleId) throws ResourceNotFoundException {
 		return ResponseEntity.ok(this.userServices.getUsersByRoleID(roleId));
 	}
+
+
 }
 	
 
