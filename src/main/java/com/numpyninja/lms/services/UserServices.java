@@ -715,6 +715,21 @@ public class UserServices implements UserDetailsService {
         return userRoleMapRepository.findAll();
     }
 
+    //get users by roleid
+    public List<UserDto> getUsersByRoleID(String roleId){
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("RoleID " + roleId + " not found"));
+        List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByRole_RoleId(roleId);
+        if (userRoleProgramBatchMapList.isEmpty()) {
+            throw new ResourceNotFoundException("No Users found for the given role ID: " + roleId);
+        }
+        List<UserDto> userdto=  userRoleProgramBatchMapList.stream()
+                .map(UserRoleProgramBatchMap::getUser)
+                .map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
+                .collect(Collectors.toList());
+        return userdto;
+    }
+
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
