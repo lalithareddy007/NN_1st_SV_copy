@@ -38,7 +38,7 @@ public class ProgramDTO {
 
 		private String programName;
 
-		//Bug5 Program Batch solved
+
 		@Pattern (regexp="^[a-z0-9][a-z0-9_ ]*(?:-[a-z0-9]+)*$", message = "Program Desc can contain only alphabets and numbers")
 		@Length(min = 4, max = 25, message = "Program Description must be of min length 4 and max length 25")
 	   	private String programDescription;
@@ -47,11 +47,9 @@ public class ProgramDTO {
 	    @ValidateStatus
 		private String programStatus;
 
-		//commenting creation and modification time as we are not displaying in FE but creation and modification
-	   // time are stored in database
 
-	     // private Timestamp creationTime;
-	     //private Timestamp lastModTime;
+		private Timestamp creationTime;
+		private Timestamp lastModTime;
 
 }
 
