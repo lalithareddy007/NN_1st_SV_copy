@@ -257,36 +257,4 @@ public class GoogleCalendarService {
 
 	}
 	
-	public static void decrypt(Key key, File inputFile, File outputFile)
-            throws com.numpyninja.lms.exception.CryptoException {
-        doCrypto(Cipher.DECRYPT_MODE, key, inputFile, outputFile);
-    }
- 
-//    private static void doCrypto(int cipherMode, String key, File inputFile,  
-    private static void doCrypto(int cipherMode, Key key, File inputFile,
-            File outputFile) throws com.numpyninja.lms.exception.CryptoException {
-        try {
-           // Key secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
-        	final String TRANSFORMATION = "AES";
-        	Key secretKey = key;
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(cipherMode, secretKey);
-             
-            FileInputStream inputStream = new FileInputStream(inputFile);
-            byte[] inputBytes = new byte[(int) inputFile.length()];
-            inputStream.read(inputBytes);
-             
-            byte[] outputBytes = cipher.doFinal(inputBytes);
-             
-            FileOutputStream outputStream = new FileOutputStream(outputFile);
-            outputStream.write(outputBytes);
-            inputStream.close();
-            outputStream.close();
-             
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException
-                | InvalidKeyException | BadPaddingException
-                | IllegalBlockSizeException | IOException ex) {
-            throw new com.numpyninja.lms.exception.CryptoException("Error encrypting/decrypting file", ex);
-        }
-    }
 }
