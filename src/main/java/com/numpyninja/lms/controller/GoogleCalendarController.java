@@ -1,4 +1,4 @@
-package com.numpyninja.lms.controller.gcalendar;
+package com.numpyninja.lms.controller;
 
 import java.util.List;
 
@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.numpyninja.lms.dto.gcalendar.GCalendarEventRequestDTO;
-import com.numpyninja.lms.dto.gcalendar.GCalendarEventResponseDTO;
+import com.numpyninja.lms.dto.GCalendarEventRequestDTO;
+import com.numpyninja.lms.dto.GCalendarEventResponseDTO;
 import com.numpyninja.lms.exception.CalendarAccessDeniedException;
 import com.numpyninja.lms.exception.GCalendarCreateEventException;
 import com.numpyninja.lms.exception.GCalendarDeleteEventException;
 import com.numpyninja.lms.exception.GCalendarEventNotFoundException;
 import com.numpyninja.lms.exception.GCalendarIOException;
 import com.numpyninja.lms.exception.GCalendarSecurityException;
-import com.numpyninja.lms.services.gcalendar.GoogleCalendarService;
+import com.numpyninja.lms.services.GoogleCalendarService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

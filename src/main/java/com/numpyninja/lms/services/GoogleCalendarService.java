@@ -1,4 +1,4 @@
-package com.numpyninja.lms.services.gcalendar;
+package com.numpyninja.lms.services;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,8 +38,8 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.numpyninja.lms.dto.gcalendar.GCalendarEventRequestDTO;
-import com.numpyninja.lms.dto.gcalendar.GCalendarEventResponseDTO;
+import com.numpyninja.lms.dto.GCalendarEventRequestDTO;
+import com.numpyninja.lms.dto.GCalendarEventResponseDTO;
 import com.numpyninja.lms.exception.CalendarAccessDeniedException;
 import com.numpyninja.lms.exception.GCalendarCreateEventException;
 import com.numpyninja.lms.exception.GCalendarDeleteEventException;

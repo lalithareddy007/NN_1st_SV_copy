@@ -6,13 +6,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.numpyninja.lms.dto.gcalendar.EventAttachmentDTO;
-import com.numpyninja.lms.dto.gcalendar.EventAttendeesDTO;
-
-import com.numpyninja.lms.dto.gcalendar.GCalendarEventResponseDTO;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttachment;
 import com.google.api.services.calendar.model.EventAttendee;
+import com.numpyninja.lms.dto.EventAttachmentDTO;
+import com.numpyninja.lms.dto.EventAttendeesDTO;
+import com.numpyninja.lms.dto.GCalendarEventResponseDTO;
 
 
 

@@ -1,4 +1,4 @@
-package com.numpyninja.lms.dto.gcalendar;
+package com.numpyninja.lms.dto;
 
 import javax.validation.constraints.NotBlank;
 
