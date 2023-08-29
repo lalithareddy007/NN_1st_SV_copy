@@ -76,7 +76,7 @@ public class UserController {
 
 	//update user info in User Table
 	@PutMapping("/users/{userId}")
-	 @ApiOperation("Update User")
+	@ApiOperation("Update User")
 	public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto updateuserDto, @PathVariable(value = "userId") String userId) throws ResourceNotFoundException, InvalidDataException {
 		UserDto responseDto = userServices.updateUser(updateuserDto, userId);
 		return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -102,12 +102,13 @@ public class UserController {
 		//return deletedUserId;
 	}
 
-	@GetMapping("/users/getAllStaff")
-	@ApiOperation("Get All Staff")
-	public ResponseEntity<List<Object>> getAllStaff() {
-		List<Object> list = userServices.getAllStaff();
-		return ResponseEntity.status(HttpStatus.OK).body(list);
-	}
+//commenting this method because getUsersByRoleID() method will perform getAllStaff()
+//	@GetMapping("/users/getAllStaff")
+//	@ApiOperation("Get All Staff")
+//	public ResponseEntity<List<Object>> getAllStaff() {
+//		List<Object> list = userServices.getAllStaff();
+//		return ResponseEntity.status(HttpStatus.OK).body(list);
+//	}
 
 	// Ask front end to include a separate link to assign program/batch to existing user
 	// Update existing user to assign program and its corresponding batch
@@ -123,12 +124,11 @@ public class UserController {
 	//USER - GET USER BY PROGRAM-Batch
 	@GetMapping("/users/programBatch/{batchId}")
 	@ApiOperation("Get User by Program Batches")
-	public ResponseEntity<List<UserDto>> getUserByProgramBatches(@PathVariable Integer batchId) throws ResourceNotFoundException
-	{
-			return ResponseEntity.ok(this.userServices.getUserByProgramBatch(batchId));
+	public ResponseEntity<List<UserDto>> getUserByProgramBatches(@PathVariable Integer batchId) throws ResourceNotFoundException {
+		return ResponseEntity.ok(this.userServices.getUserByProgramBatch(batchId));
 	}
-	
-	
+
+
 	@GetMapping("/users/programs/{programId}")
 	@ApiOperation("Get User for Program")
 	public ResponseEntity<List<UserDto>> getUsersForProgram(@PathVariable Long programId) throws ResourceNotFoundException {
@@ -143,19 +143,25 @@ public class UserController {
 	@ApiOperation("Update User Login Status")
 	public ResponseEntity<String> updateUserLoginStatus(@Valid @PathVariable(value = "userId") String userId, @Valid @RequestBody UserLoginDto updateUserLogin) throws InvalidDataException {
 		//String UserRole, String UserStatus
-		String responseDto = userServices.updateUserLogin(updateUserLogin,userId);
+		String responseDto = userServices.updateUserLogin(updateUserLogin, userId);
 		return ResponseEntity.status(HttpStatus.OK).body("UserLoginEmail/Status Updated for User: " + userId);
 	}
 
-    @GetMapping("/users/roles")
-    protected List<UserRoleMap> getAllUsersWithRoles() {
-        return userServices.getAllUsersWithRoles();
-    }
+	@GetMapping("/users/roles")
+	protected List<UserRoleMap> getAllUsersWithRoles() {
+		return userServices.getAllUsersWithRoles();
+	}
+
+
+	//get users by roleid
+	@GetMapping("/users/roles/{roleId}")
+	@ApiOperation("Get User by RoleID")
+	public ResponseEntity<List<UserDto>> getUserByRoleId(@PathVariable String roleId) throws ResourceNotFoundException {
+		return ResponseEntity.ok(this.userServices.getUsersByRoleID(roleId));
+	}
+
+
 }
-		
-		
-		
-		
 	
 
     
