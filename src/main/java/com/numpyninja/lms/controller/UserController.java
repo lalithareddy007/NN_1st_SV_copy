@@ -102,12 +102,13 @@ public class UserController {
 		//return deletedUserId;
 	}
 
-	@GetMapping("/users/getAllStaff")
-	@ApiOperation("Get All Staff")
-	public ResponseEntity<List<Object>> getAllStaff() {
-		List<Object> list = userServices.getAllStaff();
-		return ResponseEntity.status(HttpStatus.OK).body(list);
-	}
+//commenting this method because getUsersByRoleID() method will perform getAllStaff()
+//	@GetMapping("/users/getAllStaff")
+//	@ApiOperation("Get All Staff")
+//	public ResponseEntity<List<Object>> getAllStaff() {
+//		List<Object> list = userServices.getAllStaff();
+//		return ResponseEntity.status(HttpStatus.OK).body(list);
+//	}
 
 	// Ask front end to include a separate link to assign program/batch to existing user
 	// Update existing user to assign program and its corresponding batch

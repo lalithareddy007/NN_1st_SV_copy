@@ -609,15 +609,16 @@ public class UserServices implements UserDetailsService {
         return isVisaStatusValid;
     }
 
-    public List<Object> getAllStaff() {
-        List<Object> result = userRepository.getAllStaffList();
-        if (!(result.size() <= 0)) {
-            //return (userMapper.toUserStaffDTO(result));
-            return result;
-        } else {
-            throw new ResourceNotFoundException("No staff data is available in database");
-        }
-    }
+    //commenting this method because getUsersByRoleID() method will perform getAllStaff()
+//    public List<Object> getAllStaff() {
+//        List<Object> result = userRepository.getAllStaffList();
+//        if (!(result.size() <= 0)) {
+//            //return (userMapper.toUserStaffDTO(result));
+//            return result;
+//        } else {
+//            throw new ResourceNotFoundException("No staff data is available in database");
+//        }
+//    }
 
 
     //get users by batchid
@@ -707,15 +708,9 @@ public class UserServices implements UserDetailsService {
             return "UserLogin updated successfully";
         }
     }
-    
-    
-   
-
     public List<UserRoleMap> getAllUsersWithRoles() {
         return userRoleMapRepository.findAll();
     }
-
-
 
     //get users by roleid
     public List<UserDto> getUsersByRoleID(String roleId){
