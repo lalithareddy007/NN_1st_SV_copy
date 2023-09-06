@@ -28,7 +28,7 @@ public class ProgramController{
     @Autowired
     private ProgramServices programServices;
 
-  //get list of programs
+  //get list of programs cjeck
   	@GetMapping(value = "/allPrograms")
   	@ApiOperation("Get all Programs")
   	private ResponseEntity<?> getPrograms()  throws ResourceNotFoundException 
