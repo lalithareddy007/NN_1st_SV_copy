@@ -31,16 +31,14 @@ import javax.validation.constraints.Pattern;
 
 public class ProgramDTO {
 
-		private Long programId;
+	    private Long programId;
 
-	    @Pattern(regexp = "(^[a-zA-Z][a-zA-Z0-9 ]+$)", message = "Program Name can contain only alphabets and numbers")
-	    @Length(min = 4, max = 25, message = "Program Name must be of min length 4 and max length 25")
+		@Pattern(regexp = Constants.REGEX_MIN_2_ALPHA_NUMERIC,
+			message = "programName " + Constants.MSG_ALPHANUMERIC_ONLY_MIN_2)
+	    private String programName;
 
-		private String programName;
-
-
-		@Pattern (regexp="^[a-z0-9][a-z0-9_ ]*(?:-[a-z0-9]+)*$", message = "Program Desc can contain only alphabets and numbers")
-		@Length(min = 4, max = 25, message = "Program Description must be of min length 4 and max length 25")
+		@Pattern(regexp = Constants.REGEX_MIN_2_ALPHA_NUMERIC,
+			message = "programDescription " + Constants.MSG_ALPHANUMERIC_ONLY_MIN_2)
 	   	private String programDescription;
 
 	    //created custom annotation to validate status(accepts only active and inactive)
