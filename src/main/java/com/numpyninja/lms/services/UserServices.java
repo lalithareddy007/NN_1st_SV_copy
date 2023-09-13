@@ -385,38 +385,29 @@ public class UserServices implements UserDetailsService {
             throw new InvalidDataException("UserId cannot be blank/null");
         } else {
             Optional<User> userById = userRepository.findById(userId);
-            System.out.println("userById=="+userById);
+            
             if (userById.isEmpty()) {
                 throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
             } else {
 
                 List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
-                System.out.println("existingUserRoles size=="+existingUserRoles.size());
-                System.out.println("existingUserRoles =="+existingUserRoles.toString());
                 
-
                 String roleIdToUpdate = updateUserRoleStatus.getRoleId();
-                System.out.println("roleIdToUpdate=="+roleIdToUpdate);
-                
-
                 String roleStatusToUpdate = updateUserRoleStatus.getUserRoleStatus();
-                System.out.println("roleStatusToUpdate=="+roleStatusToUpdate);
+                
                 List<String> roleIdList;
                 boolean roleFound = false;
                 for (int roleCount = 0; roleCount < existingUserRoles.size(); roleCount++) {
 
                     String existingRoleId = existingUserRoles.get(roleCount).getRole().getRoleId();
-                    System.out.println("existingRoleId=="+existingRoleId);
-
+                    
                     if (roleIdToUpdate.equals(existingRoleId)) {
                         roleFound = true;
 
                         Long userRoleId = existingUserRoles.get(roleCount).getUserRoleId();
-                        System.out.println("userRoleId=="+userRoleId);
-                        System.out.println("Updating record");
-                        userRoleMapRepository.updateUserRole(userRoleId, roleStatusToUpdate);
-                        System.out.println("Record Updated");
                         
+                        userRoleMapRepository.updateUserRole(userRoleId, roleStatusToUpdate);
+                                    
                     }
                 }
                 if (!roleFound) {
