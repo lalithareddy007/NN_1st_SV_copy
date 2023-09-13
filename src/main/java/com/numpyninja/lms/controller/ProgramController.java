@@ -2,6 +2,7 @@ package com.numpyninja.lms.controller;
 
 
 import com.numpyninja.lms.dto.ProgramDTO;
+import com.numpyninja.lms.dto.ProgramWithUsersDTO;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.ProgramServices;
@@ -36,6 +37,15 @@ public class ProgramController{
   		System.out.println("in getall programs");
   		List<ProgramDTO> programList = programServices.getAllPrograms();
   		return ResponseEntity.ok(programList);  
+  	}  
+  	
+  	//get list of programs with users included
+  	@GetMapping(value = "/allProgramsWithUsers")
+  	@ApiOperation("Get all Programs along with users in each program")
+  	private ResponseEntity<List<ProgramWithUsersDTO>> getProgramsWithUsers()  throws ResourceNotFoundException 
+  	{ 
+  		System.out.println("in getall programs");
+  		return ResponseEntity.ok(programServices.getAllProgramsWithUsers());
   	}  
   	
   	//retrieves the details of a specific program
