@@ -438,6 +438,7 @@ public class UserServices implements UserDetailsService {
               
                 List<String> roleIdList;
                 boolean roleFound = false;
+                
                 for (int roleCount = 0; roleCount < existingUserRoles.size(); roleCount++) {
                 
                 		String existingRoleId = existingUserRoles.get(roleCount).getRole().getRoleId();

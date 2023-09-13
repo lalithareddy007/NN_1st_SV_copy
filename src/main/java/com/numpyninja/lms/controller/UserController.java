@@ -95,7 +95,7 @@ public class UserController {
 	
 	
 	
-	////update User role Id - (R01/R02/R03) for a given user id 
+	//update User role Id - (R01/R02/R03) for a given user id 
 	@PutMapping("/users/roleId/{userId}")
 	@ApiOperation("Update User Role Id")
 	public ResponseEntity<String> updateRoleId(@Valid @PathVariable(value = "userId") String userId, @Valid @RequestBody UserRoleIdDTO updateRoleId) throws InvalidDataException {
