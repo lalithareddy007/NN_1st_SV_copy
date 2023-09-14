@@ -3,8 +3,12 @@ package com.numpyninja.lms.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.dto.ProgramDTO;
+import com.numpyninja.lms.dto.ProgramWithUsersDTO;
+import com.numpyninja.lms.dto.UserDto;
 import com.numpyninja.lms.services.ProgramServices;
 import lombok.SneakyThrows;
+
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +26,11 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.annotation.security.RolesAllowed;
+import javax.print.attribute.standard.DateTimeAtCompleted;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,7 +58,10 @@ public class ProgramControllerTest extends AbstractTestController {
     @Autowired
     private ObjectMapper objectMapper;
     private ProgramDTO programDTO;
+    private ProgramWithUsersDTO programWithUsersDto;
+    
     private List<ProgramDTO> programList;
+    private List<ProgramWithUsersDTO> programWithUsersList;
 
     @BeforeEach
     public void setup() {
@@ -61,6 +72,35 @@ public class ProgramControllerTest extends AbstractTestController {
         programDTO = new ProgramDTO(1L, "Java", "Java Description", "Active", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
         programList = new ArrayList<ProgramDTO>();
     }
+    
+    private  void buildProgramWithUsers() {
+		UserDto u1 = new UserDto("U01", "Srinivasa", "Ramanujan", " ", 2323232323L, "India", "IST",
+				"www.linkedin.com/Ramanujan1234", "MCA", "MBA", "Indian scientist", "H1B","srinivasa.ramanujan@gmail.com");
+
+    	UserDto u2 = new UserDto("U02", "CV", "Raman", " ", 2323232324L, "USA", "EST",
+				"www.linkedin.com/Raman1234", "PHD", "MS", "Indian scientist", "Citizen","cv.raman@gmail.com");
+
+    	UserDto u3 = new UserDto("U03", "Homi", "Bhabha", " ", 2323232325L, "India", "IST",
+				"www.linkedin.com/Bhabha1234", "Phd", "MS", "Indian scientist", "H1B","homi.bhabha@gmail.com");
+
+    	ProgramWithUsersDTO programWithUsersDto1 = new ProgramWithUsersDTO(1L, 
+    			"SDET", 
+    			"SDET Program", 
+    			"Active", 
+    			List.of(u1,u2,u3), 
+    			Timestamp.valueOf(LocalDateTime.now()), 
+    			Timestamp.valueOf(LocalDateTime.now()));
+    	
+    	ProgramWithUsersDTO programWithUsersDto2 = new ProgramWithUsersDTO(2L, 
+    			"DA", 
+    			"DA Program", 
+    			"Active", 
+    			List.of(u1,u2), 
+    			Timestamp.valueOf(LocalDateTime.now()), 
+    			Timestamp.valueOf(LocalDateTime.now()));
+    	
+    	programWithUsersList = List.of(programWithUsersDto1, programWithUsersDto2);
+	}
 
     @DisplayName("Test for getting all program")
     @Test
@@ -87,8 +127,33 @@ public class ProgramControllerTest extends AbstractTestController {
 
         verify(programServices).getAllPrograms();
 
-
     }
+    
+    @DisplayName("Test for getting all programs and users in program")
+    @Test
+    @SneakyThrows
+    public void getProgramsWithUsers() {
+    	//Configure mock output data
+    	buildProgramWithUsers();
+    	//Configure programServices.getAllProgramsWithUsers() to return mock data, when invoked 
+    	when(programServices.getAllProgramsWithUsers()).thenReturn(programWithUsersList);
+    	//invoke the REST API using mockMvc
+    	ResultActions resultActions = mockMvc.perform(get("/allProgramsWithUsers"));
+    	//Validate the results received
+    	
+    	resultActions.andExpectAll(status().isOk(),
+    	MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
+    	MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(programWithUsersList)),
+    	MockMvcResultMatchers.jsonPath("$", hasSize(programWithUsersList.size())),
+    	MockMvcResultMatchers.jsonPath("$[0].programName", equalTo(programWithUsersList.get(0).getProgramName())),
+    	MockMvcResultMatchers.jsonPath("$[1].programName", equalTo(programWithUsersList.get(1).getProgramName())));		
+    			
+    	//Verifies the request is run only once
+    	verify(programServices).getAllProgramsWithUsers();
+    
+    }
+
+	
 
     @DisplayName("Test for getting Program by Id")
     @Test
