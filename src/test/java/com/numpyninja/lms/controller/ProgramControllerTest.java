@@ -1,14 +1,24 @@
 package com.numpyninja.lms.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.numpyninja.lms.config.WithMockAdmin;
-import com.numpyninja.lms.dto.ProgramDTO;
-import com.numpyninja.lms.dto.ProgramWithUsersDTO;
-import com.numpyninja.lms.dto.UserDto;
-import com.numpyninja.lms.services.ProgramServices;
-import lombok.SneakyThrows;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.assertj.core.util.Arrays;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,26 +35,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.annotation.security.RolesAllowed;
-import javax.print.attribute.standard.DateTimeAtCompleted;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.dto.ProgramDTO;
+import com.numpyninja.lms.dto.ProgramWithUsersDTO;
+import com.numpyninja.lms.dto.UserDto;
+import com.numpyninja.lms.services.ProgramServices;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import lombok.SneakyThrows;
 @ExtendWith(MockitoExtension.class)
 @WithMockUser
 @WebMvcTest(value = ProgramController.class)
