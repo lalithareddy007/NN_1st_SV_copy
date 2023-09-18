@@ -94,6 +94,9 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse> calendarIOExceptionExceptionHandler(GCalendarIOException ex) {
 		String message = ex.getMessage();
 		ApiResponse apiResponse = new ApiResponse(message, false);
+		if(message.contains("400 Bad Request")) {
+			return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+		}
 		return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	

@@ -40,7 +40,6 @@ public class GoogleCalendarController {
 	@ApiOperation("Gat all the events from the calendar")
 	public ResponseEntity<List<GCalendarEventResponseDTO>> getCalendarEvents() throws CalendarAccessDeniedException, GCalendarIOException, GCalendarSecurityException 
 	{
-		//Get Calendar events
 		List<GCalendarEventResponseDTO> caleResponse = gCalendarService.getEventsUsingServiceAcc();
 		return new ResponseEntity<List<GCalendarEventResponseDTO>>(caleResponse, HttpStatus.OK);
 	}
@@ -48,22 +47,21 @@ public class GoogleCalendarController {
 	@PostMapping(path = "/gcalendar/event", produces = "application/json")
 	@ApiOperation("Gat all the calendars from given startDate to endDate")
 	@RolesAllowed({"ROLE_ADMIN"})
-	public ResponseEntity<String> createCalendarEvent(@Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
+	public ResponseEntity<GCalendarEventResponseDTO> createCalendarEvent(@Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
 			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarCreateEventException, GCalendarSecurityException
 	{
-		gCalendarService.createEventUsingServiceAcc(eventRequest);
-		return new ResponseEntity<String>("Event creation success", HttpStatus.CREATED);
+		GCalendarEventResponseDTO event = gCalendarService.createEventUsingServiceAcc(eventRequest);
+		return new ResponseEntity<GCalendarEventResponseDTO>(event, HttpStatus.CREATED);
 	}
 	
-	//Event update is currently not working 
 	@PutMapping(path = "/gcalendar/event/{id}", produces = "application/json")
 	@ApiOperation("Gat all the calendars from given startDate to endDate")
 	@RolesAllowed({"ROLE_ADMIN"})
-	public ResponseEntity<String> updateCalendarEvent(@PathVariable("id")String eventId, @Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
+	public ResponseEntity<GCalendarEventResponseDTO> updateCalendarEvent(@PathVariable("id")String eventId, @Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
 			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarCreateEventException, GCalendarSecurityException, GCalendarEventNotFoundException
 	{
-			gCalendarService.updateEvent(eventId, eventRequest);
-			return new ResponseEntity<String>("Event update success", HttpStatus.OK);
+		GCalendarEventResponseDTO event = gCalendarService.updateEvent(eventId, eventRequest);
+		return new ResponseEntity<GCalendarEventResponseDTO>(event, HttpStatus.OK);
 	}
 	
 	@DeleteMapping(path = "/gcalendar/event/{id}")
@@ -72,7 +70,7 @@ public class GoogleCalendarController {
 	public ResponseEntity<String> deleteCalendarEvent(@PathVariable ("id") String eventId) 
 			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarDeleteEventException, GCalendarSecurityException
 	{
-			gCalendarService.deleteEvent(eventId);
-			return new ResponseEntity<String>("Event deletion success", HttpStatus.OK);
+		gCalendarService.deleteEvent(eventId);
+		return new ResponseEntity<String>("Event deletion success", HttpStatus.OK);
 	}
 }

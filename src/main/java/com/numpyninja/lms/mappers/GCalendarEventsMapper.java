@@ -24,6 +24,7 @@ public final class GCalendarEventsMapper {
     	gcEventResponseDTO.setEventDescription(event.getDescription());
     	gcEventResponseDTO.setEventSummary(event.getSummary());
     	gcEventResponseDTO.setEventStatus(event.getStatus());
+    	gcEventResponseDTO.setLocation(event.getLocation());
     	gcEventResponseDTO.setEventStartDateTime(event.getStart().getDateTime().toString());
     	gcEventResponseDTO.setEventEndDateTime(event.getEnd().getDateTime().toString());
     	return gcEventResponseDTO;

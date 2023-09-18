@@ -1,22 +1,13 @@
 package com.numpyninja.lms.services;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -47,7 +38,6 @@ import com.numpyninja.lms.exception.GCalendarEventNotFoundException;
 import com.numpyninja.lms.exception.GCalendarIOException;
 import com.numpyninja.lms.exception.GCalendarSecurityException;
 import com.numpyninja.lms.mappers.GCalendarEventsMapper;
-import com.numpyninja.lms.services.KeyService;
 
 @Service
 public class GoogleCalendarService {
@@ -66,10 +56,11 @@ public class GoogleCalendarService {
 	private GoogleCredentials getServiceCredentials() throws FileNotFoundException, IOException {
 		GoogleCredentials credential;
 		try {
+			InputStream credentialsStream = keyService.getCredentialsAsStream();
 			credential = GoogleCredentials
-					.fromStream(new FileInputStream(new File(keyService.getCredentials())))
+					.fromStream(credentialsStream)
 					.createScoped(Collections.singletonList(CalendarScopes.CALENDAR));
-			keyService.cleanup();
+			credentialsStream.close();
 		} catch (Exception e) {
 			logger.error("Error: ", e);
 			throw new GCalendarIOException(e.getLocalizedMessage());
@@ -91,7 +82,6 @@ public class GoogleCalendarService {
 		return calendar;
 	}
 
-	//Get all events from the calendar
 	public List<GCalendarEventResponseDTO> getEventsUsingServiceAcc()
 			throws CalendarAccessDeniedException, GCalendarIOException, GCalendarSecurityException {
 		try {
@@ -123,9 +113,7 @@ public class GoogleCalendarService {
 
 	}
 
-	
-	// Creates an event in google calendar
-	public void createEventUsingServiceAcc(GCalendarEventRequestDTO calendarEventRequestDTO)
+	public GCalendarEventResponseDTO createEventUsingServiceAcc(GCalendarEventRequestDTO calendarEventRequestDTO)
 			throws GCalendarIOException, CalendarAccessDeniedException, GCalendarCreateEventException,
 			GCalendarSecurityException {
 		try {
@@ -160,7 +148,7 @@ public class GoogleCalendarService {
 
 			Event eventInsertResponse = events.insert(CALENDAR_ID, event).execute();
 			logger.debug(eventInsertResponse.toString());
-
+			return GCalendarEventsMapper.mapToGCalendarEventResponseDTO(eventInsertResponse);
 		} catch (IOException e) {
 			logger.error("IOException:", e);
 			throw new GCalendarIOException(e.getLocalizedMessage());
@@ -176,9 +164,7 @@ public class GoogleCalendarService {
 		}
 	}
 
-	
-	//Updates an existing event
-	public void updateEvent( String eventId, @Valid GCalendarEventRequestDTO eventRequest) throws GCalendarSecurityException {
+	public GCalendarEventResponseDTO updateEvent( String eventId, @Valid GCalendarEventRequestDTO eventRequest) throws GCalendarSecurityException {
 		try {
 			Calendar calendar = getCalendarService(getServiceCredentials());
 			Events events = calendar.events();
@@ -212,6 +198,8 @@ public class GoogleCalendarService {
 	
 				events.update(CALENDAR_ID, eventId, existingEvent);
 			}
+			return GCalendarEventsMapper.mapToGCalendarEventResponseDTO(existingEvent);
+			
 		} catch (IOException e) {
 			logger.error("Update event failed");
 			logger.error("IOException:",e);
@@ -231,13 +219,13 @@ public class GoogleCalendarService {
 
 	}
 
-	//Deletes an existing event
-	public void deleteEvent(String eventId) throws GCalendarSecurityException {
+	public boolean deleteEvent(String eventId) throws GCalendarSecurityException {
 		try {
+			boolean deleted = false;
 			Calendar calendar = getCalendarService(getServiceCredentials());
 			Events events = calendar.events();
 			events.delete(CALENDAR_ID, eventId).execute();
-
+			return deleted;
 		} catch (IOException e) {
 			logger.error("Delete event failed for event id:" + eventId);
 			logger.error("IOException: "+  e);

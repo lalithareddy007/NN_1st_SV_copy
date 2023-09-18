@@ -1,9 +1,11 @@
 package com.numpyninja.lms.services;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -60,9 +62,9 @@ public class KeyService {
 		keyRepo.save(key);
 	}
 
-	public String getCredentials() throws Exception {
+	public String getCredentialsAsFile() throws Exception {
 		try {
-			credentialPath = doCrypto(Cipher.DECRYPT_MODE, getKey(), inputFile);
+			credentialPath = doCryptoToFile(Cipher.DECRYPT_MODE, getKey());
 		} catch (Exception e) {
 			logger.error("Error:",e);
 			throw new Exception("Failed to get credentils");
@@ -76,9 +78,38 @@ public class KeyService {
 			f.delete();
 		}
 	}
+	public InputStream getCredentialsAsStream() throws Exception {
+		try {
+			return doCryptoToStream(Cipher.DECRYPT_MODE, getKey());
+		} catch (Exception e) {
+			logger.error("Error:",e);
+			throw new Exception("Failed to get credentils");
+		}
+	}
 
+	// Return the decrypted file as Stream
+		private InputStream doCryptoToStream(int cipherMode, Key key) throws CryptoException {
+			try {
+				
+				Cipher cipher = Cipher.getInstance("AES");
+				cipher.init(cipherMode, key);
+
+				BufferedInputStream inputStream = (BufferedInputStream) ClassLoader.getSystemResourceAsStream(inputFile);
+				byte[] inputBytes = inputStream.readAllBytes();
+				inputStream.read(inputBytes);
+
+				byte[] outputBytes = cipher.doFinal(inputBytes);
+
+				return new ByteArrayInputStream(outputBytes);
+				
+			} catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException
+					| IllegalBlockSizeException | IOException ex) {
+				logger.error("Error:", ex);
+				throw new CryptoException("Error encrypting/decrypting file", ex);
+			}
+		}
 	// Return the decrypted file
-	private String doCrypto(int cipherMode, Key key, String inputFile) throws CryptoException {
+	private String doCryptoToFile(int cipherMode, Key key) throws CryptoException {
 		try {
 			
 			File outputFile = new File(createTempFile());
