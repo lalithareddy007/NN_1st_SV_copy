@@ -27,6 +27,7 @@ import javax.validation.Validator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -178,6 +179,20 @@ public class UserServices implements UserDetailsService {
                             + newUserLoginRoleDto.getUserPhoneNumber() + " already exists !!");
                 }
             }
+            /*Check Role is valid*/
+            if(!isValidRole(newUserLoginRoleDto.getUserRoleMaps())) {
+            	throw new InvalidDataException("Failed to create user, as 'roleId' is invalid !! ");
+            }
+            
+            //Check if the Phone no is Long and does not accept String and accept in specified format(Example :+91 1234567890)
+            String allCountryRegex = "^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$";
+            if (Pattern.compile(allCountryRegex).matcher(newUserLoginRoleDto.getUserPhoneNumber().toString()).matches()) {
+                System.out.println("yes its a valid format");
+            } else {
+                System.out.println("Enter phone no correct format");
+                throw new InvalidDataException("Enter phone no in this format (CountryCode)(PhoneNo) +91 1234567890");
+            }
+
             /** Checking for valid TimeZone **/
             if (!isTimeZoneValid(newUserLoginRoleDto.getUserTimeZone())) {
                 throw new InvalidDataException("Failed to create user, as 'TimeZone' is invalid !! ");
@@ -285,7 +300,22 @@ public class UserServices implements UserDetailsService {
 
     }
 
-    public UserDto updateUser(UserDto updateuserDto, String userId)
+    private boolean isValidRole(List<UserRoleMapSlimDTO> userRoleMaps) {
+    	//Get all existing roles and check if the role passed matches to one of them
+    	List<Role> availableRoles = roleRepository.findAll();
+    	//Get  unique RoleIds present in DB
+    	Set<String> availableRoleIds = availableRoles.stream().map(avRole->avRole.getRoleId()).collect(Collectors.toSet());  
+    	//Get the input roleIds which are not in DB as invalidRole list 
+    	Set<UserRoleMapSlimDTO> invalidRole = userRoleMaps.stream().filter(urm-> !availableRoleIds.contains(urm.getRoleId())).collect(Collectors.toSet());
+    	//If no invalid Roles are  present then return true, else return false
+    	if(invalidRole.isEmpty()) {
+    		return true;
+    	}
+		return false;
+	}
+
+
+	public UserDto updateUser(UserDto updateuserDto, String userId)
             throws ResourceNotFoundException, InvalidDataException {
         User toBeupdatedUser = null;
         Date utilDate = new Date();
@@ -350,7 +380,7 @@ public class UserServices implements UserDetailsService {
 
     public String updateUserRoleStatus(UserRoleMapSlimDTO updateUserRoleStatus, String userId)
             throws InvalidDataException {
-
+    	
         if (userId == null) {
             throw new InvalidDataException("UserId cannot be blank/null");
         } else {
@@ -374,15 +404,11 @@ public class UserServices implements UserDetailsService {
                     if (roleIdToUpdate.equals(existingRoleId)) {
                         roleFound = true;
 
-                        // if role id exists - update role status
                         Long userRoleId = existingUserRoles.get(roleCount).getUserRoleId();
-
-                        // using Update custom query
+                       	
                         userRoleMapRepository.updateUserRole(userRoleId, roleStatusToUpdate);
-                        break;
                     }
                 }
-
                 if (!roleFound) {
                     throw new ResourceNotFoundException(
                             "RoleID: " + roleIdToUpdate + " not found for the " + "UserID: " + userId);
@@ -398,9 +424,11 @@ public class UserServices implements UserDetailsService {
     public String deleteUser(String userId) throws ResourceNotFoundException {
 
         boolean userExists = userRepository.existsById(userId);
-
-        if (!userExists) {
-            throw new ResourceNotFoundException("UserID: " + userId + " doesnot exist ");
+        boolean noBatchProgramForUser = userRoleProgramBatchMapRepository.findByUser_UserId(userId).isEmpty();
+        if (!userExists){
+            throw new ResourceNotFoundException("UserID: " + userId + " does not exist ");
+        } else if(!noBatchProgramForUser) {
+        	throw new ResourceNotFoundException("UserID: " + userId + " Cannot be deleted as the User is assigned to a Batch/Program ");
         } else {
             UserLogin userLogin = userLoginRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
             userRepository.deleteById(userId);
@@ -581,15 +609,16 @@ public class UserServices implements UserDetailsService {
         return isVisaStatusValid;
     }
 
-    public List<Object> getAllStaff() {
-        List<Object> result = userRepository.getAllStaffList();
-        if (!(result.size() <= 0)) {
-            //return (userMapper.toUserStaffDTO(result));
-            return result;
-        } else {
-            throw new ResourceNotFoundException("No staff data is available in database");
-        }
-    }
+    //commenting this method because getUsersByRoleID() method will perform getAllStaff()
+//    public List<Object> getAllStaff() {
+//        List<Object> result = userRepository.getAllStaffList();
+//        if (!(result.size() <= 0)) {
+//            //return (userMapper.toUserStaffDTO(result));
+//            return result;
+//        } else {
+//            throw new ResourceNotFoundException("No staff data is available in database");
+//        }
+//    }
 
 
     //get users by batchid
@@ -679,9 +708,25 @@ public class UserServices implements UserDetailsService {
             return "UserLogin updated successfully";
         }
     }
-    
-    
-   
+    public List<UserRoleMap> getAllUsersWithRoles() {
+        return userRoleMapRepository.findAll();
+    }
+
+    //get users by roleid
+    public List<UserDto> getUsersByRoleID(String roleId){
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("RoleID " + roleId + " not found"));
+        List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepository.findByRole_RoleId(roleId);
+        if (userRoleProgramBatchMapList.isEmpty()) {
+            throw new ResourceNotFoundException("No Users found for the given role ID: " + roleId);
+        }
+        List<UserDto> userdto=  userRoleProgramBatchMapList.stream()
+                .map(UserRoleProgramBatchMap::getUser)
+                .map(user -> userMapper.userDtos(Arrays.asList(user)).get(0))
+                .collect(Collectors.toList());
+        return userdto;
+    }
+
 
 
 

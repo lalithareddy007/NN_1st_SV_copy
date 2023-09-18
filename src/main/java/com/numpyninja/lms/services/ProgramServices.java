@@ -2,19 +2,32 @@ package com.numpyninja.lms.services;
 
 
 import com.numpyninja.lms.dto.ProgramDTO;
+import com.numpyninja.lms.dto.ProgramWithUsersDTO;
 import com.numpyninja.lms.entity.Program;
+import com.numpyninja.lms.entity.User;
+import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.ProgramMapper;
+import com.numpyninja.lms.mappers.UserMapper;
 import com.numpyninja.lms.repository.ProgramRepository;
+import com.numpyninja.lms.repository.UserRoleProgramBatchMapRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -24,6 +37,30 @@ public class ProgramServices {
 
 	@Autowired
 	private ProgramMapper programMapper;
+	
+	@Autowired
+	private UserRoleProgramBatchMapRepository userRoleProgramBatchMapRepo;
+	
+	@Autowired
+	private UserMapper userMapper;
+	
+	public List<ProgramWithUsersDTO> getAllProgramsWithUsers(){
+		List<ProgramWithUsersDTO> programsWithUserDto = new ArrayList<>();
+		List<UserRoleProgramBatchMap> userRoleProgramBatchMapList = userRoleProgramBatchMapRepo.findAll();
+		Map<Program, List<UserRoleProgramBatchMap>> programMap = userRoleProgramBatchMapList.stream().collect(Collectors.groupingBy(UserRoleProgramBatchMap::getProgram));
+		
+		for(Entry<Program, List<UserRoleProgramBatchMap>> entry : programMap.entrySet()){
+
+			programsWithUserDto.add(ProgramWithUsersDTO.builder().programId(entry.getKey().getProgramId())
+			.programName(entry.getKey().getProgramName())
+			.programDescription(entry.getKey().getProgramDescription())
+			.programStatus(entry.getKey().getProgramStatus())
+			.creationTime(entry.getKey().getCreationTime())
+			.lastModTime(entry.getKey().getLastModTime())
+			.programUsers(entry.getValue().stream().map(UserRoleProgramBatchMap::getUser).map(o->userMapper.userDto(o)).collect(Collectors.toList())).build());
+		}
+		return programsWithUserDto;
+	}
 
 	//getALLPrograms
 	public List<ProgramDTO> getAllPrograms()  throws ResourceNotFoundException
@@ -68,14 +105,13 @@ public class ProgramServices {
 		Timestamp timestamp = Timestamp.valueOf(now);
 		newProgramEntity.setCreationTime(timestamp);
 		newProgramEntity.setLastModTime(timestamp);
-
 		List<Program>result= programRepository.findByProgramNameContainingIgnoreCaseOrderByProgramIdAsc(newProgramEntity.getProgramName());
 		if(result.size()>0) {
 			throw new DuplicateResourceFoundException("cannot create program , since already exists");
 		}else {
 
 			savedEntity = programRepository.save(newProgramEntity);
-			savedProgramDTO= programMapper.INSTANCE.toProgramDTO(savedEntity);
+			savedProgramDTO= programMapper.toProgramDTO(savedEntity);
 			return (savedProgramDTO);
 		}
 
@@ -84,7 +120,7 @@ public class ProgramServices {
 	//update based on programId
 	public ProgramDTO updateProgramById(Long programId,ProgramDTO program)throws ResourceNotFoundException
 	{
-		Program updateLMSProgramEntity =null;
+		//Program updateLMSProgramEntity =null;
 		Program savedProgramEntity =null;
 		ProgramDTO savedProgramDTO =null;
 
@@ -95,12 +131,13 @@ public class ProgramServices {
 		}
 		else {
 
-			updateLMSProgramEntity= programRepository.findById(programId).get();
+			Program updateLMSProgramEntity= programRepository.findById(programId).get();
 			updateLMSProgramEntity.setProgramName(program.getProgramName());
 			updateLMSProgramEntity.setProgramDescription(program.getProgramDescription());
 			updateLMSProgramEntity.setProgramStatus(program.getProgramStatus());
-			updateLMSProgramEntity.setCreationTime(program.getCreationTime());
-			updateLMSProgramEntity.setLastModTime(program.getLastModTime());
+//Bug8 ProgramBatch
+			updateLMSProgramEntity.setCreationTime(updateLMSProgramEntity.getCreationTime());
+			updateLMSProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 
 			savedProgramEntity = programRepository.save(updateLMSProgramEntity);
 			savedProgramDTO =programMapper.INSTANCE.toProgramDTO(savedProgramEntity);
@@ -131,8 +168,8 @@ public class ProgramServices {
 				updateProgramEntity.setProgramName(program.getProgramName());
 				updateProgramEntity.setProgramDescription(program.getProgramDescription());
 				updateProgramEntity.setProgramStatus(program.getProgramStatus());
-				updateProgramEntity.setCreationTime(program.getCreationTime());
-				updateProgramEntity.setLastModTime(program.getLastModTime());
+				updateProgramEntity.setCreationTime(updateProgramEntity.getCreationTime());
+				updateProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 				//updateProgramEntity= programMapper.INSTANCE.toProgramEntity(program);
 				programRepository.save(updateProgramEntity);
 

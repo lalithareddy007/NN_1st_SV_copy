@@ -14,8 +14,8 @@ import com.numpyninja.lms.entity.Program;
 @Mapper(componentModel = "spring")
 public interface ProgramMapper {
 	ProgramMapper INSTANCE = Mappers.getMapper(ProgramMapper.class);
-	
-	
+
+
     ProgramDTO toProgramDTO(Program savedEntity);
 	
 	//@InheritInverseConfiguration

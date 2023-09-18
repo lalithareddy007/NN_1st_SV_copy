@@ -2,6 +2,7 @@ package com.numpyninja.lms.controller;
 
 
 import com.numpyninja.lms.dto.ProgramDTO;
+import com.numpyninja.lms.dto.ProgramWithUsersDTO;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.ProgramServices;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -27,7 +29,7 @@ public class ProgramController{
     @Autowired
     private ProgramServices programServices;
 
-  //get list of programs
+  //get list of programs cjeck
   	@GetMapping(value = "/allPrograms")
   	@ApiOperation("Get all Programs")
   	private ResponseEntity<?> getPrograms()  throws ResourceNotFoundException 
@@ -35,6 +37,15 @@ public class ProgramController{
   		System.out.println("in getall programs");
   		List<ProgramDTO> programList = programServices.getAllPrograms();
   		return ResponseEntity.ok(programList);  
+  	}  
+  	
+  	//get list of programs with users included
+  	@GetMapping(value = "/allProgramsWithUsers")
+  	@ApiOperation("Get all Programs along with users in each program")
+  	private ResponseEntity<List<ProgramWithUsersDTO>> getProgramsWithUsers()  throws ResourceNotFoundException 
+  	{ 
+  		System.out.println("in getall programs");
+  		return ResponseEntity.ok(programServices.getAllProgramsWithUsers());
   	}  
   	
   	//retrieves the details of a specific program
@@ -49,7 +60,7 @@ public class ProgramController{
   	//post mapping that creates the program detail in the database  
   	@PostMapping(path="/saveprogram",consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
-  	@ApiOperation("Create Program")
+	@ApiOperation("Create Program")
   	private ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
   	{  
   	ProgramDTO savedProgramedDTO = programServices.createAndSaveProgram(newProgram);
