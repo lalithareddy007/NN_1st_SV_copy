@@ -28,5 +28,6 @@ security:
     jwtAcctActiveExpMs: 172800000 #2 days in milli seconds
     jwtForgotPasswordExpMs: 7200000 #2 hours in milli seconds
 
-
-
+google:
+  calendar-id-lms: 42jsfha8fh5t0k9vem1gg8t7fc@group.calendar.google.com
+  credentials.file: service_account/credentials.encrypted
