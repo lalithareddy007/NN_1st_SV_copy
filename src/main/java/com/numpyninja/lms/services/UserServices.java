@@ -728,12 +728,13 @@ public class UserServices implements UserDetailsService {
     }
 
 
-	public List<UserCountByStatusDTO> getUsercountByStatus(String roleId) {
-		//if(roleId.equalsIgnoreCase("all")) {
+	public List<UserCountByStatusDTO> getUsercountByStatus(String roleId) throws ResourceNotFoundException{
+		if(roleId.equalsIgnoreCase("all")) {
 			return userRoleMapRepository.getUsersCountByStatus();
-		//}
-		
-		//return userRoleMapRepository.getUsersCountByStatus(roleId);
+		}
+		if(roleRepository.findById(roleId).isEmpty())
+			throw new ResourceNotFoundException("RoleID " + roleId + " not found");
+		return userRoleMapRepository.getUsersCountByStatusByRole(roleId);
 		
 	}
 

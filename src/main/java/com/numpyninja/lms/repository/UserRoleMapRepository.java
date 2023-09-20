@@ -42,6 +42,11 @@ public interface UserRoleMapRepository  extends JpaRepository <UserRoleMap, Long
 			+ "GROUP BY u.userRoleStatus")
 	List<UserCountByStatusDTO> getUsersCountByStatus();
 
+	@Query("SELECT new com.numpyninja.lms.dto.UserCountByStatusDTO(u.userRoleStatus, COUNT(u.userRoleId)) "
+			+ "FROM UserRoleMap AS u "
+			+ "WHERE u.role.roleId=:roleId "
+			+ "GROUP BY u.userRoleStatus")
+	List<UserCountByStatusDTO> getUsersCountByStatusByRole(String roleId);
 }
 
 

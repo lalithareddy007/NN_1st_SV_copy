@@ -164,11 +164,9 @@ public class UserController {
 	
 	@GetMapping("/users/byStatus")
 	@ApiOperation("Gets count of active and inactive users. Unless role id is specified, gets all type of users")
-	public ResponseEntity<List<UserCountByStatusDTO>> getUsersCountByStatus(@RequestParam(defaultValue = "all", name = "id") String roleId ) {
+	public ResponseEntity<List<UserCountByStatusDTO>> getUsersCountByStatus(@RequestParam(defaultValue = "all", name = "id") String roleId ) throws ResourceNotFoundException{
 		
-		//List<UserRoleMap> usersCountByStatus = userServices.getUsercountByStatus(roleId);
 		List<UserCountByStatusDTO> usersCountByStatus = userServices.getUsercountByStatus(roleId);
-		
 		return ResponseEntity.ok(usersCountByStatus);
 		
 	}
