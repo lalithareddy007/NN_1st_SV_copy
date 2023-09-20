@@ -728,6 +728,16 @@ public class UserServices implements UserDetailsService {
     }
 
 
+	public List<UserCountByStatusDTO> getUsercountByStatus(String roleId) {
+		//if(roleId.equalsIgnoreCase("all")) {
+			return userRoleMapRepository.getUsersCountByStatus();
+		//}
+		
+		//return userRoleMapRepository.getUsersCountByStatus(roleId);
+		
+	}
+
+
 
 
 	/*

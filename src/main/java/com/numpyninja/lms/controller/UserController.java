@@ -1,5 +1,6 @@
 package com.numpyninja.lms.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
@@ -158,6 +160,17 @@ public class UserController {
 	@ApiOperation("Get User by RoleID")
 	public ResponseEntity<List<UserDto>> getUserByRoleId(@PathVariable String roleId) throws ResourceNotFoundException {
 		return ResponseEntity.ok(this.userServices.getUsersByRoleID(roleId));
+	}
+	
+	@GetMapping("/users/byStatus")
+	@ApiOperation("Gets count of active and inactive users. Unless role id is specified, gets all type of users")
+	public ResponseEntity<List<UserCountByStatusDTO>> getUsersCountByStatus(@RequestParam(defaultValue = "all", name = "id") String roleId ) {
+		
+		//List<UserRoleMap> usersCountByStatus = userServices.getUsercountByStatus(roleId);
+		List<UserCountByStatusDTO> usersCountByStatus = userServices.getUsercountByStatus(roleId);
+		
+		return ResponseEntity.ok(usersCountByStatus);
+		
 	}
 
 
