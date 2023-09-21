@@ -93,13 +93,10 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.OK).body("UserStatus Updated for User: " + userId);
 	}
 	
-	
-	
 	//update User role Id - (R01/R02/R03) for a given user id 
 	@PutMapping("/users/roleId/{userId}")
 	@ApiOperation("Update User Role Id")
 	public ResponseEntity<String> updateRoleId(@Valid @PathVariable(value = "userId") String userId, @Valid @RequestBody UserRoleIdDTO updateRoleId) throws InvalidDataException {
-		
 		String responseDto = userServices.updateRoleId(updateRoleId, userId);
 		return ResponseEntity.status(HttpStatus.OK).body("Role Id Updated for User: " + userId);
 	}
