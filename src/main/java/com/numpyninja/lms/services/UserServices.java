@@ -436,11 +436,15 @@ public class UserServices implements UserDetailsService {
             
                 List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
                 Long userRoleId = existingUserRoles.get(0).getUserRoleId();
-           
+                List<Role> availableRoles = roleRepository.findAll();
+                Set<String> availableRoleIds = availableRoles.stream().map(avRole->avRole.getRoleId()).collect(Collectors.toSet());
+                
                 if (updateRoleId.getUserRoleList()!= null) {
                 	
-                	String roleIdToUpdate1 = updateRoleId.getUserRoleList().get(1);
-                          if(roleIdToUpdate1.equals("R01") || roleIdToUpdate1.equals("R02") || roleIdToUpdate1.equals("R03")) {
+                	String roleIdToUpdate1 = updateRoleId.getUserRoleList().get(0);
+                	if(availableRoleIds.contains(roleIdToUpdate1)) {
+                	
+                         // if(roleIdToUpdate1.equals("R01") || roleIdToUpdate1.equals("R02") || roleIdToUpdate1.equals("R03")) {
                             
                               userRoleMapRepository.updateRoleId(userRoleId, roleIdToUpdate1);
                               
@@ -452,16 +456,18 @@ public class UserServices implements UserDetailsService {
                           	
                             		  String roleIdToUpdate2 = updateRoleId.getUserRoleList().get(1);
                           			  if (roleIdToUpdate2 !=null) {
+                          				  if(availableRoleIds.contains(roleIdToUpdate1)) {
                           		
-                          				  Role userRole = roleRepository.getById(roleIdToUpdate2);
+                          					  Role userRole = roleRepository.getById(roleIdToUpdate2);
                           				  
-                          				  toUpdatedRole.setCreationTime(new Timestamp(utilDate.getTime()));
-                          				  toUpdatedRole.setLastModTime(new Timestamp(utilDate.getTime()));
-                          				  toUpdatedRole.setUserRoleStatus("Active");
-                          				  toUpdatedRole.setRole(userRole); //Role Id R01/R02/R03
-                          				  toUpdatedRole.setUser(existingUser); //user Id U01/U02
+                          					  toUpdatedRole.setCreationTime(new Timestamp(utilDate.getTime()));
+                          					  toUpdatedRole.setLastModTime(new Timestamp(utilDate.getTime()));
+                          					  toUpdatedRole.setUserRoleStatus("Active");
+                          					  toUpdatedRole.setRole(userRole); //Role Id R01/R02/R03
+                          					  toUpdatedRole.setUser(existingUser); //user Id U01/U02
                           				  
-                          				  toUpdatedRole = userRoleMapRepository.save(toUpdatedRole);
+                          					  toUpdatedRole = userRoleMapRepository.save(toUpdatedRole);
+                          				  }
                           			  }
                             	  }
                           }
