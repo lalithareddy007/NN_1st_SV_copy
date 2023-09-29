@@ -5,6 +5,7 @@ import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.config.WithMockAdminStaff;
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.services.AssignmentService;
+import com.numpyninja.lms.services.AssignmentSubmitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class AssignmentControllerTest extends AbstractTestController {
 
     @MockBean
     private AssignmentService assignmentService;
+
+    @MockBean
+    private AssignmentSubmitService assignmentSubmitService;
 
     @Autowired
     private ObjectMapper objectMapper;

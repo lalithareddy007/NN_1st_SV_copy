@@ -143,13 +143,13 @@ public class ProgBatchControllerTest extends AbstractTestController {
     // @WithMockUser(username="tim@gmail.com",roles={"STAFF","ADMIN"})
     public void givenBatch_whenCreateBatch_thenReturnSavedBatch() throws Exception {
         BatchDTO batchDTO3 = listOfBatches.get(2);
-
+        batchDTO3.setBatchName("DataScience1");
         given(batchService.createBatch(org.mockito.ArgumentMatchers.any())).willReturn(batchDTO3);   // it works for this code only
 
         ResultActions response = mockMvc.perform(post("/batches").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(batchDTO3)));
         response.andDo(print()).andExpect(status().isCreated());
-        System.out.println("response : " + response.toString());
+//        System.out.println("response : " + response.toString());
         response.andExpect(jsonPath("$.batchId", is(batchDTO3.getBatchId())))
                 .andExpect(jsonPath("$.batchName", is(batchDTO3.getBatchName())));
     }
@@ -157,7 +157,7 @@ public class ProgBatchControllerTest extends AbstractTestController {
     @Test @WithMockStaffStudent
     public void givenBatch_whenCreateBatch_thenReturnReturn403_forbidden() throws Exception {
         BatchDTO batchDTO3 = listOfBatches.get(2);
-
+        batchDTO3.setBatchName("DataScience1");
         given(batchService.createBatch(org.mockito.ArgumentMatchers.any())).willReturn(batchDTO3);   // it works for this code only
 
         ResultActions response = mockMvc.perform(post("/batches").contentType(MediaType.APPLICATION_JSON)
@@ -169,7 +169,7 @@ public class ProgBatchControllerTest extends AbstractTestController {
     @Test
     @WithMockAdmin
     public void givenUpdatedBatch_whenUpdateBatch_thenReturnUpdateBatchObject_Role_Admin() throws Exception {
-        BatchDTO updateDetailDTO = new BatchDTO(1, "01", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
+        BatchDTO updateDetailDTO = new BatchDTO(1, "SDET1", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
 
         Integer batchId = 1;
 
@@ -187,7 +187,7 @@ public class ProgBatchControllerTest extends AbstractTestController {
 
     @Test @WithMockStudent   // 403 forbidden
     public void givenUpdatedBatch_Role_Student_whenUpdateBatch_thenReturn403_forbidden_() throws Exception {
-        BatchDTO updateDetailDTO = new BatchDTO(1, "01", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
+        BatchDTO updateDetailDTO = new BatchDTO(1, "SDET1", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
 
         Integer batchId = 1;
 

@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Sort;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
+@Transactional
 public class ProgBatchRepositoryTest {
 
 	@Autowired
@@ -24,24 +26,38 @@ public class ProgBatchRepositoryTest {
 
 	@Autowired
 	ProgramRepository programRepository;
+	Program mockProgram1;
+	Batch mockBatch1;
 
-	Program mockProgram;
-
-	Batch mockBatch;
 
 	@BeforeEach
 	public void setUp() {
+
 		setMockProgramBatchAndSave();
 	}
 
 	private void setMockProgramBatchAndSave() {
-		mockProgram = new Program(2L, "DA", "DA Training",
-				"Active", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
-		programRepository.save(mockProgram);
 
-		mockBatch = new Batch(1, "DA 01", "DA Batch 01", "Active", mockProgram,
-				6, Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
-		progBatchRepository.save(mockBatch);
+		List<Program> mockProgram=programRepository.findByProgramName("SDET");
+		if(mockProgram.isEmpty()){
+			mockProgram1 = new Program();
+			mockProgram1.setProgramName("DA");
+			mockProgram1.setProgramDescription("DA Training");
+			mockProgram1.setProgramStatus("Active");
+			mockProgram1.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
+			mockProgram1.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+			 programRepository.save(mockProgram1);
+		}
+		else{
+
+			mockProgram1=mockProgram.get(0);
+		}
+		List<Batch> mockBatch = progBatchRepository.findByBatchName("DA 01");
+		if (mockBatch.isEmpty()) {
+			mockBatch1 = new Batch(1, "DA 01", "DA Batch 01", "Active", mockProgram1,
+					6, Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
+			progBatchRepository.save(mockBatch1);
+		}
 	}
 
 	@DisplayName("JUnit test for get Batches by BatchName")
@@ -52,6 +68,7 @@ public class ProgBatchRepositoryTest {
 
 		// when
 		List<Batch> batchList = progBatchRepository.findByBatchName(batchName);
+		System.out.println(batchList);
 
 		// then
 		assertThat(batchList).isNotEmpty();
@@ -65,6 +82,7 @@ public class ProgBatchRepositoryTest {
 		List<Batch> list = progBatchRepository.findByBatchNameContainingIgnoreCaseOrderByBatchIdAsc(batchName);
 
 		assertThat(list).isNotEmpty();
+
 	}
 
 	@DisplayName("JUnit test for get Batches by ProgramId ")
@@ -72,7 +90,7 @@ public class ProgBatchRepositoryTest {
 	//@Order(6)
 	public void givenProgramId_WhenFindBatch_ReturnBatchObjects() {
 		// given
-		Long programId = 2L;
+		Long programId = mockProgram1.getProgramId();
 
 		// when
 		List<Batch> batchList = progBatchRepository.findByProgramProgramId(programId);
@@ -90,18 +108,18 @@ public class ProgBatchRepositoryTest {
 
 		assertThat(optionalBatch).isNotEqualTo(0);
 	}
-	
-	
+
+
 	@DisplayName("test to get batchName and Program by programId")
 	@Test
 	public void testFindByBatchNameAndProgram_ProgramId() {
-		
+
 		String batchName = "SDET";
 		Long ProgramID = 2L;
 		Batch optionalBatch = progBatchRepository
 				.findByBatchNameAndProgram_ProgramId(batchName, ProgramID);
 		assertThat(optionalBatch).isNotEqualTo(0);
-		
+
 	}
-	
+
 }
