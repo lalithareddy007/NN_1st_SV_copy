@@ -27,8 +27,9 @@ public class UserLoginDto {
 
   //created custom annotation to validate status( accepts only "Active" and "Inactive")
     @ValidateStatus
-    @JsonIgnore
+    //@JsonIgnore
     private String status;
 
     private List<String> roleIds;
+
 }
