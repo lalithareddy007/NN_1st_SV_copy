@@ -385,28 +385,29 @@ public class UserServices implements UserDetailsService {
             throw new InvalidDataException("UserId cannot be blank/null");
         } else {
             Optional<User> userById = userRepository.findById(userId);
-
+            
             if (userById.isEmpty()) {
                 throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
             } else {
 
                 List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
-
+                
                 String roleIdToUpdate = updateUserRoleStatus.getRoleId();
-
                 String roleStatusToUpdate = updateUserRoleStatus.getUserRoleStatus();
+                
                 List<String> roleIdList;
                 boolean roleFound = false;
                 for (int roleCount = 0; roleCount < existingUserRoles.size(); roleCount++) {
 
                     String existingRoleId = existingUserRoles.get(roleCount).getRole().getRoleId();
-
+                    
                     if (roleIdToUpdate.equals(existingRoleId)) {
                         roleFound = true;
 
                         Long userRoleId = existingUserRoles.get(roleCount).getUserRoleId();
-                       	
+                        
                         userRoleMapRepository.updateUserRole(userRoleId, roleStatusToUpdate);
+                                    
                     }
                 }
                 if (!roleFound) {
@@ -417,7 +418,87 @@ public class UserServices implements UserDetailsService {
             return userId;
         }
     }
-
+  
+    private boolean validateInputRoles(List<String> userRoles) {
+    	
+    	boolean validated = false;
+    	if(userRoles.size() > 2 || userRoles.size() < 1)
+    		throw new InvalidDataException("Input roles cannot be 0 or greater than 2");
+    	List<Role> availableRoles = roleRepository.findAll();
+        Set<String> availableRoleIds = availableRoles.stream().map(avRole->avRole.getRoleId()).collect(Collectors.toSet());//R01/R02/R03
+        
+        if(userRoles.size() > 1 ) {
+        	String roleId1 = userRoles.get(0);
+        	String roleId2 = userRoles.get(1);  
+        	
+        	if(userRoles.get(0).equals(userRoles.get(1)))
+        		throw new InvalidDataException("Please enter a valid Role Id. Role id's cannot be same. ");
+        	
+        	if (!(availableRoleIds.contains(roleId1)) ||  !(availableRoleIds.contains(roleId2))) {
+        		throw new InvalidDataException("Invalid Role Ids.");
+        	}
+        }
+        
+        if(userRoles.size() > 0 ) {
+        	String roleId1 = userRoles.get(0);
+        	if (!(availableRoleIds.contains(roleId1))) {
+        		throw new InvalidDataException ("Invalid role id");
+        		
+        	}
+        }
+        validated = true;
+        return validated;
+        
+    }
+    
+    public String updateRoleId(UserRoleIdDTO updateRoleId, String userId)
+            throws InvalidDataException {
+    	
+    	UserRoleMap toUpdatedRole =null;
+        Optional<User> userById = userRepository.findById(userId);
+        if (userById.isEmpty()) {
+                throw new ResourceNotFoundException("UserID: " + userId + " Not Found");
+        } 
+        List<UserRoleMap> existingUserRoles = userRoleMapRepository.findUserRoleMapsByUserUserId(userId);
+        Long userRoleId = existingUserRoles.get(0).getUserRoleId();
+        Set<String> existingRoleIds = existingUserRoles.stream().map(role -> role.getRole().getRoleId()).collect(Collectors.toSet());
+        String roleIdToUpdate1 = updateRoleId.getUserRoleList().get(0);
+       
+        if(existingRoleIds.contains(roleIdToUpdate1)) {
+              	System.out.println("Role Id already exists");
+              		throw new InvalidDataException("Role "+roleIdToUpdate1+ "already exists for user " +userId);
+        }
+        if( updateRoleId.getUserRoleList().size() > 1) {
+        	String roleIdToUpdate2 = updateRoleId.getUserRoleList().get(1);
+            if(existingRoleIds.contains(roleIdToUpdate2)) {
+                  		throw new InvalidDataException("Role "+roleIdToUpdate2+ " already exists for user " +userId);
+            }
+        }
+        if(validateInputRoles(updateRoleId.getUserRoleList())) {
+             userRoleMapRepository.updateRoleId(userRoleId, roleIdToUpdate1);//Update the role
+             if( updateRoleId.getUserRoleList().size() > 1) {
+                toUpdatedRole = userMapper.userRole(updateRoleId);
+                User existingUser = userRepository.findById(userId)
+                                    .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+                        			  
+                String roleIdToUpdate2 = updateRoleId.getUserRoleList().get(1);
+                Role userRole = roleRepository.getById(roleIdToUpdate2);
+                    
+                toUpdatedRole.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
+                toUpdatedRole.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+                toUpdatedRole.setUserRoleStatus("Active");
+                toUpdatedRole.setRole(userRole); //Role Id R01/R02/R03
+                toUpdatedRole.setUser(existingUser); //user Id U01/U02
+                        				  
+                toUpdatedRole = userRoleMapRepository.save(toUpdatedRole);
+             }
+          }
+          else 
+              throw new ResourceNotFoundException(
+                      "Invalid Role Id for " + "UserID: " + userId);
+        return userId;
+    }
+      
     /**
      * Service method for Delete User
      **/

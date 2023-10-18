@@ -37,10 +37,18 @@ public interface UserRoleMapRepository  extends JpaRepository <UserRoleMap, Long
 	@Query("update UserRoleMap u set u.userRoleStatus = :roleStatusToUpdate, u.lastModTime= CURRENT_TIMESTAMP where u.userRoleId = :userRoleId")
 	void updateUserRole(@Param(value = "userRoleId") Long userRoleId, @Param(value = "roleStatusToUpdate") String roleStatusToUpdate);
 	
+
+	@Modifying
+	@Query("update UserRoleMap u set u.role.roleId = :roleIdToUpdate, u.lastModTime= CURRENT_TIMESTAMP where u.userRoleId = :userRoleId")
+	void updateRoleId(@Param(value = "userRoleId") Long userRoleId, @Param(value = "roleIdToUpdate") String roleIdToUpdate);
+	
+	
+
 	@Query("SELECT new com.numpyninja.lms.dto.UserCountByStatusDTO(u.userRoleStatus, COUNT(u.userRoleId)) "
 			+ "FROM UserRoleMap AS u "
 			+ "GROUP BY u.userRoleStatus")
 	List<UserCountByStatusDTO> getUsersCountByStatus();
+
 
 	@Query("SELECT new com.numpyninja.lms.dto.UserCountByStatusDTO(u.userRoleStatus, COUNT(u.userRoleId)) "
 			+ "FROM UserRoleMap AS u "

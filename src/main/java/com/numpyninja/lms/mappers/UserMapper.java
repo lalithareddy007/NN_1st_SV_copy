@@ -33,6 +33,11 @@ public interface UserMapper {
     List<UserRoleMap> userRoleMapList(List<UserRoleMapSlimDTO> userRoleMapSlimDto);
 
     UserRoleMap userRoleMap(UserAndRoleDTO userAndRoleDto);
+    
+    UserRoleMap userRole(UserRoleIdDTO updateRoleId);
+    
+    
+    
 
     List<UserRoleMap> touserRoleMapList(List<UserAndRoleDTO> userAndRoleDto);
 
