@@ -502,6 +502,21 @@ public class UserServices implements UserDetailsService {
     /**
      * Service method for Delete User
      **/
+//    public String deleteUser(String userId) throws ResourceNotFoundException {
+//
+//        boolean userExists = userRepository.existsById(userId);
+//        boolean noBatchProgramForUser = userRoleProgramBatchMapRepository.findByUser_UserId(userId).isEmpty();
+//        if (!userExists){
+//            throw new ResourceNotFoundException("UserID: " + userId + " does not exist ");
+//        } else if(!noBatchProgramForUser) {
+//        	throw new ResourceNotFoundException("UserID: " + userId + " Cannot be deleted as the User is assigned to a Batch/Program ");
+//        } else {
+//            UserLogin userLogin = userLoginRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+//            userRepository.deleteById(userId);
+//            removeUserFromUserCache(userLogin.getUserLoginEmail());
+//        }
+//        return userId;
+//    }
     public String deleteUser(String userId) throws ResourceNotFoundException {
 
         boolean userExists = userRepository.existsById(userId);
@@ -509,15 +524,22 @@ public class UserServices implements UserDetailsService {
         if (!userExists){
             throw new ResourceNotFoundException("UserID: " + userId + " does not exist ");
         } else if(!noBatchProgramForUser) {
-        	throw new ResourceNotFoundException("UserID: " + userId + " Cannot be deleted as the User is assigned to a Batch/Program ");
+//            throw new ResourceNotFoundException("UserID: " + userId + " Cannot be deleted as the User is assigned to a Batch/Program ");
+           List<UserRoleProgramBatchMap> userRoleProgramBatchMapList= userRoleProgramBatchMapRepository.findByUser_UserId(userId);
+            if(Objects.equals(userRoleProgramBatchMapList.get(0).getRole().getRoleId(), "R03")){
+                userRoleProgramBatchMapRepository.deleteById(userRoleProgramBatchMapRepository.findByUser_UserId(userId).get(0).getUserRoleProgramBatchId());
+                UserLogin userLogin1=userLoginRepository.findById(userId).get();
+                userLogin1.setLoginStatus("Inactive");
+                userLoginRepository.save(userLogin1);
+            }
         } else {
-            UserLogin userLogin = userLoginRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
-            userRepository.deleteById(userId);
-            removeUserFromUserCache(userLogin.getUserLoginEmail());
+
+            UserLogin userLogin1=userLoginRepository.findById(userId).get();
+            userLogin1.setLoginStatus("Inactive");
+            userLoginRepository.save(userLogin1);
         }
         return userId;
     }
-
     private void removeUserFromUserCache(String emailId) {
         userCache.removeUserFromCache(emailId);
     }
@@ -807,6 +829,17 @@ public class UserServices implements UserDetailsService {
                 .collect(Collectors.toList());
         return userdto;
     }
+
+
+	public List<UserCountByStatusDTO> getUsercountByStatus(String roleId) throws ResourceNotFoundException{
+		if(roleId.equalsIgnoreCase("all")) {
+			return userRoleMapRepository.getUsersCountByStatus();
+		}
+		if(roleRepository.findById(roleId).isEmpty())
+			throw new ResourceNotFoundException("RoleID " + roleId + " not found");
+		return userRoleMapRepository.getUsersCountByStatusByRole(roleId);
+		
+	}
 
 
 
