@@ -27,8 +27,7 @@ import java.util.Optional;
 @Service
 public class ClassService {
 	@Autowired
-
-	private ClassRepository classRepository;
+	ClassRepository classRepository;
 
 	@Autowired
 	ProgBatchRepository batchRepository;
@@ -37,10 +36,10 @@ public class ClassService {
 	UserRepository userRepository;
 
 	@Autowired
-	private ClassScheduleMapper classMapper;
+	ClassScheduleMapper classMapper;
 
 	@Autowired
-	private UserRoleMapRepository userRoleMapRepository;
+	UserRoleMapRepository userRoleMapRepository;
 
 	@Autowired
 	RoleRepository roleRepository;
