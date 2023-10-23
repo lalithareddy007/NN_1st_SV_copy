@@ -69,6 +69,8 @@ public class UserControllerTest {
 	private UserRoleMap mockUserRoleMap;
 
 	private UserAndRoleDTO mockUserAndRoleDto;
+	
+	private UserRoleIdDTO mockUserRoleIdDTO;
 
 	private UserRoleMapSlimDTO mockUserRoleMapSlimDto;
 
@@ -292,6 +294,57 @@ public class UserControllerTest {
 		response.andExpect(status().isOk());
 		//.andExpect(jsonPath("$.roleId").value("R02"));
 	}
+	
+	@Test
+	@DisplayName("Test to update user Roles for single role")
+	void  testupdateRoleId() throws JsonProcessingException, Exception { 
+		String userId= "U01";
+		List<String> roleList= new ArrayList();
+		roleList.add("R03");
+		mockUserRoleIdDTO = new UserRoleIdDTO(roleList);
+		UserRoleIdDTO updatedUserRoleDto = new UserRoleIdDTO(); 
+		List<String> updatedRoleList = new ArrayList();
+		updatedRoleList.add("R02");
+		updatedUserRoleDto.setUserRoleList(updatedRoleList);
+		
+		given(userService.updateRoleId(any(UserRoleIdDTO.class),
+				any(String.class))).willReturn(userId);
+		
+		ResultActions response = mockMvc.perform(put("/users/roleId/{userId}",userId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(updatedUserRoleDto)));
+		
+		response.andExpect(status().isOk());
+		
+	} 
+	
+	@Test
+	@DisplayName("Test to update user Roles for two roles")
+	void  testupdateRoleId1() throws JsonProcessingException, Exception { 
+		String userId= "U08";
+		List<String> roleList= new ArrayList();
+		roleList.add("R01");
+		roleList.add("R02");
+		
+		mockUserRoleIdDTO = new UserRoleIdDTO(roleList);
+		UserRoleIdDTO updatedUserRoleDto = new UserRoleIdDTO(); 
+		List<String> updatedRoleList = new ArrayList();
+		updatedRoleList.add("R01");
+		updatedRoleList.add("R02");
+		
+		updatedUserRoleDto.setUserRoleList(updatedRoleList);
+		
+		given(userService.updateRoleId(any(UserRoleIdDTO.class),
+				any(String.class))).willReturn(userId);
+		
+		ResultActions response = mockMvc.perform(put("/users/roleId/{userId}",userId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(updatedUserRoleDto)));
+		
+		response.andExpect(status().isOk());
+		
+	} 
+
 
 	@DisplayName("test to assign/update program/batch to Student")
 	@SneakyThrows
