@@ -112,7 +112,7 @@ public class ClassController {
 	} 
 	
 	//DeleteClassById
-	@DeleteMapping(path="deletebyClass/{classId}",produces = "application/json")  
+	@DeleteMapping(path="deleteByClass/{classId}",produces = "application/json")
 	@ResponseBody
 	@ApiOperation("Delete Class by Class ID")
 	@PreAuthorize("hasRole('ADMIN')")
@@ -122,12 +122,13 @@ public class ClassController {
 		boolean deleted = classServices.deleteByClassId(classId);
 	if(deleted)
 		return ResponseEntity.status(HttpStatus.OK).build();
-			else
+			else {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	}
 	}  
 
 	
-	////Update Class Recording by ClassId
+	//Update Class Recording by ClassId
 	@PutMapping(path="updateClassrecording/{classId}", consumes = "application/json", produces = "application/json")  
 	@ResponseBody
 	@ApiOperation("Update Class Recordings By Class ID")
