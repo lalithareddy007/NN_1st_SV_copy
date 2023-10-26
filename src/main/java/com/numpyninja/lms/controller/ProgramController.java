@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -32,7 +33,7 @@ public class ProgramController{
   //get list of programs cjeck
   	@GetMapping(value = "/allPrograms")
   	@ApiOperation("Get all Programs")
-  	private ResponseEntity<?> getPrograms()  throws ResourceNotFoundException 
+  	public ResponseEntity<?> getPrograms()  throws ResourceNotFoundException
   	{ 
   		System.out.println("in getall programs");
   		List<ProgramDTO> programList = programServices.getAllPrograms();
@@ -58,38 +59,42 @@ public class ProgramController{
   	}  
   			
   	//post mapping that creates the program detail in the database  
-  	@PostMapping(path="/saveprogram",consumes = "application/json", produces = "application/json")  
+  	@PostMapping(path="/saveprogram",consumes = "application/json", produces = "application/json")
+	@PreAuthorize("hasRole('ADMIN')")
   	//@ResponseBody
 	@ApiOperation("Create Program")
-  	private ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
+  	public ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
   	{  
   	ProgramDTO savedProgramedDTO = programServices.createAndSaveProgram(newProgram);
   	return ResponseEntity.status(HttpStatus.CREATED).body(savedProgramedDTO);  
   	} 
   				
   	//put mapping that updates the program detail by programId  
-  	@PutMapping(path="/putprogram/{programId}", consumes = "application/json", produces = "application/json")  
+  	@PutMapping(path="/putprogram/{programId}", consumes = "application/json", produces = "application/json")
+	@PreAuthorize("hasRole('ADMIN')")
   	//@ResponseBody
   	@ApiOperation("Update Program by Program ID")
-  	private ResponseEntity <ProgramDTO> updateProgramById(@PathVariable("programId")@NotBlank @Positive Long programId ,@Valid @RequestBody ProgramDTO modifyProgram) throws ResourceNotFoundException
+  	public ResponseEntity <ProgramDTO> updateProgramById(@PathVariable("programId")@NotBlank @Positive Long programId ,@Valid @RequestBody ProgramDTO modifyProgram) throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok(programServices.updateProgramById(programId,modifyProgram));
   	} 
   			
   	//creating put mapping that updates the program detail  by programName 
-  	@PutMapping(path="/program/{programName}", consumes = "application/json", produces = "application/json")  
+  	@PutMapping(path="/program/{programName}", consumes = "application/json", produces = "application/json")
+	@PreAuthorize("hasRole('ADMIN')")
   	//@ResponseBody
   	@ApiOperation("Update Program by Program Name")
-  	private ResponseEntity <ProgramDTO> updateProgramByName(@Valid @PathVariable("programName") String programName ,@Valid @RequestBody ProgramDTO modifyProgram)throws ResourceNotFoundException  
+  	public ResponseEntity <ProgramDTO> updateProgramByName(@Valid @PathVariable("programName") String programName ,@Valid @RequestBody ProgramDTO modifyProgram)throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok(programServices.updateProgramByName(programName,modifyProgram));
   	} 
   			 
   	//delete mapping that deletes a specified program  
-  	@DeleteMapping(path="/deletebyprogid/{programId}")  
+  	@DeleteMapping(path="/deletebyprogid/{programId}")
+	@PreAuthorize("hasRole('ADMIN')")
   	@ResponseBody
   	@ApiOperation("Delete Program by Program ID")
-  	private ResponseEntity<String>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException
+  	public ResponseEntity<String>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException
   	{
   	System.out.println("in delete by programID controller");
   	boolean deleted = programServices.deleteByProgramId(programId);
@@ -101,10 +106,11 @@ public class ProgramController{
   	}
   			 
   	//delete mapping that deletes a specified program by ProgramName  
-  	@DeleteMapping(path="/deletebyprogname/{programName}")  
+  	@DeleteMapping(path="/deletebyprogname/{programName}")
+	@PreAuthorize("hasRole('ADMIN')")
   	//@ResponseBody
   	@ApiOperation("Delete Program by Program Name")
-  	private ResponseEntity<?>  deleteByProgramName(@PathVariable("programName")@NotBlank @NotNull String programName) throws ResourceNotFoundException  
+  	public ResponseEntity<?>  deleteByProgramName(@PathVariable("programName")@NotBlank @NotNull String programName) throws ResourceNotFoundException
   	{  
   	System.out.println("in delete by programName controller");
   	boolean deleted =programServices.deleteByProgramName(programName);
