@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureDataJpa
-@WebMvcTest(AssignmentControllerIT.class)
+@WebMvcTest(AssignmentController.class)
 @ComponentScan(basePackages = "com.numpyninja.lms.*")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 public class AssignmentControllerIT {
