@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureDataJpa
-@WebMvcTest(UserController.class)
+@WebMvcTest(AssignmentControllerIT.class)
 @ComponentScan(basePackages = "com.numpyninja.lms.*")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 public class AssignmentControllerIT {
@@ -69,7 +69,7 @@ public class AssignmentControllerIT {
 
     @Test
     @Order(1)
-    public void createAssignment() throws Exception {
+    public void testCreateAssignment() throws Exception {
 
         AssignmentDto assignmentDto = new AssignmentDto();
         assignmentDto.setAssignmentName("DA Assignment");
@@ -118,7 +118,7 @@ public class AssignmentControllerIT {
 
     @Test
     @Order(2)
-    public void getAllAssignments() throws Exception {
+    public void testGetAllAssignments() throws Exception {
         final MvcResult mvcResult = mockMvc.perform(get("/lms/assignments").contextPath("/lms")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json"))
@@ -154,7 +154,7 @@ public class AssignmentControllerIT {
 
     @Test
     @Order(4)
-    public void updateAssignment() throws Exception {
+    public void testUpdateAssignment() throws Exception {
 
         AssignmentDto assignmentDto = new AssignmentDto();
         assignmentDto.setAssignmentName("DA Assignment2");
@@ -192,7 +192,7 @@ public class AssignmentControllerIT {
 
     @Test
     @Order(5)
-    public void getAssignmentsForBatch() throws Exception {
+    public void testGetAssignmentsForBatch() throws Exception {
         final MvcResult mvcResult = mockMvc.perform(get("/lms/assignments/batch/" + 1).contextPath("/lms")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json"))
@@ -225,7 +225,7 @@ public class AssignmentControllerIT {
 
     @Test
     @Order(6)
-    public void deleteAssignment() throws Exception {
+    public void testDeleteAssignment() throws Exception {
         final MvcResult mvcResult = mockMvc.perform(delete("/lms/assignments/" + assignmentId).contextPath("/lms")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json"))
