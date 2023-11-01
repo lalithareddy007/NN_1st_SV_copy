@@ -39,7 +39,6 @@ public class ClassController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<ClassDto> createAndSaveClass(@Valid @RequestBody ClassDto classDTO)throws DuplicateResourceFoundException
 	{
-		log.info("in create a new class schedule");
 		ClassDto savedClassDTO = classServices.createClass(classDTO);
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedClassDTO);
 	} 
@@ -49,7 +48,6 @@ public class ClassController {
 	@ApiOperation("Get all Class List")
 	public ResponseEntity<?> getAllClassesList()  throws ResourceNotFoundException
 	{
-		log.info("in get all classes");
 		List<ClassDto> ClassesList = classServices.getAllClasses();
 		return ResponseEntity.ok(ClassesList);  
 	}  
@@ -60,7 +58,6 @@ public class ClassController {
 	@ApiOperation("Get Class details by ID")
 	public ResponseEntity <?> getClassesById(@PathVariable("classId") @NotBlank @Positive Long classId)throws ResourceNotFoundException
 	{
-		log.info("in get All classes by ClassId");
 		ClassDto classesDTOList= classServices.getClassByClassId(classId);
 		return ResponseEntity.ok(classesDTOList);
 	}  
@@ -70,7 +67,6 @@ public class ClassController {
 	@ApiOperation("Get all Classes by Class Topic ")
 	public ResponseEntity<?> getAllClassesByClassTopic(@PathVariable("classTopic") @NotBlank @Positive String classTopic)  throws ResourceNotFoundException
 	{
-		log.info("in getall Class By ClassTopic");
 		List<ClassDto> ClassesList = classServices.getClassesByClassTopic(classTopic);
 		return ResponseEntity.ok(ClassesList);
 	}
@@ -81,7 +77,6 @@ public class ClassController {
 	@ApiOperation("Get all Classes by Batch ID")
 	public ResponseEntity <?> getClassesByBatchId(@PathVariable("batchId") @NotBlank @Positive Integer batchId)throws ResourceNotFoundException
 		{
-			log.info("in get All classes by BatchId");
 			List<ClassDto> classesDTOList= classServices.getClassesByBatchId(batchId);
 			return ResponseEntity.ok(classesDTOList);
 		}
@@ -92,7 +87,6 @@ public class ClassController {
 	@ApiOperation("Get all Classes by Staff ID")
 	public ResponseEntity <?> getClassesByStaffId(@PathVariable(value="staffId") @NotBlank @Positive String staffId)throws ResourceNotFoundException
 		{
-			log.info("in get All classes by staffId");
 			List<ClassDto> classesDTOList= classServices.getClassesByStaffId(staffId);
 			return ResponseEntity.ok(classesDTOList);
 		}  
@@ -118,7 +112,6 @@ public class ClassController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?>  deleteByClassId(@PathVariable("classId")@NotBlank @Positive Long classId) throws ResourceNotFoundException
 	{
-		log.info("in delete by classId controller");
 		boolean deleted = classServices.deleteByClassId(classId);
 	if(deleted)
 		return ResponseEntity.status(HttpStatus.OK).build();
@@ -141,22 +134,20 @@ public class ClassController {
 	
 	//get class Recording by classId
 	
-	@GetMapping(path="classrecordings/{classId}", produces = "application/json")  
+	@GetMapping(path="classRecordings/{classId}", produces = "application/json")
 	@ResponseBody
 	@ApiOperation("Get Class Recordings by Class ID")
 	public ResponseEntity <ClassRecordingDTO> getClassRecordingByClassId(@PathVariable("classId") @NotBlank @Positive Long classId)throws ResourceNotFoundException
 	{
-		log.info("in get class recordings by ClassId");
 		return ResponseEntity.ok(classServices.getClassRecordingByClassId(classId));
 	} 
 	
 	
-	@GetMapping(path="batchrecordings/{batchId}", produces = "application/json")  
+	@GetMapping(path="batchRecordings/{batchId}", produces = "application/json")
 	@ResponseBody
 	@ApiOperation("Get Class Recordings by Batch ID")
 	public ResponseEntity<List<ClassRecordingDTO>> getClassRecordingByBatchId(@PathVariable("batchId") @NotBlank @Positive Integer batchId)throws ResourceNotFoundException
 	{
-		log.info("in get class recordings by batchId");
 		return ResponseEntity.ok(classServices.getClassesRecordingByBatchId(batchId));
 	}
 	

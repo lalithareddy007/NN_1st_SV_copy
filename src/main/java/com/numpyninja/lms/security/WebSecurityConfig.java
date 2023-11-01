@@ -76,9 +76,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/login/**").permitAll()
                 .antMatchers(PUBLIC_URLS).permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/staff/**").hasRole("STAFF")
-                .antMatchers("/user/**").hasRole("USER")
                 .anyRequest().authenticated();        // ”permitAll” will configure the authorization so that all requests are allowed on that particular path ; '/login'
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
