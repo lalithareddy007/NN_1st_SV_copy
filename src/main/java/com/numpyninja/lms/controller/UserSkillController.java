@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class UserSkillController {
     }
     @PostMapping("/create")
     @ApiOperation("Create New User Skill")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
         public ResponseEntity<UserSkillDTO> createUserSkill(@RequestBody  UserSkillDTO newuserskillDTO ) throws DuplicateResourceFoundException {
             UserSkillDTO responseDto = this.userSkillService.createUserSkill(newuserskillDTO);
             return new ResponseEntity<>(responseDto,HttpStatus.CREATED);
@@ -34,6 +36,7 @@ public class UserSkillController {
 
     @GetMapping()
     @ApiOperation("Get All User Skill")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public List<UserSkillDTO> getAllUserSkill(){
 
         return userSkillService.getAllUserSkills();
@@ -47,6 +50,7 @@ public class UserSkillController {
 
     @PutMapping("/{id}")
     @ApiOperation("Update User Skill")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public  ResponseEntity<UserSkillDTO>  updateUserSkill(@RequestBody UserSkillDTO userSkillDTO, @PathVariable String id){
      UserSkillDTO updateUserSkillDTO =this.userSkillService.updateUserSkill(userSkillDTO,id);
      return ResponseEntity.ok(updateUserSkillDTO);
@@ -60,6 +64,7 @@ public class UserSkillController {
     }*/
     @DeleteMapping(path="/deleteByUserSkillId/{id}")
     @ApiOperation("Delete User Skill by User Skill ID")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity< ApiResponse>deleteUserSkillByUserSkillId(@PathVariable String id){
         this.userSkillService.deleteUserSkillByUserSkillId(id);
         return new ResponseEntity<ApiResponse>(new ApiResponse("UserSkill deleted successfully", true), HttpStatus.OK);
