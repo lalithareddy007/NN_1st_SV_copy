@@ -192,7 +192,8 @@ public class ProgramServices {
 			Boolean value = programRepository.existsById(programId);
 			if (value) {
 				Program progEntity = programRepository.findById(programId).get();
-				programRepository.delete(progEntity);
+				progEntity.setProgramStatus("Inactive");
+				programRepository.save(progEntity);
 				return value;
 			} else {
 				System.out.println("no record found with programId" + "  " + programId);
@@ -225,7 +226,8 @@ public class ProgramServices {
 						deletedLMSProgramEntity =eachRec;
 					}
 				}
-				programRepository.delete(deletedLMSProgramEntity);
+				deletedLMSProgramEntity.setProgramStatus("Inactive");
+				programRepository.save(deletedLMSProgramEntity);
 				deleted =true;
 				return deleted;
 			}
