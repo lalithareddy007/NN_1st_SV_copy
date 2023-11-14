@@ -84,7 +84,9 @@ public class UserSkillControllerTest extends AbstractTestController {
             given(userSkillService.getAllUserSkills()).willReturn(userSkillList);
             mockMvc.perform(get("/userSkill")
                             .contentType(MediaType.APPLICATION_JSON))
-                    .andExpectAll(status().isForbidden());
+                    .andExpectAll(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(3)));
+        verify(userSkillService).getAllUserSkills();
     }
 
     @DisplayName("Test for getting all UserSkills for particular User")
@@ -156,7 +158,9 @@ public class UserSkillControllerTest extends AbstractTestController {
         ResultActions resultActions = mockMvc.perform(post("/userSkill/create")
                 .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(userSkillDTO2)));
         //then
-        resultActions.andExpect(status().isForbidden());
+        resultActions.andExpect(status().isCreated())
+                .andExpect((ResultMatcher) jsonPath("$.userId", equalTo(userSkillDTO2.getUserId()), String.class))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userSkillId", equalTo(userSkillDTO2.getUserSkillId())));
     }
 
     @DisplayName("Test for Updating UserSkill by UserSKillId")
@@ -193,7 +197,9 @@ public class UserSkillControllerTest extends AbstractTestController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedUserSkillDTO)));
         //then
-        resultActions.andExpect(status().isForbidden());
+        resultActions.andExpect(status().isOk()).andDo(print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userId", equalTo(updatedUserSkillDTO.getUserId()), String.class))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.userSkillId", equalTo(updatedUserSkillDTO.getUserSkillId())));
     }
 
     /*  @DisplayName("Test - Delete UserSkill By UserId ")
@@ -234,6 +240,7 @@ public class UserSkillControllerTest extends AbstractTestController {
         //when
         ResultActions resultActions = mockMvc.perform(delete("/userSkill/deleteByUserSkillId/{id}", userSkillId));
         //then
-        resultActions.andExpect(status().isForbidden());
+        resultActions.andExpect(status().isOk());
+        verify(userSkillService).deleteUserSkillByUserSkillId(userSkillId);
     }
 }
