@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -32,7 +33,7 @@ public class ProgramController{
   //get list of programs cjeck
   	@GetMapping(value = "/allPrograms")
   	@ApiOperation("Get all Programs")
-  	private ResponseEntity<?> getPrograms()  throws ResourceNotFoundException 
+  	public ResponseEntity<?> getPrograms()  throws ResourceNotFoundException
   	{ 
   		System.out.println("in getall programs");
   		List<ProgramDTO> programList = programServices.getAllPrograms();
@@ -42,7 +43,7 @@ public class ProgramController{
   	//get list of programs with users included
   	@GetMapping(value = "/allProgramsWithUsers")
   	@ApiOperation("Get all Programs along with users in each program")
-  	private ResponseEntity<List<ProgramWithUsersDTO>> getProgramsWithUsers()  throws ResourceNotFoundException 
+  	public ResponseEntity<List<ProgramWithUsersDTO>> getProgramsWithUsers()  throws ResourceNotFoundException
   	{ 
   		System.out.println("in getall programs");
   		return ResponseEntity.ok(programServices.getAllProgramsWithUsers());
@@ -52,7 +53,7 @@ public class ProgramController{
   	@GetMapping(path="programs/{programId}")  
   	//@ResponseBody
   	@ApiOperation("Get Program by Program ID")
-  	private ResponseEntity <ProgramDTO> getOneProgramById(@PathVariable("programId") @NotBlank @Positive Long programId)throws ResourceNotFoundException
+  	public ResponseEntity <ProgramDTO> getOneProgramById(@PathVariable("programId") @NotBlank @Positive Long programId)throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok().body(programServices.getProgramsById(programId));
   	}  
@@ -61,7 +62,8 @@ public class ProgramController{
   	@PostMapping(path="/saveprogram",consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
 	@ApiOperation("Create Program")
-  	private ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
+	@PreAuthorize("hasRole('ADMIN')")
+  	public ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
   	{  
   	ProgramDTO savedProgramedDTO = programServices.createAndSaveProgram(newProgram);
   	return ResponseEntity.status(HttpStatus.CREATED).body(savedProgramedDTO);  
@@ -71,7 +73,8 @@ public class ProgramController{
   	@PutMapping(path="/putprogram/{programId}", consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
   	@ApiOperation("Update Program by Program ID")
-  	private ResponseEntity <ProgramDTO> updateProgramById(@PathVariable("programId")@NotBlank @Positive Long programId ,@Valid @RequestBody ProgramDTO modifyProgram) throws ResourceNotFoundException
+	@PreAuthorize("hasRole('ADMIN')")
+  	public ResponseEntity <ProgramDTO> updateProgramById(@PathVariable("programId")@NotBlank @Positive Long programId ,@Valid @RequestBody ProgramDTO modifyProgram) throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok(programServices.updateProgramById(programId,modifyProgram));
   	} 
@@ -80,7 +83,8 @@ public class ProgramController{
   	@PutMapping(path="/program/{programName}", consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
   	@ApiOperation("Update Program by Program Name")
-  	private ResponseEntity <ProgramDTO> updateProgramByName(@Valid @PathVariable("programName") String programName ,@Valid @RequestBody ProgramDTO modifyProgram)throws ResourceNotFoundException  
+	@PreAuthorize("hasRole('ADMIN')")
+  	public ResponseEntity <ProgramDTO> updateProgramByName(@Valid @PathVariable("programName") String programName ,@Valid @RequestBody ProgramDTO modifyProgram)throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok(programServices.updateProgramByName(programName,modifyProgram));
   	} 
@@ -89,7 +93,8 @@ public class ProgramController{
   	@DeleteMapping(path="/deletebyprogid/{programId}")  
   	@ResponseBody
   	@ApiOperation("Delete Program by Program ID")
-  	private ResponseEntity<String>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException
+	@PreAuthorize("hasRole('ADMIN')")
+  	public ResponseEntity<String>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException
   	{
   	System.out.println("in delete by programID controller");
   	boolean deleted = programServices.deleteByProgramId(programId);
@@ -104,7 +109,8 @@ public class ProgramController{
   	@DeleteMapping(path="/deletebyprogname/{programName}")  
   	//@ResponseBody
   	@ApiOperation("Delete Program by Program Name")
-  	private ResponseEntity<?>  deleteByProgramName(@PathVariable("programName")@NotBlank @NotNull String programName) throws ResourceNotFoundException  
+	@PreAuthorize("hasRole('ADMIN')")
+  	public ResponseEntity<?>  deleteByProgramName(@PathVariable("programName")@NotBlank @NotNull String programName) throws ResourceNotFoundException
   	{  
   	System.out.println("in delete by programName controller");
   	boolean deleted =programServices.deleteByProgramName(programName);
