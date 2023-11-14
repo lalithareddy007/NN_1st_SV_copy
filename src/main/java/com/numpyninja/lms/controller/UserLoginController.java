@@ -87,8 +87,16 @@ public class UserLoginController {
     @PostMapping("/login/forgotpassword/confirmEmail")
 	@ApiOperation("ForgotPassword Confirm Email")
 	public ResponseEntity<JwtResponseDto> forgotPasswordConfirmEmail(@Valid @RequestBody EmailDto userLoginEmail) throws InvalidDataException {
-		JwtResponseDto forgotPassResDto = userLoginService.forgotPasswordConfirmEmail(userLoginEmail);
-		return ResponseEntity.status(HttpStatus.CREATED).body(forgotPassResDto);
+    	JwtResponseDto forgotPassResDto = userLoginService.forgotPasswordConfirmEmail(userLoginEmail);
+		String status=forgotPassResDto.getStatus();
+		if (status.equalsIgnoreCase("Invalid Email")) {
+			System.out.println("Invalid Email Id. Id not registered");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(forgotPassResDto);
+		}
+		else {
+			System.out.println("Valid EMail Id. Status : Ok");
+			return ResponseEntity.status(HttpStatus.CREATED).body(forgotPassResDto);
+		}
 	}
     
     @GetMapping("/validateToken")
