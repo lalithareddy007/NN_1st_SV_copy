@@ -2,6 +2,7 @@ package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.BatchDTO;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
@@ -103,6 +104,26 @@ public class ProgBatchControllerIT {
          assertEquals(batchId,batchDTO.getBatchId());
     	
     }
+    
+    @Test
+    public void testGetBatchByInvalidId() throws Exception {
+    	int batchId=9999;
+        final MvcResult mvcResult = mockMvc.perform(get("/lms/batches/batchId/{batchId}", batchId).contextPath("/lms")
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json"))
+        .andReturn();
+        
+        String jsonResponse = mvcResult.getResponse().getContentAsString();
+        assertEquals(404, mvcResult.getResponse().getStatus());
+
+        ApiResponse apiResponse = obj.readValue(jsonResponse, ApiResponse.class);
+        String message = apiResponse.getMessage();
+        System.out.println("message=="+message);
+
+        assertEquals(false, apiResponse.isSuccess());
+        assertEquals("Batch not found with Id : 9999 ", message);
+    	
+    }
    
     @Test
    public void testGetBatchByName() throws Exception{
@@ -127,6 +148,25 @@ public class ProgBatchControllerIT {
        assertEquals(6, firstBatch.getBatchNoOfClasses());
        assertEquals("Active", firstBatch.getBatchStatus());
   }
+    
+    @Test
+    public void testGetBatchByInvalidName() throws Exception{
+     	
+     	String batchName= "InValidBatchName";
+     	final MvcResult mvcResult = mockMvc.perform(get("/lms/batches/batchName/{batchName}", batchName).contextPath("/lms")
+                .header("Authorization", "Bearer " + token)
+                .contentType("application/json"))
+        .andReturn();
+ 	   
+     	 String jsonResponse = mvcResult.getResponse().getContentAsString();
+         assertEquals(404, mvcResult.getResponse().getStatus());
+
+         ApiResponse apiResponse = obj.readValue(jsonResponse, ApiResponse.class);
+         String message = apiResponse.getMessage();
+         
+         assertEquals(false, apiResponse.isSuccess());
+         assertEquals("programBatch with idInValidBatchNamenot found", message);
+   }
      
    
     @Test
@@ -139,6 +179,24 @@ public class ProgBatchControllerIT {
  	   
  	  assertEquals(200, mvcResult.getResponse().getStatus());
  	 }
+    
+    @Test
+    public void testGetBatchByInvalidProgram() throws Exception{
+     	
+    	 final MvcResult mvcResult = mockMvc.perform(get("/lms/batches/program/{programId}", 1234).contextPath("/lms")
+                 .header("Authorization", "Bearer " + token)
+                 .contentType("application/json"))
+         .andReturn();
+ 	   
+     	 String jsonResponse = mvcResult.getResponse().getContentAsString();
+         assertEquals(404, mvcResult.getResponse().getStatus());
+
+         ApiResponse apiResponse = obj.readValue(jsonResponse, ApiResponse.class);
+         String message = apiResponse.getMessage();
+         
+         assertEquals(false, apiResponse.isSuccess());
+         assertEquals("batch with this programId 1234not found", message);
+   }
    
     
     @Test
