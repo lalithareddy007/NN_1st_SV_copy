@@ -176,6 +176,7 @@ public class UserControllerTest {
 
 
 	@Test
+	@WithMockAdmin
 	@DisplayName("test to create user with their role ")
 	void testcreateUserWithRole() throws Exception{
 
@@ -212,6 +213,7 @@ public class UserControllerTest {
 	}
 
 	@Test
+	@WithMockAdmin
 	@DisplayName("test to update user ")
 	void testupdateUser() throws JsonProcessingException, Exception {
 
@@ -238,6 +240,7 @@ public class UserControllerTest {
 
 	@DisplayName("test to update user - Not Found")
 	@SneakyThrows
+	@WithMockAdmin
 	@Test
 	public void testupdateUserNoFound() {
 
@@ -261,6 +264,7 @@ public class UserControllerTest {
 	}
 
 	@Test
+	@WithMockAdmin
 	@DisplayName("test to delete an user ")
 	void testdeleteUser() throws Exception {
 		String userId = "U04";
@@ -274,6 +278,7 @@ public class UserControllerTest {
 	}
 
 	@Test
+	@WithMockAdmin
 	@DisplayName("test to update user Role Status")
 	void testupdateUserRoleStatus() throws JsonProcessingException, Exception {
 		String userId = "U04";
@@ -296,6 +301,7 @@ public class UserControllerTest {
 	}
 	
 	@Test
+	@WithMockAdmin
 	@DisplayName("Test to update user Roles for single role")
 	void  testupdateRoleId() throws JsonProcessingException, Exception { 
 		String userId= "U01";
@@ -319,6 +325,7 @@ public class UserControllerTest {
 	} 
 	
 	@Test
+	@WithMockAdmin
 	@DisplayName("Test to update user Roles for two roles")
 	void  testupdateRoleId1() throws JsonProcessingException, Exception { 
 		String userId= "U08";
@@ -348,6 +355,7 @@ public class UserControllerTest {
 
 	@DisplayName("test to assign/update program/batch to Student")
 	@SneakyThrows
+	@WithMockAdmin
 	@Test
 	public void testAssignUpdateUserRoleProgramBatchStatusForStudent() {
 		String userId = "U07";
@@ -368,6 +376,7 @@ public class UserControllerTest {
 
 	@DisplayName("test to assign/update program/batches to Staff")
 	@SneakyThrows
+	@WithMockAdmin
 	@Test
 	public void testAssignUpdateUserRoleProgramBatchStatusForStaff() {
 		String userId = "U09";
