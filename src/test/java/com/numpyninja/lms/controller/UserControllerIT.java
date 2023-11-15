@@ -3,8 +3,6 @@ package com.numpyninja.lms.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.dto.*;
-import com.numpyninja.lms.entity.Role;
-import com.numpyninja.lms.entity.UserRoleMap;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,7 +47,6 @@ public class UserControllerIT {
     private static Long programId;
 
     private String userRoleStatus;
-    private String roleName;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -103,13 +100,6 @@ public class UserControllerIT {
         userRoleMapSlimDTO.setRoleId("R03");
         userRoleMapSlimDTO.setUserRoleStatus("Active");
 
-        Role role = new Role();
-        role.setRoleName("ROLE_USER");
-
-        UserRoleMap userRoleMap = new UserRoleMap();
-        userRoleMap.setRole(role);
-
-
         List<UserRoleMapSlimDTO> userRoleMapsList = new ArrayList<>();
         userRoleMapsList.add(userRoleMapSlimDTO);
 
@@ -142,7 +132,6 @@ public class UserControllerIT {
         userId = userDto.getUserId();
         roleId = "R03";
         userRoleStatus = "Active";
-        roleName = "ROLE_USER";
     }
 
     //test get all users
