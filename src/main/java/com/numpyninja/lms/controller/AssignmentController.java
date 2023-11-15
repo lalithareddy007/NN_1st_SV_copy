@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +40,7 @@ public class AssignmentController {
 	
 	//create an assignment
 	@PostMapping("")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_STAFF')")
 	@ApiOperation("Create New Assignment")
 	public ResponseEntity<AssignmentDto> createAssignment(@Valid @RequestBody AssignmentDto assignmentDto) {
 		AssignmentDto createdAssignmentDto =  this.assignmentService.createAssignment(assignmentDto);
@@ -48,7 +49,7 @@ public class AssignmentController {
 	
 	//update an assignment
 	@PutMapping("/{id}")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_STAFF')")
 	@ApiOperation("Update existing Assignment")
 	public ResponseEntity<AssignmentDto> updateAssignment(@Valid @RequestBody AssignmentDto assignmentDto, @PathVariable Long id) {
 		AssignmentDto updatedAssignmentDto =  this.assignmentService.updateAssignment(assignmentDto, id);
@@ -57,7 +58,7 @@ public class AssignmentController {
 	
 	//delete an assignment
 	@DeleteMapping("/{id}")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_STAFF')")
 	@ApiOperation("Delete existing Assignment")
 	public ResponseEntity<ApiResponse> deleteAssignment(@PathVariable Long id) {
 		
@@ -76,6 +77,7 @@ public class AssignmentController {
 	//get all assignments
     @GetMapping("")
     @ApiOperation("Get list of all Assignments")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<List<AssignmentDto>> getAllAssignments() {
         return ResponseEntity.ok(this.assignmentService.getAllAssignments());  
     }

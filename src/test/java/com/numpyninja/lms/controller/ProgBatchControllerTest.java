@@ -68,12 +68,21 @@ public class ProgBatchControllerTest extends AbstractTestController {
 
 
     @Test
+    @WithMockAdminStaff
     public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesList() throws Exception {
         // given - BDDMockito.given()
         given(batchService.getAllBatches()).willReturn(listOfBatches);
         mockMvc.perform(MockMvcRequestBuilders.get("/batches").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
+    }
+    @Test
+    @WithMockUser
+    public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesListByUser() throws Exception {
+        // given - BDDMockito.given()
+        given(batchService.getAllBatches()).willReturn(listOfBatches);
+        mockMvc.perform(MockMvcRequestBuilders.get("/batches").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
 
@@ -154,7 +163,8 @@ public class ProgBatchControllerTest extends AbstractTestController {
                 .andExpect(jsonPath("$.batchName", is(batchDTO3.getBatchName())));
     }
 
-    @Test @WithMockStaffStudent
+    @Test
+    @WithMockStaffStudent
     public void givenBatch_whenCreateBatch_thenReturnReturn403_forbidden() throws Exception {
         BatchDTO batchDTO3 = listOfBatches.get(2);
         batchDTO3.setBatchName("DataScience1");
@@ -185,7 +195,7 @@ public class ProgBatchControllerTest extends AbstractTestController {
                 .andExpect(jsonPath("batchDescription", is(updateDetailDTO.getBatchDescription())));
     }
 
-    @Test @WithMockStudent   // 403 forbidden
+    @Test @WithMockStaffStudent   // 403 forbidden
     public void givenUpdatedBatch_Role_Student_whenUpdateBatch_thenReturn403_forbidden_() throws Exception {
         BatchDTO updateDetailDTO = new BatchDTO(1, "SDET1", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
 
@@ -215,7 +225,7 @@ public class ProgBatchControllerTest extends AbstractTestController {
                 .andDo(print());
     }
 
-    @Test @WithMockStaff
+    @Test @WithMockStaffStudent
     public void givenBatchId_Role_Staff_whenDeleteBatch_thenReturn403Forbidden() throws Exception {
         Integer batchId = 2;
 

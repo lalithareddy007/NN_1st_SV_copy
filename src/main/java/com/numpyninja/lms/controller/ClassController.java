@@ -36,7 +36,7 @@ public class ClassController {
 	@PostMapping(path="/CreateClassSchedule",consumes = "application/json", produces = "application/json")  
 	@ResponseBody
 	@ApiOperation("Create new Class")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<ClassDto> createAndSaveClass(@Valid @RequestBody ClassDto classDTO)throws DuplicateResourceFoundException
 	{
 		ClassDto savedClassDTO = classServices.createClass(classDTO);
@@ -99,7 +99,7 @@ public class ClassController {
 	@PutMapping(path="updateClass/{classId}", consumes = "application/json", produces = "application/json")  
 	@ResponseBody
 	@ApiOperation("Update Class Schedule by Class ID")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity <ClassDto> updateClassScheduleById(@PathVariable @NotBlank @Positive Long classId ,@Valid @RequestBody ClassDto modifyClassSchedule) throws ResourceNotFoundException
 	{  
 		return ResponseEntity.ok(classServices.updateClassByClassId(classId,modifyClassSchedule));
@@ -109,7 +109,7 @@ public class ClassController {
 	@DeleteMapping(path="deleteByClass/{classId}",produces = "application/json")
 	@ResponseBody
 	@ApiOperation("Delete Class by Class ID")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?>  deleteByClassId(@PathVariable("classId")@NotBlank @Positive Long classId) throws ResourceNotFoundException
 	{
 		boolean deleted = classServices.deleteByClassId(classId);
@@ -125,7 +125,7 @@ public class ClassController {
 	@PutMapping(path="updateClassrecording/{classId}", consumes = "application/json", produces = "application/json")  
 	@ResponseBody
 	@ApiOperation("Update Class Recordings By Class ID")
-	@PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	public ResponseEntity <ClassDto> updateClassRecordingByClassId(@PathVariable @NotBlank @Positive Long classId ,@Valid @RequestBody ClassRecordingDTO classRecordingDTO) throws ResourceNotFoundException
 	{  
 		return ResponseEntity.ok(classServices.updateClassRecordingByClassId(classId,classRecordingDTO));

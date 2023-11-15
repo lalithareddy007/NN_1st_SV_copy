@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,7 @@ public class AttendanceController{
 	// get all attendances
 	@GetMapping("")
 	@ApiOperation("Get all Attendance records")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	protected ResponseEntity<List<AttendanceDto>> getAllAssignments() {
 		return ResponseEntity.ok(this.attendanceServices.getAllAttendances());
 	}
@@ -61,6 +63,7 @@ public class AttendanceController{
 
 	// get all Attendance of a Class
 	@GetMapping("/class/{classId}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@ApiOperation("Get Attendance by Class ID")
 	public ResponseEntity<List<AttendanceDto>> getAttendancesbyClass(@PathVariable(value = "classId") Long classId) {
 		return ResponseEntity.ok(this.attendanceServices.getAttendanceByClass(classId));
@@ -68,13 +71,14 @@ public class AttendanceController{
 
 	// get all Attendance of a Batch
 	@GetMapping("/batch/{batchId}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@ApiOperation("Get Attendance by Batch ID")
 	public ResponseEntity<List<AttendanceDto>> getAttendancesbyBatch(@PathVariable(value = "batchId") Integer batchId) {
 		return ResponseEntity.ok(this.attendanceServices.getAttendanceByBatch(batchId));
 	}
 
 	@DeleteMapping(path = "/{id}")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@ApiOperation("Delete Attendance")
 	public ResponseEntity<String> deleteAttendance(@PathVariable Long id) {
 		attendanceServices.deleteAttendance(id);
@@ -83,7 +87,7 @@ public class AttendanceController{
 	}
 
 	@PostMapping(path = "", consumes = "application/json", produces = "application/json")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@ApiOperation("Create new Attendance")
 	public ResponseEntity<AttendanceDto> createAttendance(@Valid @RequestBody AttendanceDto attendanceDto) {
 		AttendanceDto newAttendance = attendanceServices.createAttendance(attendanceDto);
@@ -92,7 +96,7 @@ public class AttendanceController{
 
 	// update an Attendance
 	@PutMapping(path="/{id}",consumes = "application/json", produces = "application/json")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@ApiOperation("Update Attendance")
 	public ResponseEntity<AttendanceDto> updateAttendance(@RequestBody AttendanceDto attendanceDto,
 			@PathVariable Long id) {

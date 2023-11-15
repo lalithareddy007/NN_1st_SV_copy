@@ -11,16 +11,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.numpyninja.lms.config.WithMockStaffStudent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -113,6 +120,19 @@ public class GoogleCalendarControllerTest extends AbstractTestController {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.eventStatus", equalTo(mockEventResponse.getEventStatus())));
 		 verify(calendarService).createEventUsingServiceAcc(Mockito.any(GCalendarEventRequestDTO.class));
 	}
+	@Test
+	@SneakyThrows
+	@DisplayName("GCalendarTest: CreateCalendarEvent")
+	@WithMockStaffStudent
+	void createCalendarEventByStaff() {
+
+		when(calendarService.createEventUsingServiceAcc(Mockito.any(GCalendarEventRequestDTO.class))).thenReturn(mockEventResponse);
+		ResultActions resultActions = mockMvc.perform(post("/gcalendar/event")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(mockEventRequest)));
+
+		resultActions.andExpect(status().isForbidden());
+	}
 
 	@Test
 	@SneakyThrows
@@ -124,6 +144,16 @@ public class GoogleCalendarControllerTest extends AbstractTestController {
 		ResultActions resultActions = mockMvc.perform(delete("/gcalendar/event/" + eventId));
 		resultActions.andExpect(status().isOk())
 				.andExpect(MockMvcResultMatchers.content().string("Event deletion success"));
+	}
+	@Test
+	@SneakyThrows
+	@DisplayName("GCalendarTest: DeleteCalendarEvent")
+	@WithMockStaffStudent
+	void deleteCalendarEventByStaffOrUser() {
+		String eventId = "1";
+		when(calendarService.deleteEvent(Mockito.any(String.class))).thenReturn(true);
+		ResultActions resultActions = mockMvc.perform(delete("/gcalendar/event/" + eventId));
+		resultActions.andExpect(status().isForbidden());
 	}
 
 	@Test
@@ -152,6 +182,20 @@ public class GoogleCalendarControllerTest extends AbstractTestController {
 						MockMvcResultMatchers.jsonPath("$.eventStatus", equalTo(mockEventResponse.getEventStatus())));
 
 		verify(calendarService).updateEvent(Mockito.any(String.class), Mockito.any(GCalendarEventRequestDTO.class));
+
+	}
+	@Test
+	@SneakyThrows
+	@DisplayName("GCalendarTest: UpdateCalendarEvent")
+	@WithMockStaffStudent
+	void updateCalendarEventByStaffOrUser() {
+		String eventId = "1";
+		when(calendarService.updateEvent(Mockito.any(String.class), Mockito.any(GCalendarEventRequestDTO.class)))
+				.thenReturn(mockEventResponse);
+		ResultActions resultActions = mockMvc.perform(put("/gcalendar/event/" + eventId)
+				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(mockEventRequest)));
+
+		resultActions.andExpect(status().isForbidden());
 
 	}
 }

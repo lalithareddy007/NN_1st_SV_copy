@@ -1,7 +1,9 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.config.WithMockAdminStaff;
+import com.numpyninja.lms.config.WithMockStaff;
 import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.AssignmentSubmitService;
@@ -200,6 +202,7 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
 
     @Test
     @SneakyThrows
+    @WithMockAdminStaff
     @DisplayName("Test to Get All Submissions list")
     public void testGetAllSubmissions() {
         List<AssignmentSubmitDTO> getAllSubmissionsList = new ArrayList<>();
@@ -214,6 +217,23 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
                 .andDo(print())
                 .andExpect(jsonPath("$", hasSize(getAllSubmissionsList.size())));
         verify(assignmentSubmitService).getAllSubmissions();
+
+    }
+
+    @Test
+    @SneakyThrows
+    @WithMockUser
+    @DisplayName("Test to Get All Submissions list")
+    public void testGetAllSubmissionsByUser() {
+        List<AssignmentSubmitDTO> getAllSubmissionsList = new ArrayList<>();
+        getAllSubmissionsList.add(mockAssignmentSubmitDTO1);
+        getAllSubmissionsList.add(mockAssignmentSubmitDTO2);
+        getAllSubmissionsList.add(mockAssignmentSubmitDTO3);
+
+        when(assignmentSubmitService.getAllSubmissions()).thenReturn(getAllSubmissionsList);
+
+        ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission"));
+        resultActions.andExpect(status().isForbidden());
 
     }
 
@@ -239,7 +259,7 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
     @Test
     @SneakyThrows
     @DisplayName("Test for  ResubmitAssignment")
-    @WithMockAdminStaff
+    @WithMockUser
     public void testResubmitAssignment() {
         Long submissionId = 4L;
         AssignmentSubmitDTO updateAssignmentDTO = mockAssignmentSubmitDTO1;
@@ -267,8 +287,26 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
 
     @Test
     @SneakyThrows
-    @DisplayName("Test to grade submissions")
+    @DisplayName("Test for  ResubmitAssignment")
     @WithMockAdminStaff
+    public void testResubmitAssignmentByAdmin() {
+        Long submissionId = 4L;
+        AssignmentSubmitDTO updateAssignmentDTO = mockAssignmentSubmitDTO1;
+        updateAssignmentDTO.setAssignmentId(5L);
+        updateAssignmentDTO.setUserId("U05");
+        updateAssignmentDTO.setGrade(100);
+        updateAssignmentDTO.setSubDesc("Java-Collection");
+        when(assignmentSubmitService.resubmitAssignment(any(AssignmentSubmitDTO.class), eq(submissionId))).thenReturn(mockAssignmentSubmitDTO1);
+
+        ResultActions resultActions = mockMvc.perform(put("/assignmentsubmission/{id}", submissionId).contentType(MediaType.APPLICATION_JSON).
+                accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateAssignmentDTO)));
+        resultActions.andExpect(status().isForbidden());
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Test to grade submissions")
+    @WithMockStaff
     public void testGradeSubmissions() {
         long submissionId = 8L;
         given(assignmentSubmitService.gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId)))
@@ -284,6 +322,20 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
 
         verify(assignmentSubmitService).gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId));
 
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Test to grade submissions")
+    @WithMockAdmin
+    public void testGradeSubmissionsByAdmin() {
+        long submissionId = 8L;
+        given(assignmentSubmitService.gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId)))
+                .willReturn(mockAssignmentSubmitDTO4);
+        ResultActions resultActions = mockMvc.perform(put("/assignmentsubmission/gradesubmission/{submissionId}", submissionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(mockAssignmentSubmitDTO4)));
+        resultActions.andExpect(status().isForbidden());
     }
 }
 

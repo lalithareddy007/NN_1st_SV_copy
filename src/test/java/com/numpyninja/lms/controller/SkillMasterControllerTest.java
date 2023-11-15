@@ -1,6 +1,7 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdminStaff;
 import com.numpyninja.lms.dto.SkillMasterDto;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.SkillMasterService;
@@ -157,6 +158,7 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - DeleteSkillById - Ok")
         @SneakyThrows
+        @WithMockAdminStaff
         @Test
         public void testDeleteSkillById() {
             //given
@@ -171,9 +173,25 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
             verify(skillMasterService).deleteBySkillId(skillId);
         }
+        @DisplayName("test - DeleteSkillById - Ok")
+        @SneakyThrows
+        @WithMockUser
+        @Test
+        public void testDeleteSkillByIdByUser() {
+            //given
+            Long skillId = 1L;
+            given(skillMasterService.deleteBySkillId(skillId)).willReturn(true);
+
+            //when
+            ResultActions resultActions = mockMvc.perform(delete("/deletebySkillId/{skillId}", skillId));
+
+            //then
+            resultActions.andExpect(status().isForbidden());
+        }
 
         @DisplayName("test - DeleteSkillById - Not Found")
         @SneakyThrows
+        @WithMockAdminStaff
         @Test
         public void testDeleteSkillByIdNotFound() {
             //given
@@ -196,6 +214,7 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - CreateAndSaveSkill")
         @SneakyThrows
+        @WithMockAdminStaff
         @Test
         public void testCreateAndSaveSkill() {
             //given
@@ -214,6 +233,22 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
             verify(skillMasterService).createAndSaveSkillMaster(any(SkillMasterDto.class));
         }
+        @DisplayName("test - CreateAndSaveSkill")
+        @SneakyThrows
+        @WithMockUser
+        @Test
+        public void testCreateAndSaveSkillByUser() {
+            //given
+            when(skillMasterService.createAndSaveSkillMaster(any(SkillMasterDto.class))).thenReturn(mockSkillMasterDto);
+
+            //when
+            ResultActions resultActions = mockMvc.perform(post("/SaveSkillMaster")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(mockSkillMasterDto)));
+
+            //then
+            resultActions.andExpectAll(status().isForbidden());
+        }
 
     }
 
@@ -222,6 +257,7 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - UpdateSkillById - Ok")
         @SneakyThrows
+        @WithMockAdminStaff
         @Test
         public void testUpdateSkillById() {
 
@@ -246,9 +282,31 @@ public class SkillMasterControllerTest extends AbstractTestController {
             verify(skillMasterService).updateSkillMasterById(ArgumentMatchers.any(Long.class),
                     ArgumentMatchers.any(SkillMasterDto.class));
         }
+        @DisplayName("test - UpdateSkillById - Ok")
+        @SneakyThrows
+        @WithMockUser
+        @Test
+        public void testUpdateSkillByIdByUser() {
+
+            //given
+            Long skillId = 1L;
+            SkillMasterDto updatedSkillMasterDto = mockSkillMasterDto;
+            updatedSkillMasterDto.setSkillName("New Java");
+            when(skillMasterService.updateSkillMasterById(ArgumentMatchers.any(Long.class),
+                    ArgumentMatchers.any(SkillMasterDto.class))).thenReturn(updatedSkillMasterDto);
+
+            //when
+            ResultActions response = mockMvc.perform(put("/updateSkills/{skillId}", skillId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedSkillMasterDto)));
+
+            //then
+            response.andExpectAll(status().isForbidden());
+        }
 
         @DisplayName("test - UpdateSkillById - Not Found")
         @SneakyThrows
+        @WithMockAdminStaff
         @Test
         public void testUpdateSkillByIdNotFound() {
 

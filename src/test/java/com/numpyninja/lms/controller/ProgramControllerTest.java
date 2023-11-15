@@ -21,6 +21,7 @@ import java.util.List;
 
 import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.config.WithMockStaff;
+import com.numpyninja.lms.config.WithMockStaffStudent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -183,8 +184,8 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Creating a Program")
     @Test
     @SneakyThrows
-    @WithMockStaff
-    public void testCreateProgramByStaff() {
+    @WithMockStaffStudent
+    public void testCreateProgramByStaffUser() {
         given(programServices.createAndSaveProgram(ArgumentMatchers.any(ProgramDTO.class)))
                 .willAnswer((i) -> i.getArgument(0));
         ResultActions resultActions = mockMvc.perform(post("/saveprogram/")
@@ -214,8 +215,8 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Updating Program by ProgramId")
     @Test
     @SneakyThrows
-    @WithMockUser
-    public void testUpdateProgramByProgramIdByUser() {
+    @WithMockStaffStudent
+    public void testUpdateProgramByProgramIdByStaffOrUser() {
         Long programId = 1L;
         ProgramDTO updateProgramDTO = programDTO;
         updateProgramDTO.setProgramName("update program");
@@ -248,8 +249,8 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Updating Program by ProgramName")
     @Test
     @SneakyThrows
-    @WithMockStaff
-    public void testUpdateProgramByProgramNameByStaff() {
+    @WithMockStaffStudent
+    public void testUpdateProgramByProgramNameByStaffOrStudent() {
         String programName = "Java Update";
         ProgramDTO updateProgramDTO = programDTO;
         updateProgramDTO.setProgramDescription("Update Desc");
@@ -276,8 +277,8 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Delete Program by ProgramId")
     @Test
     @SneakyThrows
-    @WithMockStaff
-    public void testDeleteProgramByProgramIdByStaff() {
+    @WithMockStaffStudent
+    public void testDeleteProgramByProgramIdByStaffOrStudent() {
         Long programId = 2L;
         given(programServices.deleteByProgramId(programId)).willReturn(true);
         ResultActions resultActions = mockMvc.perform(delete("/deletebyprogid/{programId}", programId));
@@ -300,8 +301,8 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Delete Program by ProgramName")
     @Test
     @SneakyThrows
-    @WithMockStaff
-    public void testDeleteProgramByProgramNameByStaff() {
+    @WithMockStaffStudent
+    public void testDeleteProgramByProgramNameByStaffOrStudent() {
         String programName = "Java Delete";
         given(programServices.deleteByProgramName(programName)).willReturn(true);
         ResultActions resultActions = mockMvc.perform(delete("/deletebyprogname/{programName}", programName));
