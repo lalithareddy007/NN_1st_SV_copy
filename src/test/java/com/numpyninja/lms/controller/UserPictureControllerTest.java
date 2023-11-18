@@ -1,6 +1,8 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdmin;
+import com.numpyninja.lms.config.WithMockStaff;
 import com.numpyninja.lms.dto.UserPictureEntityDTO;
 import com.numpyninja.lms.services.UserPictureService;
 import org.hamcrest.CoreMatchers;
@@ -49,6 +51,7 @@ public class UserPictureControllerTest extends AbstractTestController {
     }
 
     @Test
+    @WithMockAdmin
     void testDownload() throws Exception {
         final String userId = userPicEntityDto.getUserId();
         final String userFileType = userPicEntityDto.getUserFileType();
@@ -70,6 +73,7 @@ public class UserPictureControllerTest extends AbstractTestController {
     }
 
     @Test
+    @WithMockAdmin
     public void testSave() throws Exception {
 
         given(userPictureService.uploadtoDB(ArgumentMatchers.any(UserPictureEntityDTO.class)))
@@ -83,8 +87,21 @@ public class UserPictureControllerTest extends AbstractTestController {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.userFilePath", equalTo(userPicEntityDto.getUserFilePath())));
     }
+    @Test
+    @WithMockUser
+    void testSaveByUser() throws Exception {
+
+        given(userPictureService.uploadtoDB(ArgumentMatchers.any(UserPictureEntityDTO.class)))
+                .willAnswer((i) -> i.getArgument(0));
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/file/userpicture").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userPicEntityDto)));
+        // then
+        resultActions.andExpect(status().isForbidden()).andDo(print());
+    }
 
     @Test
+    @WithMockStaff
     public void testUpdate() throws Exception {
         final String userId = userPicEntityDto.getUserId();
         UserPictureEntityDTO updatePicEntityDto = userPicEntityDto;
@@ -98,8 +115,21 @@ public class UserPictureControllerTest extends AbstractTestController {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.userFilePath", CoreMatchers.is(updatePicEntityDto.getUserFilePath())));
 
     }
+    @Test
+    @WithMockUser
+    void testUpdateByUser() throws Exception {
+        final String userId = userPicEntityDto.getUserId();
+        UserPictureEntityDTO updatePicEntityDto = userPicEntityDto;
+        when(userPictureService.updateFile(updatePicEntityDto, userId)).thenReturn(updatePicEntityDto);
+
+        ResultActions response = mockMvc.perform(put("/file/userpicture/{userid}", userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatePicEntityDto)));
+        response.andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
 
     @Test
+    @WithMockAdmin
     public void testdelete() throws Exception {
 
         final String userId = userPicEntityDto.getUserId();
@@ -110,6 +140,20 @@ public class UserPictureControllerTest extends AbstractTestController {
         ResultActions response = mockMvc.perform(delete("/file/userpicture/{userid}", userId).param("userfiletype", userFileType)
                 .contentType(MediaType.APPLICATION_JSON));
         response.andExpect(MockMvcResultMatchers.status().isOk());
+
+    }
+    @Test
+    @WithMockUser
+    void testDeleteByUser() throws Exception {
+
+        final String userId = userPicEntityDto.getUserId();
+        final String userFileType = userPicEntityDto.getUserFileType();
+
+        doNothing().when(userPictureService).DeleteFile(userId, userFileType);
+
+        ResultActions response = mockMvc.perform(delete("/file/userPicture/{userid}", userId).param("userFileType", userFileType)
+                .contentType(MediaType.APPLICATION_JSON));
+        response.andExpect(MockMvcResultMatchers.status().isForbidden());
 
     }
 
