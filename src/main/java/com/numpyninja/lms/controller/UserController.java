@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import com.numpyninja.lms.dto.*;
 
+import com.numpyninja.lms.entity.Role;
 import com.numpyninja.lms.entity.UserRoleMap;
 import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 
@@ -60,7 +61,6 @@ public class UserController {
 		List<UserDto> userList = userServices.getAllUsers();
 		return ResponseEntity.ok(userList);
 	}
-
 
 	//get user by ID - user, role, program, batch, skill and other details
 	@GetMapping("/users/{id}")
@@ -170,7 +170,6 @@ public class UserController {
 		return userServices.getAllUsersWithRoles();
 	}
 
-
 	//get users by roleid
 	@GetMapping("/users/roles/{roleId}")
 	@ApiOperation("Get User by RoleID")
@@ -185,6 +184,12 @@ public class UserController {
 		List<UserCountByStatusDTO> usersCountByStatus = userServices.getUsercountByStatus(roleId);
 		return ResponseEntity.ok(usersCountByStatus);
 		
+	}
+
+	@GetMapping("/roles")
+	@ApiOperation("Get All roles")
+	public List<Role> getAllRoles(){
+		return userServices.getAllRoles();
 	}
 
 
