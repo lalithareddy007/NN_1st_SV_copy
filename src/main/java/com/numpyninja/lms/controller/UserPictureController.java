@@ -32,7 +32,7 @@ public class UserPictureController {
 
 	@Autowired
 	private UserPictureService userpictureservice;
-	@PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@PostMapping(path = "/userpicture", consumes = "application/json", produces = "application/json")
 	@ApiOperation("Create New User Picture")
 	public ResponseEntity<UserPictureEntityDTO> Save(@RequestBody UserPictureEntityDTO userpicturedto) throws IOException{
@@ -45,7 +45,6 @@ public class UserPictureController {
 
 	@GetMapping(path="/userpicture/{userid}", produces = "application/json")
 	@ApiOperation("Get User Picture by User ID")
-	@PreAuthorize("hasRole('ADMIN') or hasRole('STAFF') or hasRole('USER')")
 	public ResponseEntity<UserPictureEntityDTO> download(@PathVariable (value="userid")String  userid,  @RequestParam (value="userfiletype") String userfiletype) throws IOException{
 		UserPictureEntityDTO downloadpicture=	userpictureservice.download(userid, userfiletype);
 		return ResponseEntity.ok(downloadpicture);
@@ -56,7 +55,7 @@ public class UserPictureController {
 
 	@DeleteMapping("/userpicture/{userid}")
 	@ApiOperation("Delete User Picture")
-	@PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	public ResponseEntity<MessageResponse> Delete(@PathVariable String userid,@RequestParam String userfiletype ) throws IOException
 	{
 		this.userpictureservice.DeleteFile(userid, userfiletype);
@@ -66,7 +65,7 @@ public class UserPictureController {
 
 	@PutMapping("/userpicture/{userid}")
 	@ApiOperation("Update User Picture")
-	@PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	public ResponseEntity<UserPictureEntityDTO> update(@RequestBody  UserPictureEntityDTO userpicturedto ,@PathVariable String userid) throws IOException
 	{
 		UserPictureEntityDTO updatedPicture=this.userpictureservice.updateFile(userpicturedto,userid);
