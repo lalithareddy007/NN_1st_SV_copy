@@ -201,6 +201,58 @@ class AttendanceControllerTest extends AbstractTestController {
     }
     @DisplayName("test to get attendance by classId")
     @Test
+    @WithMockAdmin
+    @SneakyThrows
+    void testGetAttendancesbyClassByAdmin() {
+
+
+        long classId = 7;
+        AttendanceDto mockAttendanceDto2 = attendanceDtos;
+        attendanceDtos.setAttId(2L);
+        attendanceDtos.setAttendance("Present");
+        ArrayList<AttendanceDto> attendancedtoList = new ArrayList();
+        attendancedtoList.add(mockAttendanceDto);
+        attendancedtoList.add(mockAttendanceDto2);
+        given(attendanceServices.getAttendanceByClass(classId))
+                .willReturn(attendancedtoList);
+
+        //when
+        ResultActions response = mockMvc.perform(get("/attendance/class/{classId}", classId));
+
+        //then
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$", hasSize(attendancedtoList.size())));
+
+    }
+    @DisplayName("test to get attendance by classId")
+    @Test
+    @WithMockStaff
+    @SneakyThrows
+    void testGetAttendancesbyClassByStaff() {
+
+
+        long classId = 7;
+        AttendanceDto mockAttendanceDto2 = attendanceDtos;
+        attendanceDtos.setAttId(2L);
+        attendanceDtos.setAttendance("Present");
+        ArrayList<AttendanceDto> attendancedtoList = new ArrayList();
+        attendancedtoList.add(mockAttendanceDto);
+        attendancedtoList.add(mockAttendanceDto2);
+        given(attendanceServices.getAttendanceByClass(classId))
+                .willReturn(attendancedtoList);
+
+        //when
+        ResultActions response = mockMvc.perform(get("/attendance/class/{classId}", classId));
+
+        //then
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$", hasSize(attendancedtoList.size())));
+
+    }
+    @DisplayName("test to get attendance by classId")
+    @Test
     @WithMockUser
     @SneakyThrows
     void testGetAttendancesbyClassByUser() {
@@ -226,9 +278,33 @@ class AttendanceControllerTest extends AbstractTestController {
 
     @DisplayName("test to get attendance by batchId")
     @Test
-    @WithMockAdminStaff
+    @WithMockAdmin
     @SneakyThrows
-    void testGetAttendancesbyBatch() {
+    void testGetAttendancesbyBatchByAdmin() {
+        //given
+        Integer batchId = 7;
+        AttendanceDto mockAttendanceDto2 = attendanceDtos;
+        attendanceDtos.setAttId(2L);
+        attendanceDtos.setAttendance("Present");
+        ArrayList<AttendanceDto> attendancedtoList = new ArrayList();
+        attendancedtoList.add(mockAttendanceDto);
+        attendancedtoList.add(mockAttendanceDto2);
+        given(attendanceServices.getAttendanceByBatch(batchId))
+                .willReturn(attendancedtoList);
+
+        //when
+        ResultActions response = mockMvc.perform(get("/attendance/batch/{batchId}", batchId));
+
+        //then
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$", hasSize(attendancedtoList.size())));
+    }
+    @DisplayName("test to get attendance by batchId")
+    @Test
+    @WithMockStaff
+    @SneakyThrows
+    void testGetAttendancesbyBatchByStaff() {
         //given
         Integer batchId = 7;
         AttendanceDto mockAttendanceDto2 = attendanceDtos;
@@ -292,9 +368,26 @@ class AttendanceControllerTest extends AbstractTestController {
     }
     @DisplayName("test to delete attendance")
     @Test
-    @WithMockStaffStudent
+    @WithMockStaff
     @SneakyThrows
     void testDeleteAttendanceByStaff() throws Exception {
+        //given
+        Long attId = 8L;
+        BDDMockito.willDoNothing().given(attendanceServices).deleteAttendance(attId);
+
+        //when
+        ResultActions response = mockMvc.perform(delete("/attendance/{id}", attId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        //then
+        response.andExpect(status().isForbidden());
+    }
+    @DisplayName("test to delete attendance")
+    @Test
+    @WithMockUser
+    @SneakyThrows
+    void testDeleteAttendanceByStudent() throws Exception {
         //given
         Long attId = 8L;
         BDDMockito.willDoNothing().given(attendanceServices).deleteAttendance(attId);
@@ -311,10 +404,26 @@ class AttendanceControllerTest extends AbstractTestController {
 
 
     @DisplayName("test to create  attendance")
-    @WithMockAdminStaff
+    @WithMockAdmin
     @Test
     @SneakyThrows
-    void testCreateAttendance() {
+    void testCreateAttendanceByAdmin() {
+        given(attendanceServices.createAttendance(ArgumentMatchers.any(AttendanceDto.class)))
+                .willAnswer((i) -> i.getArgument(0));
+        ResultActions resultActions = mockMvc.perform(post("/attendance")
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(attendanceDtos)));
+
+        resultActions.andExpect(status().isCreated())
+                .andExpect((ResultMatcher) jsonPath("$.attId", equalTo(attendanceDtos.getAttId()), Long.class))
+                .andExpect((ResultMatcher) jsonPath("$.attendance", equalTo(attendanceDtos.getAttendance())));
+
+
+    }
+    @DisplayName("test to create  attendance")
+    @WithMockStaff
+    @Test
+    @SneakyThrows
+    void testCreateAttendanceByStaff() {
         given(attendanceServices.createAttendance(ArgumentMatchers.any(AttendanceDto.class)))
                 .willAnswer((i) -> i.getArgument(0));
         ResultActions resultActions = mockMvc.perform(post("/attendance")
@@ -341,10 +450,26 @@ class AttendanceControllerTest extends AbstractTestController {
 
 
     @DisplayName("test to update attendance")
-    @WithMockAdminStaff
+    @WithMockAdmin
     @Test
     @SneakyThrows
-    void testUpdateAttendance() throws Exception {
+    void testUpdateAttendanceByAdmin() throws Exception {
+        Long attId = 1L;
+        AttendanceDto updateAttendanceDTO = attendanceDtos;
+        updateAttendanceDTO.setAttendance("Present");
+        given(attendanceServices.updateAttendance(any(AttendanceDto.class), any(Long.class)))
+                .willReturn(updateAttendanceDTO);
+        ResultActions resultActions = mockMvc.perform(put("/attendance/{id}", attId)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateAttendanceDTO)));
+        resultActions.andExpect(status().isOk()).andDo(print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.attId", equalTo(updateAttendanceDTO.getAttId()), Long.class))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.attendance", equalTo(updateAttendanceDTO.getAttendance())));
+    }
+    @DisplayName("test to update attendance")
+    @WithMockStaff
+    @Test
+    @SneakyThrows
+    void testUpdateAttendanceByStaff() throws Exception {
         Long attId = 1L;
         AttendanceDto updateAttendanceDTO = attendanceDtos;
         updateAttendanceDTO.setAttendance("Present");

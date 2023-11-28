@@ -1,7 +1,9 @@
 package com.numpyninja.lms.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.config.WithMockAdminStaff;
+import com.numpyninja.lms.config.WithMockStaff;
 import com.numpyninja.lms.dto.SkillMasterDto;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.SkillMasterService;
@@ -158,9 +160,26 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - DeleteSkillById - Ok")
         @SneakyThrows
-        @WithMockAdminStaff
+        @WithMockAdmin
         @Test
-        public void testDeleteSkillById() {
+        public void testDeleteSkillByIdByAdmin() {
+            //given
+            Long skillId = 1L;
+            given(skillMasterService.deleteBySkillId(skillId)).willReturn(true);
+
+            //when
+            ResultActions resultActions = mockMvc.perform(delete("/deletebySkillId/{skillId}", skillId));
+
+            //then
+            resultActions.andExpect(status().isOk());
+
+            verify(skillMasterService).deleteBySkillId(skillId);
+        }
+        @DisplayName("test - DeleteSkillById - Ok")
+        @SneakyThrows
+        @WithMockStaff
+        @Test
+        public void testDeleteSkillByIdByStaff() {
             //given
             Long skillId = 1L;
             given(skillMasterService.deleteBySkillId(skillId)).willReturn(true);
@@ -191,7 +210,7 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - DeleteSkillById - Not Found")
         @SneakyThrows
-        @WithMockAdminStaff
+        @WithMockAdmin
         @Test
         public void testDeleteSkillByIdNotFound() {
             //given
@@ -214,9 +233,30 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - CreateAndSaveSkill")
         @SneakyThrows
-        @WithMockAdminStaff
+        @WithMockAdmin
         @Test
-        public void testCreateAndSaveSkill() {
+        public void testCreateAndSaveSkillByAdmin() {
+            //given
+            when(skillMasterService.createAndSaveSkillMaster(any(SkillMasterDto.class))).thenReturn(mockSkillMasterDto);
+
+            //when
+            ResultActions resultActions = mockMvc.perform(post("/SaveSkillMaster")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(mockSkillMasterDto)));
+
+            //then
+            resultActions.andExpectAll(status().isCreated(),
+                            content().contentType(MediaType.APPLICATION_JSON),
+                            jsonPath("$.skillName", is(mockSkillMasterDto.getSkillName())))
+                    .andDo(print());
+
+            verify(skillMasterService).createAndSaveSkillMaster(any(SkillMasterDto.class));
+        }
+        @DisplayName("test - CreateAndSaveSkill")
+        @SneakyThrows
+        @WithMockStaff
+        @Test
+        public void testCreateAndSaveSkillByStaff() {
             //given
             when(skillMasterService.createAndSaveSkillMaster(any(SkillMasterDto.class))).thenReturn(mockSkillMasterDto);
 
@@ -257,9 +297,36 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - UpdateSkillById - Ok")
         @SneakyThrows
-        @WithMockAdminStaff
+        @WithMockAdmin
         @Test
-        public void testUpdateSkillById() {
+        public void testUpdateSkillByIdByAdmin() {
+
+            //given
+            Long skillId = 1L;
+            SkillMasterDto updatedSkillMasterDto = mockSkillMasterDto;
+            updatedSkillMasterDto.setSkillName("New Java");
+            when(skillMasterService.updateSkillMasterById(ArgumentMatchers.any(Long.class),
+                    ArgumentMatchers.any(SkillMasterDto.class))).thenReturn(updatedSkillMasterDto);
+
+            //when
+            ResultActions response = mockMvc.perform(put("/updateSkills/{skillId}", skillId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedSkillMasterDto)));
+
+            //then
+            response.andExpectAll(status().isOk(),
+                            content().contentType(MediaType.APPLICATION_JSON),
+                            jsonPath("$.skillName", is(updatedSkillMasterDto.getSkillName())))
+                    .andDo(print());
+
+            verify(skillMasterService).updateSkillMasterById(ArgumentMatchers.any(Long.class),
+                    ArgumentMatchers.any(SkillMasterDto.class));
+        }
+        @DisplayName("test - UpdateSkillById - Ok")
+        @SneakyThrows
+        @WithMockStaff
+        @Test
+        public void testUpdateSkillByIdByStaff() {
 
             //given
             Long skillId = 1L;
@@ -306,9 +373,9 @@ public class SkillMasterControllerTest extends AbstractTestController {
 
         @DisplayName("test - UpdateSkillById - Not Found")
         @SneakyThrows
-        @WithMockAdminStaff
+        @WithMockAdmin
         @Test
-        public void testUpdateSkillByIdNotFound() {
+        public void testUpdateSkillByIdNotFoundByAdmin() {
 
             //given
             Long skillId = 3L;

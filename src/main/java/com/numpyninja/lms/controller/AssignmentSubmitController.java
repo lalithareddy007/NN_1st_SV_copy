@@ -101,7 +101,7 @@ public class AssignmentSubmitController {
 
     @PutMapping(path="/gradesubmission/{submissionId}",consumes="application/json", produces="application/json" )
     @ApiOperation("Grade Assignment Submission")
-    @PreAuthorize("hasRole('ROLE_STAFF')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<AssignmentSubmitDTO> gradeAssignmentSubmission(@RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                      @PathVariable Long submissionId){
         AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitService.gradeAssignmentSubmission(assignmentSubmitDTO,submissionId);

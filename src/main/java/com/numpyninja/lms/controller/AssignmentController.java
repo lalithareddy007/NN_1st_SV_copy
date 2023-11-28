@@ -40,7 +40,7 @@ public class AssignmentController {
 	
 	//create an assignment
 	@PostMapping("")
-	@PreAuthorize("hasRole('ROLE_STAFF')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@ApiOperation("Create New Assignment")
 	public ResponseEntity<AssignmentDto> createAssignment(@Valid @RequestBody AssignmentDto assignmentDto) {
 		AssignmentDto createdAssignmentDto =  this.assignmentService.createAssignment(assignmentDto);
@@ -49,7 +49,7 @@ public class AssignmentController {
 	
 	//update an assignment
 	@PutMapping("/{id}")
-	@PreAuthorize("hasRole('ROLE_STAFF')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@ApiOperation("Update existing Assignment")
 	public ResponseEntity<AssignmentDto> updateAssignment(@Valid @RequestBody AssignmentDto assignmentDto, @PathVariable Long id) {
 		AssignmentDto updatedAssignmentDto =  this.assignmentService.updateAssignment(assignmentDto, id);
@@ -58,7 +58,7 @@ public class AssignmentController {
 	
 	//delete an assignment
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ROLE_STAFF')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
 	@ApiOperation("Delete existing Assignment")
 	public ResponseEntity<ApiResponse> deleteAssignment(@PathVariable Long id) {
 		

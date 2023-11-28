@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.numpyninja.lms.config.WithMockStaff;
 import com.numpyninja.lms.config.WithMockStaffStudent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -123,8 +124,21 @@ public class GoogleCalendarControllerTest extends AbstractTestController {
 	@Test
 	@SneakyThrows
 	@DisplayName("GCalendarTest: CreateCalendarEvent")
-	@WithMockStaffStudent
+	@WithMockStaff
 	void createCalendarEventByStaff() {
+
+		when(calendarService.createEventUsingServiceAcc(Mockito.any(GCalendarEventRequestDTO.class))).thenReturn(mockEventResponse);
+		ResultActions resultActions = mockMvc.perform(post("/gcalendar/event")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(mockEventRequest)));
+
+		resultActions.andExpect(status().isForbidden());
+	}
+	@Test
+	@SneakyThrows
+	@DisplayName("GCalendarTest: CreateCalendarEvent")
+	@WithMockUser
+	void createCalendarEventByStudent() {
 
 		when(calendarService.createEventUsingServiceAcc(Mockito.any(GCalendarEventRequestDTO.class))).thenReturn(mockEventResponse);
 		ResultActions resultActions = mockMvc.perform(post("/gcalendar/event")
@@ -148,13 +162,24 @@ public class GoogleCalendarControllerTest extends AbstractTestController {
 	@Test
 	@SneakyThrows
 	@DisplayName("GCalendarTest: DeleteCalendarEvent")
-	@WithMockStaffStudent
-	void deleteCalendarEventByStaffOrUser() {
+	@WithMockStaff
+	void deleteCalendarEventByStaff() {
 		String eventId = "1";
 		when(calendarService.deleteEvent(Mockito.any(String.class))).thenReturn(true);
 		ResultActions resultActions = mockMvc.perform(delete("/gcalendar/event/" + eventId));
 		resultActions.andExpect(status().isForbidden());
 	}
+	@Test
+	@SneakyThrows
+	@DisplayName("GCalendarTest: DeleteCalendarEvent")
+	@WithMockUser
+	void deleteCalendarEventByStudent() {
+		String eventId = "1";
+		when(calendarService.deleteEvent(Mockito.any(String.class))).thenReturn(true);
+		ResultActions resultActions = mockMvc.perform(delete("/gcalendar/event/" + eventId));
+		resultActions.andExpect(status().isForbidden());
+	}
+
 
 	@Test
 	@SneakyThrows
@@ -187,8 +212,22 @@ public class GoogleCalendarControllerTest extends AbstractTestController {
 	@Test
 	@SneakyThrows
 	@DisplayName("GCalendarTest: UpdateCalendarEvent")
-	@WithMockStaffStudent
-	void updateCalendarEventByStaffOrUser() {
+	@WithMockStaff
+	void updateCalendarEventByStaff() {
+		String eventId = "1";
+		when(calendarService.updateEvent(Mockito.any(String.class), Mockito.any(GCalendarEventRequestDTO.class)))
+				.thenReturn(mockEventResponse);
+		ResultActions resultActions = mockMvc.perform(put("/gcalendar/event/" + eventId)
+				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(mockEventRequest)));
+
+		resultActions.andExpect(status().isForbidden());
+
+	}
+	@Test
+	@SneakyThrows
+	@DisplayName("GCalendarTest: UpdateCalendarEvent")
+	@WithMockUser
+	void updateCalendarEventByUser() {
 		String eventId = "1";
 		when(calendarService.updateEvent(Mockito.any(String.class), Mockito.any(GCalendarEventRequestDTO.class)))
 				.thenReturn(mockEventResponse);

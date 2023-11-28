@@ -184,8 +184,20 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Creating a Program")
     @Test
     @SneakyThrows
-    @WithMockStaffStudent
-    public void testCreateProgramByStaffUser() {
+    @WithMockStaff
+    public void testCreateProgramByStaff() {
+        given(programServices.createAndSaveProgram(ArgumentMatchers.any(ProgramDTO.class)))
+                .willAnswer((i) -> i.getArgument(0));
+        ResultActions resultActions = mockMvc.perform(post("/saveprogram/")
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(programDTO)));
+
+        resultActions.andExpect(status().isForbidden());
+    }
+    @DisplayName("Test for Creating a Program")
+    @Test
+    @SneakyThrows
+    @WithMockUser
+    public void testCreateProgramByUser() {
         given(programServices.createAndSaveProgram(ArgumentMatchers.any(ProgramDTO.class)))
                 .willAnswer((i) -> i.getArgument(0));
         ResultActions resultActions = mockMvc.perform(post("/saveprogram/")
@@ -215,8 +227,23 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Updating Program by ProgramId")
     @Test
     @SneakyThrows
-    @WithMockStaffStudent
-    public void testUpdateProgramByProgramIdByStaffOrUser() {
+    @WithMockStaff
+    public void testUpdateProgramByProgramIdByStaff() {
+        Long programId = 1L;
+        ProgramDTO updateProgramDTO = programDTO;
+        updateProgramDTO.setProgramName("update program");
+        given(programServices.updateProgramById(any(Long.class), any(ProgramDTO.class)))
+                .willReturn(updateProgramDTO);
+        ResultActions resultActions = mockMvc.perform(put("/putprogram/{programId}", programId)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateProgramDTO)));
+        resultActions.andExpect(status().isForbidden());
+
+    }
+    @DisplayName("Test for Updating Program by ProgramId")
+    @Test
+    @SneakyThrows
+    @WithMockUser
+    public void testUpdateProgramByProgramIdByUser() {
         Long programId = 1L;
         ProgramDTO updateProgramDTO = programDTO;
         updateProgramDTO.setProgramName("update program");
@@ -249,8 +276,23 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Updating Program by ProgramName")
     @Test
     @SneakyThrows
-    @WithMockStaffStudent
-    public void testUpdateProgramByProgramNameByStaffOrStudent() {
+    @WithMockStaff
+    public void testUpdateProgramByProgramNameByStaff() {
+        String programName = "Java Update";
+        ProgramDTO updateProgramDTO = programDTO;
+        updateProgramDTO.setProgramDescription("Update Desc");
+        given(programServices.updateProgramByName(any(String.class), any(ProgramDTO.class)))
+                .willReturn(updateProgramDTO);
+        ResultActions resultActions = mockMvc.perform(put("/program/{programName}", programName)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateProgramDTO)));
+        resultActions.andExpect(status().isForbidden());
+
+    }
+    @DisplayName("Test for Updating Program by ProgramName")
+    @Test
+    @SneakyThrows
+    @WithMockUser
+    public void testUpdateProgramByProgramNameByUser() {
         String programName = "Java Update";
         ProgramDTO updateProgramDTO = programDTO;
         updateProgramDTO.setProgramDescription("Update Desc");
@@ -277,14 +319,26 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Delete Program by ProgramId")
     @Test
     @SneakyThrows
-    @WithMockStaffStudent
-    public void testDeleteProgramByProgramIdByStaffOrStudent() {
+    @WithMockStaff
+    public void testDeleteProgramByProgramIdByStaff() {
         Long programId = 2L;
         given(programServices.deleteByProgramId(programId)).willReturn(true);
         ResultActions resultActions = mockMvc.perform(delete("/deletebyprogid/{programId}", programId));
         resultActions.andExpect(status().isForbidden());
 
     }
+    @DisplayName("Test for Delete Program by ProgramId")
+    @Test
+    @SneakyThrows
+    @WithMockUser
+    public void testDeleteProgramByProgramIdByStudent() {
+        Long programId = 2L;
+        given(programServices.deleteByProgramId(programId)).willReturn(true);
+        ResultActions resultActions = mockMvc.perform(delete("/deletebyprogid/{programId}", programId));
+        resultActions.andExpect(status().isForbidden());
+
+    }
+
 
     @DisplayName("Test for Delete Program by ProgramName")
     @Test
@@ -301,8 +355,19 @@ public class ProgramControllerTest extends AbstractTestController {
     @DisplayName("Test for Delete Program by ProgramName")
     @Test
     @SneakyThrows
-    @WithMockStaffStudent
-    public void testDeleteProgramByProgramNameByStaffOrStudent() {
+    @WithMockStaff
+    public void testDeleteProgramByProgramNameByStaff() {
+        String programName = "Java Delete";
+        given(programServices.deleteByProgramName(programName)).willReturn(true);
+        ResultActions resultActions = mockMvc.perform(delete("/deletebyprogname/{programName}", programName));
+        resultActions.andExpect(status().isForbidden());
+
+    }
+    @DisplayName("Test for Delete Program by ProgramName")
+    @Test
+    @SneakyThrows
+    @WithMockUser
+    public void testDeleteProgramByProgramNameByStudent() {
         String programName = "Java Delete";
         given(programServices.deleteByProgramName(programName)).willReturn(true);
         ResultActions resultActions = mockMvc.perform(delete("/deletebyprogname/{programName}", programName));

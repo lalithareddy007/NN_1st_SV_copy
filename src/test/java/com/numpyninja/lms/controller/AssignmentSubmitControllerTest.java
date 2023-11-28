@@ -202,9 +202,28 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
 
     @Test
     @SneakyThrows
-    @WithMockAdminStaff
+    @WithMockAdmin
     @DisplayName("Test to Get All Submissions list")
-    public void testGetAllSubmissions() {
+    public void testGetAllSubmissionsByAdmin() {
+        List<AssignmentSubmitDTO> getAllSubmissionsList = new ArrayList<>();
+        getAllSubmissionsList.add(mockAssignmentSubmitDTO1);
+        getAllSubmissionsList.add(mockAssignmentSubmitDTO2);
+        getAllSubmissionsList.add(mockAssignmentSubmitDTO3);
+
+        when(assignmentSubmitService.getAllSubmissions()).thenReturn(getAllSubmissionsList);
+
+        ResultActions resultActions = mockMvc.perform(get("/assignmentsubmission"));
+        resultActions.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$", hasSize(getAllSubmissionsList.size())));
+        verify(assignmentSubmitService).getAllSubmissions();
+
+    }
+    @Test
+    @SneakyThrows
+    @WithMockStaff
+    @DisplayName("Test to Get All Submissions list")
+    public void testGetAllSubmissionsByStaff() {
         List<AssignmentSubmitDTO> getAllSubmissionsList = new ArrayList<>();
         getAllSubmissionsList.add(mockAssignmentSubmitDTO1);
         getAllSubmissionsList.add(mockAssignmentSubmitDTO2);
@@ -288,8 +307,25 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
     @Test
     @SneakyThrows
     @DisplayName("Test for  ResubmitAssignment")
-    @WithMockAdminStaff
+    @WithMockAdmin
     public void testResubmitAssignmentByAdmin() {
+        Long submissionId = 4L;
+        AssignmentSubmitDTO updateAssignmentDTO = mockAssignmentSubmitDTO1;
+        updateAssignmentDTO.setAssignmentId(5L);
+        updateAssignmentDTO.setUserId("U05");
+        updateAssignmentDTO.setGrade(100);
+        updateAssignmentDTO.setSubDesc("Java-Collection");
+        when(assignmentSubmitService.resubmitAssignment(any(AssignmentSubmitDTO.class), eq(submissionId))).thenReturn(mockAssignmentSubmitDTO1);
+
+        ResultActions resultActions = mockMvc.perform(put("/assignmentsubmission/{id}", submissionId).contentType(MediaType.APPLICATION_JSON).
+                accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateAssignmentDTO)));
+        resultActions.andExpect(status().isForbidden());
+    }
+    @Test
+    @SneakyThrows
+    @DisplayName("Test for  ResubmitAssignment")
+    @WithMockStaff
+    public void testResubmitAssignmentByStaff() {
         Long submissionId = 4L;
         AssignmentSubmitDTO updateAssignmentDTO = mockAssignmentSubmitDTO1;
         updateAssignmentDTO.setAssignmentId(5L);
@@ -307,7 +343,27 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
     @SneakyThrows
     @DisplayName("Test to grade submissions")
     @WithMockStaff
-    public void testGradeSubmissions() {
+    public void testGradeSubmissionsByStaff() {
+        long submissionId = 8L;
+        given(assignmentSubmitService.gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId)))
+                .willReturn(mockAssignmentSubmitDTO4);
+        ResultActions resultActions = mockMvc.perform(put("/assignmentsubmission/gradesubmission/{submissionId}", submissionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(mockAssignmentSubmitDTO4)));
+        resultActions.andExpect(status().isOk()).andDo(print())
+                .andExpect(jsonPath("$.assignmentId").value(mockAssignmentSubmitDTO4.getAssignmentId()))
+                .andExpect((jsonPath("$.userId").value(mockAssignmentSubmitDTO4.getUserId())))
+                .andExpect(jsonPath("$.grade").value(mockAssignmentSubmitDTO4.getGrade()))
+                .andExpect(jsonPath("$.gradedBy").value(mockAssignmentSubmitDTO4.getGradedBy()));
+
+        verify(assignmentSubmitService).gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId));
+
+    }
+    @Test
+    @SneakyThrows
+    @DisplayName("Test to grade submissions")
+    @WithMockAdmin
+    public void testGradeSubmissionsByAdmin() {
         long submissionId = 8L;
         given(assignmentSubmitService.gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId)))
                 .willReturn(mockAssignmentSubmitDTO4);
@@ -327,8 +383,8 @@ public class AssignmentSubmitControllerTest extends AbstractTestController {
     @Test
     @SneakyThrows
     @DisplayName("Test to grade submissions")
-    @WithMockAdmin
-    public void testGradeSubmissionsByAdmin() {
+    @WithMockUser
+    public void testGradeSubmissionsByUser() {
         long submissionId = 8L;
         given(assignmentSubmitService.gradeAssignmentSubmission(any(AssignmentSubmitDTO.class), eq(submissionId)))
                 .willReturn(mockAssignmentSubmitDTO4);
