@@ -195,7 +195,7 @@ public class ProgBatchControllerIT {
          String message = apiResponse.getMessage();
          
          assertEquals(false, apiResponse.isSuccess());
-         assertEquals("batch with this programId 1234not found", message);
+         assertEquals("batch with this programId 1234 not found", message);
    }
    
     
@@ -205,15 +205,15 @@ public class ProgBatchControllerIT {
     public void testCreateBatch() throws Exception{
  	   
     	 BatchDTO dummyBatchDTO =new BatchDTO();
-    	 dummyBatchDTO.setBatchId(10);
-    	 dummyBatchDTO.setBatchDescription("SDET Test Batch");
-    	 dummyBatchDTO.setBatchName("A02");
+    	 dummyBatchDTO.setBatchName("Test Java Batch01");
+    	 dummyBatchDTO.setBatchDescription("TestJava Desc");
     	 dummyBatchDTO.setBatchNoOfClasses(5);
     	 dummyBatchDTO.setBatchStatus("Active");
-    	 dummyBatchDTO.setProgramId(2L);
-    	 dummyBatchDTO.setProgramName("SDET");
+    	 dummyBatchDTO.setProgramId(15L);
+    	 dummyBatchDTO.setProgramName("Java");
     	
     	 String requestJson =obj.writeValueAsString(dummyBatchDTO);
+    	 
          final MvcResult mvcResult=mockMvc.perform(post("/lms/batches").contextPath("/lms").content(requestJson)
                          .header("Authorization", "Bearer " + token).contentType("application/json"))
                  .andReturn();
@@ -244,9 +244,8 @@ public class ProgBatchControllerIT {
         BatchDTO batchDTO=obj.readValue(responseBody, BatchDTO.class);
         assertEquals(batchDTO.getBatchDescription(),dummyBatchDTO.getBatchDescription());
  	 }
-   
     
-    @Test
+   @Test
    @Transactional
     public void testdeleteBatch() throws Exception{
  	   
