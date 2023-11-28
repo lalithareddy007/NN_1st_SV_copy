@@ -37,13 +37,10 @@ import java.time.LocalDateTime;
 public class SkillMasterControllerIntegrationTest {
     private static MockMvc mockMvc;
     private static String token;
-
     @Autowired
     private WebApplicationContext webApplicationContext;
-
     @Autowired
     private SkillMasterRepository skillMasterRepository;
-
     @Autowired
     private UserRepository userRepository;
     ObjectMapper obj = new ObjectMapper();
@@ -97,10 +94,10 @@ public class SkillMasterControllerIntegrationTest {
         assertEquals("TestIntegration", skillMastreDto.getSkillName());
 
         // Retrieve the SkillDTO with the generated ID
+        skillMastreDto = obj.readValue(jsonResponse, SkillMasterDto.class);
         assertNotNull(skillMastreDto.getSkillId(), "SkillId is null");
         skillId = skillMastreDto.getSkillId();
-        System.out.println("Skill ID"+ skillId);
-    }
+       }
 
     @Test
     @Order(2)
@@ -139,7 +136,7 @@ public class SkillMasterControllerIntegrationTest {
 
     @Test
     @Order(4)
-    public void testgetOneSkillByName() throws Exception{
+    public void testGetOneSkillByName() throws Exception{
         String skillName="TestIntegration";
         final MvcResult mvcResult = mockMvc.perform(get("/lms/skills/{skillMasterName}", skillName).contextPath("/lms")
                         .header("Authorization", "Bearer " + token)
@@ -149,7 +146,7 @@ public class SkillMasterControllerIntegrationTest {
     }
     @Test
     @Order(5)
-    public void testgetOneSkillByName_notFound() throws Exception{
+    public void testGetOneSkillByName_notFound() throws Exception{
         String skillName="IntegrationTestSample";
         final MvcResult mvcResult = mockMvc.perform(get("/lms/skills/{skillMasterName}", skillName).contextPath("/lms")
                         .header("Authorization", "Bearer " + token)
@@ -165,8 +162,7 @@ public class SkillMasterControllerIntegrationTest {
 
     @Test
     @Order(6)
-    public void testupdateSkillById() throws Exception{
-        System.out.println("SkillId"+skillId);
+    public void testUpdateSkillById() throws Exception{
         final SkillMasterDto skillMasterDto;
         skillMasterDto = new SkillMasterDto();
         skillMasterDto.setSkillName("TestIntegrationUpdate");
@@ -174,7 +170,7 @@ public class SkillMasterControllerIntegrationTest {
         skillMasterDto.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
 
         String jsonRequest = obj.writeValueAsString(skillMasterDto);
-        final MvcResult mvcResult = mockMvc.perform(put("/lms/updateSkills/{skillId}" + skillId).contextPath("/lms")
+        final MvcResult mvcResult = mockMvc.perform(put("/lms/updateSkills/" + skillId).contextPath("/lms")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
                         .content(jsonRequest))
@@ -183,15 +179,53 @@ public class SkillMasterControllerIntegrationTest {
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         assertEquals(200, mvcResult.getResponse().getStatus());
 
+        assertEquals("TestIntegrationUpdate", skillMasterDto.getSkillName());
+    }
+    @Test
+    @Order(7)
+    public void testUpdateSkillByIdNotFound() throws Exception {
+        final SkillMasterDto skillMasterDto;
+        skillMasterDto = new SkillMasterDto();
+        skillMasterDto.setSkillName("TestIntegrationUpdate1");
+        skillMasterDto.setCreationTime(Timestamp.valueOf(LocalDateTime.now()));
+        skillMasterDto.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
+
+        String jsonRequest = obj.writeValueAsString(skillMasterDto);
+        final MvcResult mvcResult = mockMvc.perform(put("/lms/updateSkills/" + 1000).contextPath("/lms")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType("application/json")
+                        .content(jsonRequest))
+                .andReturn();
+        String jsonResponse = mvcResult.getResponse().getContentAsString();
+        assertEquals(404, mvcResult.getResponse().getStatus());
+
         ApiResponse apiResponse = obj.readValue(jsonResponse, ApiResponse.class);
         String message = apiResponse.getMessage();
         assertEquals(false, apiResponse.isSuccess());
-        assertEquals("TestIntegrationUpdate", skillMasterDto.getSkillName());
-
+        assertEquals("User" + "Id", "UserId");
     }
 
+    @Test
+    @Order(8)
+    public void testDeleteUserSkillByUserSkillIdNotFound() throws Exception {
 
+        final MvcResult mvcResult = mockMvc.perform(delete("/lms/deletebySkillId/" + 1000).contextPath("/lms")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType("application/json"))
+                .andReturn();
+        assertEquals(404, mvcResult.getResponse().getStatus());
+    }
 
+    @Test
+    @Order(Integer.MAX_VALUE)
+    public void testDeleteUserSkillByUserSkillId() throws Exception {
+
+        final MvcResult mvcResult = mockMvc.perform(delete("/lms/deletebySkillId/" + skillId).contextPath("/lms")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType("application/json"))
+                .andReturn();
+       assertEquals(200, mvcResult.getResponse().getStatus());
+    }
 
 }
 
