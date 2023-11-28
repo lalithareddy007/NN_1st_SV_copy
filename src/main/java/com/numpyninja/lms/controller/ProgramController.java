@@ -62,7 +62,7 @@ public class ProgramController{
   	@PostMapping(path="/saveprogram",consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
 	@ApiOperation("Create Program")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
   	public ResponseEntity<?> createAndSaveProgram(@Valid @RequestBody ProgramDTO newProgram)throws  DuplicateResourceFoundException
   	{  
   	ProgramDTO savedProgramedDTO = programServices.createAndSaveProgram(newProgram);
@@ -73,7 +73,7 @@ public class ProgramController{
   	@PutMapping(path="/putprogram/{programId}", consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
   	@ApiOperation("Update Program by Program ID")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
   	public ResponseEntity <ProgramDTO> updateProgramById(@PathVariable("programId")@NotBlank @Positive Long programId ,@Valid @RequestBody ProgramDTO modifyProgram) throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok(programServices.updateProgramById(programId,modifyProgram));
@@ -83,7 +83,7 @@ public class ProgramController{
   	@PutMapping(path="/program/{programName}", consumes = "application/json", produces = "application/json")  
   	//@ResponseBody
   	@ApiOperation("Update Program by Program Name")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
   	public ResponseEntity <ProgramDTO> updateProgramByName(@Valid @PathVariable("programName") String programName ,@Valid @RequestBody ProgramDTO modifyProgram)throws ResourceNotFoundException
   	{  
   	return ResponseEntity.ok(programServices.updateProgramByName(programName,modifyProgram));
@@ -93,7 +93,7 @@ public class ProgramController{
   	@DeleteMapping(path="/deletebyprogid/{programId}")  
   	@ResponseBody
   	@ApiOperation("Delete Program by Program ID")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
   	public ResponseEntity<String>  deleteByProgramId(@PathVariable("programId")@NotBlank @Positive Long programId) throws ResourceNotFoundException
   	{
   	System.out.println("in delete by programID controller");
@@ -109,7 +109,7 @@ public class ProgramController{
   	@DeleteMapping(path="/deletebyprogname/{programName}")  
   	//@ResponseBody
   	@ApiOperation("Delete Program by Program Name")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
   	public ResponseEntity<?>  deleteByProgramName(@PathVariable("programName")@NotBlank @NotNull String programName) throws ResourceNotFoundException
   	{  
   	System.out.println("in delete by programName controller");

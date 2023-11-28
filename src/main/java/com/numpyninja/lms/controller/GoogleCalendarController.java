@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +47,7 @@ public class GoogleCalendarController {
 
 	@PostMapping(path = "/gcalendar/event", produces = "application/json")
 	@ApiOperation("Gat all the calendars from given startDate to endDate")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<GCalendarEventResponseDTO> createCalendarEvent(@Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
 			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarCreateEventException, GCalendarSecurityException
 	{
@@ -56,7 +57,7 @@ public class GoogleCalendarController {
 	
 	@PutMapping(path = "/gcalendar/event/{id}", produces = "application/json")
 	@ApiOperation("Gat all the calendars from given startDate to endDate")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<GCalendarEventResponseDTO> updateCalendarEvent(@PathVariable("id")String eventId, @Valid @RequestBody GCalendarEventRequestDTO eventRequest) 
 			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarCreateEventException, GCalendarSecurityException, GCalendarEventNotFoundException
 	{
@@ -66,7 +67,7 @@ public class GoogleCalendarController {
 	
 	@DeleteMapping(path = "/gcalendar/event/{id}")
 	@ApiOperation("Deletes the event with the given event ID")
-	@RolesAllowed({"ROLE_ADMIN"})
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<String> deleteCalendarEvent(@PathVariable ("id") String eventId) 
 			throws GCalendarIOException, CalendarAccessDeniedException,  GCalendarDeleteEventException, GCalendarSecurityException
 	{

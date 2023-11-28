@@ -40,7 +40,7 @@ public class AssignmentSubmitController {
 
     @PostMapping(path="", consumes="application/json", produces="application/json")
     @ApiOperation("Create New Submission")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<AssignmentSubmitDTO> submitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
     {
         AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.submitAssignment(assignmentSubmitDTO);
@@ -57,7 +57,7 @@ public class AssignmentSubmitController {
    
     @GetMapping("")
     @ApiOperation("Get All Submissions")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<List<AssignmentSubmitDTO>> getAllSubmissions() {
        
     	List<AssignmentSubmitDTO> submissionsListDTO = assignmentSubmitService.getAllSubmissions();
@@ -67,7 +67,7 @@ public class AssignmentSubmitController {
 
     @PutMapping(path="/{id}", consumes="application/json", produces="application/json")
     @ApiOperation("Update details of Submission")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<AssignmentSubmitDTO> resubmitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                   @PathVariable Long id)
     {
@@ -77,7 +77,7 @@ public class AssignmentSubmitController {
 
     @DeleteMapping(path="/{id}")
     @ApiOperation("Delete Submission")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<ApiResponse> deleteSubmission(@PathVariable Long id)
     {
         assignmentSubmitService.deleteSubmissions(id);
@@ -101,7 +101,7 @@ public class AssignmentSubmitController {
 
     @PutMapping(path="/gradesubmission/{submissionId}",consumes="application/json", produces="application/json" )
     @ApiOperation("Grade Assignment Submission")
-    @PreAuthorize("hasRole('STAFF')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
     public ResponseEntity<AssignmentSubmitDTO> gradeAssignmentSubmission(@RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                      @PathVariable Long submissionId){
         AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitService.gradeAssignmentSubmission(assignmentSubmitDTO,submissionId);

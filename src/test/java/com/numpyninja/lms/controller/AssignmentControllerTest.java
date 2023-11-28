@@ -3,6 +3,8 @@ package com.numpyninja.lms.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.config.WithMockAdminStaff;
+import com.numpyninja.lms.config.WithMockStaff;
+import com.numpyninja.lms.config.WithMockStaffStudent;
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.services.AssignmentService;
 import com.numpyninja.lms.services.AssignmentSubmitService;
@@ -10,7 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,11 +29,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.doAnswer;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -80,7 +89,7 @@ class AssignmentControllerTest extends AbstractTestController {
     @Test
     void testCreateAssignment() throws Exception {
         //given
-        given(assignmentService.createAssignment(ArgumentMatchers.any(AssignmentDto.class)))
+        given(assignmentService.createAssignment(any(AssignmentDto.class)))
                 .willAnswer((i) -> i.getArgument(0));
 
         //when
@@ -93,17 +102,91 @@ class AssignmentControllerTest extends AbstractTestController {
                 .andExpect(jsonPath("$.assignmentId", is(mockAssignmentDto.getAssignmentId()), Long.class))
                 .andExpect(jsonPath("$.assignmentName", is(mockAssignmentDto.getAssignmentName())));
     }
+    @DisplayName("test for creating a new assignment")
+    @WithMockAdmin
+    @Test
+    void testCreateAssignmentByAdmin() throws Exception {
+        //given
+        given(assignmentService.createAssignment(any(AssignmentDto.class)))
+                .willAnswer((i) -> i.getArgument(0));
+
+        //when
+        ResultActions response = mockMvc.perform(post("/assignments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(mockAssignmentDto)));
+
+        //then
+        response.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.assignmentId", is(mockAssignmentDto.getAssignmentId()), Long.class))
+                .andExpect(jsonPath("$.assignmentName", is(mockAssignmentDto.getAssignmentName())));
+    }
+    @DisplayName("test for creating a new assignment")
+    @WithMockStaff
+    @Test
+    void testCreateAssignmentByStaff() throws Exception {
+        //given
+        given(assignmentService.createAssignment(any(AssignmentDto.class)))
+                .willAnswer((i) -> i.getArgument(0));
+
+        //when
+        ResultActions response = mockMvc.perform(post("/assignments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(mockAssignmentDto)));
+
+        //then
+        response.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.assignmentId", is(mockAssignmentDto.getAssignmentId()), Long.class))
+                .andExpect(jsonPath("$.assignmentName", is(mockAssignmentDto.getAssignmentName())));
+    }
+    @DisplayName("test for creating a new assignment")
+    @WithMockUser
+    @Test
+    void testCreateAssignmentByUser() throws Exception {
+        //given
+        given(assignmentService.createAssignment(any(AssignmentDto.class)))
+                .willAnswer((i) -> i.getArgument(0));
+
+        //when
+        ResultActions response = mockMvc.perform(post("/assignments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(mockAssignmentDto)));
+
+        //then
+        response.andExpect(status().isForbidden());
+    }
 
     @DisplayName("test for updating an assignment")
     @Test
-    @WithMockAdmin
-    void testUpdateAssignment() throws Exception {
+    @WithMockStaff
+    void testUpdateAssignmentByStaff() throws Exception {
         //given
         Long assignmentId = 1L;
         AssignmentDto updatedAssignmentDto = mockAssignmentDto;
         updatedAssignmentDto.setAssignmentName("New Test Assignment");
-        given(assignmentService.updateAssignment(ArgumentMatchers.any(AssignmentDto.class)
-                , ArgumentMatchers.any(Long.class))).willReturn(updatedAssignmentDto);
+        given(assignmentService.updateAssignment(any(AssignmentDto.class)
+                , any(Long.class))).willReturn(updatedAssignmentDto);
+
+        //when
+        ResultActions response = mockMvc.perform(put("/assignments/{id}", assignmentId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedAssignmentDto)));
+
+        //then
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.assignmentId", is(updatedAssignmentDto.getAssignmentId()), Long.class))
+                .andExpect(jsonPath("$.assignmentName", is(updatedAssignmentDto.getAssignmentName())));
+    }
+    @DisplayName("test for updating an assignment")
+    @Test
+    @WithMockAdmin
+    void testUpdateAssignmentByAdmin() throws Exception {
+        //given
+        Long assignmentId = 1L;
+        AssignmentDto updatedAssignmentDto = mockAssignmentDto;
+        updatedAssignmentDto.setAssignmentName("New Test Assignment");
+        given(assignmentService.updateAssignment(any(AssignmentDto.class)
+                , any(Long.class))).willReturn(updatedAssignmentDto);
 
         //when
         ResultActions response = mockMvc.perform(put("/assignments/{id}", assignmentId)
@@ -117,10 +200,31 @@ class AssignmentControllerTest extends AbstractTestController {
                 .andExpect(jsonPath("$.assignmentName", is(updatedAssignmentDto.getAssignmentName())));
     }
 
+
+    @DisplayName("test for updating an assignment")
+    @Test
+    @WithMockUser
+    void testUpdateAssignmentByUser() throws Exception {
+        //given
+        Long assignmentId = 1L;
+        AssignmentDto updatedAssignmentDto = mockAssignmentDto;
+        updatedAssignmentDto.setAssignmentName("New Test Assignment");
+        given(assignmentService.updateAssignment(any(AssignmentDto.class)
+                , any(Long.class))).willReturn(updatedAssignmentDto);
+
+        //when
+        ResultActions response = mockMvc.perform(put("/assignments/{id}", assignmentId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedAssignmentDto)));
+
+        //then
+        response.andExpect(status().isForbidden());
+    }
+
     @DisplayName("test for deleting an assignment")
     @Test
-    @WithMockAdmin
-    void testDeleteAssignment() throws Exception {
+    @WithMockStaff
+    void testDeleteAssignmentByStaff() throws Exception {
         //given
         Long assignmentId = 1L;
         willDoNothing().given(assignmentService).deleteAssignment(assignmentId);
@@ -132,8 +236,38 @@ class AssignmentControllerTest extends AbstractTestController {
         response.andExpect(status().isOk())
                 .andDo(print());
     }
+    @DisplayName("test for deleting an assignment")
+    @Test
+    @WithMockAdmin
+    void testDeleteAssignmentByAdmin() throws Exception {
+        //given
+        Long assignmentId = 1L;
+        willDoNothing().given(assignmentService).deleteAssignment(assignmentId);
+
+        //when
+        ResultActions response = mockMvc.perform(delete("/assignments/{id}", assignmentId));
+
+        //then
+        response.andExpect(status().isOk())
+                .andDo(print());
+    }
+    @DisplayName("test for deleting an assignment")
+    @Test
+    @WithMockUser
+    void testDeleteAssignmentByUser() throws Exception {
+        //given
+        Long assignmentId = 1L;
+        willDoNothing().given(assignmentService).deleteAssignment(assignmentId);
+
+        //when
+        ResultActions response = mockMvc.perform(delete("/assignments/{id}", assignmentId));
+
+        //then
+        response.andExpect(status().isForbidden());
+    }
 
     @DisplayName("test to get all the assignments")
+    @WithMockAdminStaff
     @Test
     void testGetAllAssignments() throws Exception {
         //given
@@ -152,6 +286,25 @@ class AssignmentControllerTest extends AbstractTestController {
         response.andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$", hasSize(assignmentDtoList.size())));
+    }
+    @DisplayName("test to get all the assignments")
+    @WithMockUser
+    @Test
+    void testGetAllAssignmentsByUser() throws Exception {
+        //given
+        AssignmentDto mockAssignmentDto2 = mockAssignmentDto;
+        mockAssignmentDto2.setAssignmentId(2L);
+        mockAssignmentDto2.setAssignmentName("Test Assignment2");
+        ArrayList<AssignmentDto> assignmentDtoList = new ArrayList();
+        assignmentDtoList.add(mockAssignmentDto);
+        assignmentDtoList.add(mockAssignmentDto2);
+        given(assignmentService.getAllAssignments()).willReturn(assignmentDtoList);
+
+        //when
+        ResultActions response = mockMvc.perform(get("/assignments"));
+
+        //then
+        response.andExpect(status().isForbidden());
     }
 
     @DisplayName("test to get an assignment by Id")

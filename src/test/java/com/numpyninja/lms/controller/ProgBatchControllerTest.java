@@ -68,12 +68,30 @@ public class ProgBatchControllerTest extends AbstractTestController {
 
 
     @Test
-    public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesList() throws Exception {
+    @WithMockAdmin
+    public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesListByAdmin() throws Exception {
         // given - BDDMockito.given()
         given(batchService.getAllBatches()).willReturn(listOfBatches);
         mockMvc.perform(MockMvcRequestBuilders.get("/batches").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
+    }
+    @Test
+    @WithMockStaff
+    public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesListByStaff() throws Exception {
+        // given - BDDMockito.given()
+        given(batchService.getAllBatches()).willReturn(listOfBatches);
+        mockMvc.perform(MockMvcRequestBuilders.get("/batches").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)));
+    }
+    @Test
+    @WithMockUser
+    public void givenBatchList_WhenGetAllBatches_ThenReturnBatchesListByUser() throws Exception {
+        // given - BDDMockito.given()
+        given(batchService.getAllBatches()).willReturn(listOfBatches);
+        mockMvc.perform(MockMvcRequestBuilders.get("/batches").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
 
@@ -138,10 +156,10 @@ public class ProgBatchControllerTest extends AbstractTestController {
 
 
     @Test
-    @WithMockAdminStaff
+    @WithMockAdmin
     //if we dont provide annotation we need to specify like this on every test
     // @WithMockUser(username="tim@gmail.com",roles={"STAFF","ADMIN"})
-    public void givenBatch_whenCreateBatch_thenReturnSavedBatch() throws Exception {
+    public void givenBatch_whenCreateBatch_thenReturnSavedBatchByAdmin() throws Exception {
         BatchDTO batchDTO3 = listOfBatches.get(2);
         batchDTO3.setBatchName("DataScience1");
         given(batchService.createBatch(org.mockito.ArgumentMatchers.any())).willReturn(batchDTO3);   // it works for this code only
@@ -153,9 +171,21 @@ public class ProgBatchControllerTest extends AbstractTestController {
         response.andExpect(jsonPath("$.batchId", is(batchDTO3.getBatchId())))
                 .andExpect(jsonPath("$.batchName", is(batchDTO3.getBatchName())));
     }
+    @Test
+    @WithMockStaff
+    public void givenBatch_whenCreateBatch_thenReturnSavedBatchByStaff() throws Exception {
+        BatchDTO batchDTO3 = listOfBatches.get(2);
+        batchDTO3.setBatchName("DataScience1");
+        given(batchService.createBatch(org.mockito.ArgumentMatchers.any())).willReturn(batchDTO3);   // it works for this code only
 
-    @Test @WithMockStaffStudent
-    public void givenBatch_whenCreateBatch_thenReturnReturn403_forbidden() throws Exception {
+        ResultActions response = mockMvc.perform(post("/batches").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(batchDTO3)));
+        response.andDo(print()).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser
+    public void givenBatch_whenCreateBatch_thenReturnReturn403_forbiddenByUser() throws Exception {
         BatchDTO batchDTO3 = listOfBatches.get(2);
         batchDTO3.setBatchName("DataScience1");
         given(batchService.createBatch(org.mockito.ArgumentMatchers.any())).willReturn(batchDTO3);   // it works for this code only
@@ -185,8 +215,22 @@ public class ProgBatchControllerTest extends AbstractTestController {
                 .andExpect(jsonPath("batchDescription", is(updateDetailDTO.getBatchDescription())));
     }
 
-    @Test @WithMockStudent   // 403 forbidden
-    public void givenUpdatedBatch_Role_Student_whenUpdateBatch_thenReturn403_forbidden_() throws Exception {
+    @Test @WithMockStaff  // 403 forbidden
+    public void givenUpdatedBatch_Role_Student_whenUpdateBatch_thenReturn403_forbidden_ByStaff() throws Exception {
+        BatchDTO updateDetailDTO = new BatchDTO(1, "SDET1", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
+
+        Integer batchId = 1;
+
+        given(batchService.updateBatch(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any())).willReturn(updateDetailDTO);   // it works for this code only
+
+        ResultActions response = mockMvc.perform(put("/batches/{batchId}", batchId).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDetailDTO)));
+
+        response.andDo(print()).andExpect(status().isForbidden());
+
+    }
+    @Test @WithMockUser   // 403 forbidden
+    public void givenUpdatedBatch_Role_Student_whenUpdateBatch_thenReturn403_forbidden_ByUser() throws Exception {
         BatchDTO updateDetailDTO = new BatchDTO(1, "SDET1", "SDET BATCH 01 Updation", "Active", 8, (long) 1, "SDET");
 
         Integer batchId = 1;
@@ -216,7 +260,21 @@ public class ProgBatchControllerTest extends AbstractTestController {
     }
 
     @Test @WithMockStaff
-    public void givenBatchId_Role_Staff_whenDeleteBatch_thenReturn403Forbidden() throws Exception {
+    public void givenBatchId_Role_Staff_whenDeleteBatch_thenReturn403ForbiddenByStaff() throws Exception {
+        Integer batchId = 2;
+
+        // given
+        BDDMockito.willDoNothing().given(batchService).deleteProgramBatch(batchId);
+
+        // when -  action or the behaviour that we are going test
+        ResultActions response = mockMvc.perform(delete("/batches/{batchId}", batchId));
+
+        // then - verify the output
+        response.andExpect(status().isForbidden())
+                .andDo(print());
+    }
+    @Test @WithMockUser
+    public void givenBatchId_Role_Staff_whenDeleteBatch_thenReturn403ForbiddenByUser() throws Exception {
         Integer batchId = 2;
 
         // given
