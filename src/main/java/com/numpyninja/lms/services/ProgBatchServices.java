@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.exception.InvalidDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -127,8 +128,21 @@ public class ProgBatchServices {
     }
 
     public void deleteProgramBatch(Integer batchId) {
-    	progBatchRepository.findById(batchId).orElseThrow(()-> new ResourceNotFoundException("Batch", "Id", batchId));
-    	progBatchRepository.deleteById(batchId);
+        if(batchId!=null) {
+            Boolean value = progBatchRepository.existsById(batchId);
+            if (value) {
+                Batch batchEntity = progBatchRepository.findById(batchId).get();
+                batchEntity.setBatchStatus("Inactive");
+                progBatchRepository.save(batchEntity);
+
+            } else {
+                System.out.println("No record found with batchId" + "  " + batchId);
+                throw new ResourceNotFoundException("No record found with batchId" + batchId);
+            }
+        }
+        else {
+            throw new InvalidDataException("BatchId is mandatory");
+        }
     }
 
 }
