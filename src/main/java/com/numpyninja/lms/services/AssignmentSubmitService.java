@@ -260,7 +260,7 @@ public class AssignmentSubmitService {
             throw new InvalidDataException("Grader information mandatory!");
         else if(!userRepository.existsById(gradedBy))
             throw new ResourceNotFoundException("Grader", "ID", gradedBy);
-        else if(!userRoleMapRepository.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
+        else if(userRoleMapRepository.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
                 gradedBy,"R03","Active"))//.isEmpty())
             throw new InvalidDataException("User "+gradedBy+" is not allowed to grade the submission");
         //check for grading should not happen before due date.

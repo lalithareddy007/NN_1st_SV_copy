@@ -27,14 +27,13 @@ import java.util.Optional;
 @Service
 public class ClassService {
 	@Autowired
-
 	private ClassRepository classRepository;
 
 	@Autowired
-	ProgBatchRepository batchRepository;
+	private ProgBatchRepository batchRepository;
 
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 
 	@Autowired
 	private ClassScheduleMapper classMapper;

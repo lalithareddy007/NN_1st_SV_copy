@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -39,7 +40,7 @@ public class AssignmentSubmitController {
 
     @PostMapping(path="", consumes="application/json", produces="application/json")
     @ApiOperation("Create New Submission")
-    @RolesAllowed({"ROLE_ADMIN"})
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AssignmentSubmitDTO> submitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO)
     {
         AssignmentSubmitDTO createdAssignSubmitDTO = assignmentSubmitService.submitAssignment(assignmentSubmitDTO);
@@ -56,6 +57,7 @@ public class AssignmentSubmitController {
    
     @GetMapping("")
     @ApiOperation("Get All Submissions")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<List<AssignmentSubmitDTO>> getAllSubmissions() {
        
     	List<AssignmentSubmitDTO> submissionsListDTO = assignmentSubmitService.getAllSubmissions();
@@ -65,7 +67,7 @@ public class AssignmentSubmitController {
 
     @PutMapping(path="/{id}", consumes="application/json", produces="application/json")
     @ApiOperation("Update details of Submission")
-    @RolesAllowed({"ROLE_ADMIN"})
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AssignmentSubmitDTO> resubmitAssignment( @RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                   @PathVariable Long id)
     {
@@ -75,7 +77,7 @@ public class AssignmentSubmitController {
 
     @DeleteMapping(path="/{id}")
     @ApiOperation("Delete Submission")
-    @RolesAllowed({"ROLE_ADMIN"})
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponse> deleteSubmission(@PathVariable Long id)
     {
         assignmentSubmitService.deleteSubmissions(id);
@@ -99,7 +101,7 @@ public class AssignmentSubmitController {
 
     @PutMapping(path="/gradesubmission/{submissionId}",consumes="application/json", produces="application/json" )
     @ApiOperation("Grade Assignment Submission")
-    @RolesAllowed({"ROLE_ADMIN"})
+    @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<AssignmentSubmitDTO> gradeAssignmentSubmission(@RequestBody AssignmentSubmitDTO assignmentSubmitDTO,
                                                                      @PathVariable Long submissionId){
         AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitService.gradeAssignmentSubmission(assignmentSubmitDTO,submissionId);
