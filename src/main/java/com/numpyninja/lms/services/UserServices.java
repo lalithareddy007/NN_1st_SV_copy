@@ -841,8 +841,9 @@ public class UserServices implements UserDetailsService {
 		
 	}
 
-
-
+    public List<Role> getAllRoles() {
+        return roleRepository.findAll();
+    }
 
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
