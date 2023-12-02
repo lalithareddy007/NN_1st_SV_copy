@@ -1,13 +1,12 @@
 package com.numpyninja.lms.mappers;
 
-import java.util.List;
-
+import com.numpyninja.lms.dto.AttendanceDto;
+import com.numpyninja.lms.entity.Attendance;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import com.numpyninja.lms.dto.AttendanceDto;
-import com.numpyninja.lms.entity.Attendance;
+import java.util.List;
 
 @Mapper(componentModel = "spring", uses={ClassScheduleMapper.class, UserMapper.class})
 public interface AttendanceMapper {

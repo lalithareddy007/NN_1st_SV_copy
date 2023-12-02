@@ -2,25 +2,24 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.entity.Attendance;
-import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AttendanceMapper;
 import com.numpyninja.lms.repository.AttendanceRepository;
 import com.numpyninja.lms.repository.ClassRepository;
 import com.numpyninja.lms.repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+
+
 
 @Service
 public class AttendanceServices {
@@ -101,11 +100,18 @@ public class AttendanceServices {
 		User user = userRepository.findById(studentId)
 				.orElseThrow(() -> new ResourceNotFoundException("Student Id " + studentId + " not found"));
 
-		List<Attendance> attendanceRecord = this.attendanceRepository.findByObjClassAndUser(objClass, user);
+		if(!validAttendanceDate(attendanceDto.getAttendanceDate())){
+			throw new com.numpyninja.lms.exception.InvalidDataException("Invalid attendance date: must be within 7 days of class date");
+		}
+
+		List<Attendance> attendanceRecord = this.attendanceRepository.findByobjClass_csIdAndUser_userIdAndAttendanceDate(
+											objClass.getCsId(),
+											user.getUserId(),
+											attendanceDto.getAttendanceDate());
 
 		 // Check if an attendance record already exists for the given classId and studentId
 		 if(!attendanceRecord.isEmpty() ) {
-		  throw new DuplicateResourceFoundException("Attendance record already exists for class " + classId + " and student " + studentId);
+		  throw new DuplicateResourceFoundException(String.format("Student %s's attendance is marked for %s, for %s", studentId, objClass.getClassTopic(), attendanceDto.getAttendanceDate()));
 		 }
 		
 		Attendance attendance = attendanceMapper.toAttendance(attendanceDto);
@@ -117,6 +123,12 @@ public class AttendanceServices {
 		Attendance newAttendance = attendanceRepository.save(attendance);
 		return attendanceMapper.toAttendanceDto(newAttendance);
 	}
+
+private boolean validAttendanceDate(LocalDate classDate){
+		LocalDate dateBefore7days = LocalDate.now().minusDays(7);
+        return classDate.isBefore(java.time.LocalDate.now()) &&
+				classDate.isAfter(dateBefore7days);
+    }
 
 	// Update new Attendance under class
 	public AttendanceDto updateAttendance(AttendanceDto attendanceDto, Long attendanceId) {
