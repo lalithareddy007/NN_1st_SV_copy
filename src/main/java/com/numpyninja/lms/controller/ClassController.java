@@ -5,21 +5,26 @@ import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.ClassService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -133,7 +138,6 @@ public class ClassController {
 	
 	
 	//get class Recording by classId
-	
 	@GetMapping(path="classRecordings/{classId}", produces = "application/json")
 	@ResponseBody
 	@ApiOperation("Get Class Recordings by Class ID")
@@ -150,7 +154,49 @@ public class ClassController {
 	{
 		return ResponseEntity.ok(classServices.getClassesRecordingByBatchId(batchId));
 	}
-	
-	
-	
+
+	@GetMapping(path="/classrecordings")
+	@ApiOperation("Get All Recordings")
+	public ResponseEntity<List<ClassRecordingDTO>> getAllRecordings(){
+		return ResponseEntity.ok(classServices.getClassesRecordings());
+    }
+
+	@GetMapping(path="/downloadrecording")
+	public ResponseEntity<InputStreamResource> downloadRecording(@PathVariable Long csId) throws FileNotFoundException {
+		File filePath = new File("/Users/akshatakanaje/Downloads/sqlhackthons.mp4");
+
+		InputStreamResource resource = new InputStreamResource(new FileInputStream(filePath));
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filePath.getName());
+
+		return ResponseEntity.ok()
+				.headers(headers)
+				.contentLength(filePath.length())
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(resource);
+	}
+
+	@GetMapping(path="/download/{csId}")
+	public ResponseEntity<Resource> download(@PathVariable Long csId) throws FileNotFoundException {
+		ClassRecordingDTO recording = classServices.getClassRecordingByClassId(csId);
+		String path = recording.getClassRecordingPath();
+
+		Path downloadPath = Paths.get(path);
+		File file = downloadPath.toFile();
+		if(!file.exists()){
+			return (ResponseEntity<Resource>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+		HttpHeaders headers = new HttpHeaders();
+		String downloadFileName = file.getName().replaceAll(" ", "");
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + downloadFileName);
+
+		return ResponseEntity.ok()
+				.headers(headers)
+				.contentLength(path.length())
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(resource);
+	}
+
 }

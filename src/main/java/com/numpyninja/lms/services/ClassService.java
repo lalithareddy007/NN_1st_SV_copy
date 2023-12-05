@@ -142,11 +142,7 @@ public class ClassService {
 		Class class2 = classRepository.save(class1);
 		return classMapper.toClassSchdDTO(class2);
 
-
-
-
 	}
-
 
 	//get All Class schedules -not mentioned in Excel
 	public List<ClassDto> getAllClasses() throws ResourceNotFoundException{
@@ -158,6 +154,7 @@ public class ClassService {
 			return (classMapper.toClassScheduleDTOList(ClassScheduleList));
 		}
 	}
+
 	//get class by classId
 	public ClassDto getClassByClassId(Long id) throws ResourceNotFoundException{
 		Optional<Class> classOptional = classRepository.findById(id);
@@ -263,7 +260,8 @@ public class ClassService {
     			throw new IllegalArgumentException();
     		}
      	}*/
-//get all classes by classStaffId
+
+    //get all classes by classStaffId
 	public List<ClassDto> getClassesByStaffId(String staffId) throws ResourceNotFoundException,IllegalArgumentException
 	{
 		if(staffId!=null)
@@ -289,7 +287,6 @@ public class ClassService {
 
 
 	//Update Class Schedules by Id
-
 	public ClassDto updateClassByClassId(Long id,ClassDto modifiedClassDTO) throws ResourceNotFoundException{
 		String staffId = modifiedClassDTO.getClassStaffId();
 		Integer batchid = modifiedClassDTO.getBatchId();
@@ -355,8 +352,7 @@ public class ClassService {
 		ClassDto updatedClassDto = classMapper.toClassSchdDTO(updatedClass);
 		return updatedClassDto;
 	}
-	
-	
+
 	//delete by classId
 	public Boolean deleteByClassId(Long classId) throws ResourceNotFoundException
 	{
@@ -382,9 +378,7 @@ public class ClassService {
 
 	}
 
-
 	//get class Recording by batchId
-
 	public List<ClassRecordingDTO> getClassesRecordingByBatchId(Integer batchId) throws ResourceNotFoundException {
 
 		List<Class> ClassObj =classRepository.findByBatchInClass_batchId(batchId);
@@ -402,10 +396,6 @@ public class ClassService {
 	}
 
 
-
-
-
-
 	//get class Recording by ClassId
 	public ClassRecordingDTO getClassRecordingByClassId(Long id) throws ResourceNotFoundException{
 
@@ -417,12 +407,7 @@ public class ClassService {
 		ClassRecordingDTO classRecordingDTO = new ClassRecordingDTO(id,classRecordingPath);
 		return classRecordingDTO;
 		//return new ClassRecordingDTO(id,classRecordingPath);
-
 	}
-
-
-
-	;
 
 
 	//Update Class Recording by ClassId
@@ -454,5 +439,21 @@ public class ClassService {
 				throw new IllegalArgumentException();
 			}
 		}
+	}
+
+	//get All Class Recordings
+	public List<ClassRecordingDTO> getClassesRecordings() {
+		final List<Class> classRecordings = classRepository.findAll();
+
+		List<ClassRecordingDTO> classRecordingDTOList = new ArrayList<ClassRecordingDTO>();
+
+		for(Class classRecord: classRecordings){
+			ClassRecordingDTO classRecordingDTO = new ClassRecordingDTO();
+			classRecordingDTO.setCsId(classRecord.getCsId());
+			classRecordingDTO.setClassRecordingPath(classRecord.getClassRecordingPath());
+
+			classRecordingDTOList.add(classRecordingDTO);
+		}
+		return classRecordingDTOList;
 	}
 }
