@@ -2,6 +2,7 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.enums.FacetFieldEnums;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
@@ -96,6 +97,98 @@ public class UserServices implements UserDetailsService {
         List<UserLogin> userLogins = userLoginRepository.findAll();
         List<UserDto> userDtos = userLoginMapper.toUserDTOs(userLogins);
         return userDtos;
+    }
+
+    public UserDTOV2 getAllUsersV2() {
+        List<UserLogin> userLogins = userLoginRepository.findAll();
+        List<UserDto> userDtos = userLoginMapper.toUserDTOs(userLogins);
+        UserDTOV2 userDTOsV2 = new UserDTOV2();
+        userDTOsV2.setUsers(userDtos);
+
+        Map<String, Integer> locationMap = new HashMap<>();
+        Map<String, Integer> timeZoneMap = new HashMap<>();
+        Map<String, Integer> underGraduationMap = new HashMap<>();
+        Map<String, Integer> postGraduationMap = new HashMap<>();
+        Map<String, Integer> visaStatusMap = new HashMap<>();
+
+        for(UserDto userDto : userDtos) {
+            String userLocation = userDto.getUserLocation();
+            String userTimeZone = userDto.getUserTimeZone();
+            String userUnderGraduation = userDto.getUserEduUg();
+            String userPostGraduation = userDto.getUserEduPg();
+            String userVisaStatus = userDto.getUserVisaStatus();
+
+            if(userLocation != null){
+                locationMap.put(userLocation.toLowerCase(),
+                        locationMap.getOrDefault(userLocation.toLowerCase(),0)+1);
+            }
+            if(userTimeZone != null){
+                timeZoneMap.put(userTimeZone.toLowerCase(),
+                        timeZoneMap.getOrDefault(userTimeZone.toLowerCase(),0)+1);
+            }
+            if(userUnderGraduation != null){
+                underGraduationMap.put(userUnderGraduation.toLowerCase(),
+                        underGraduationMap.getOrDefault(userUnderGraduation.toLowerCase(),0)+1);
+            }
+            if(userPostGraduation != null){
+                postGraduationMap.put(userPostGraduation.toLowerCase(),
+                        postGraduationMap.getOrDefault(userPostGraduation.toLowerCase(),0)+1);
+            }
+            if(userVisaStatus != null){
+                visaStatusMap.put(userVisaStatus.toLowerCase(),
+                        visaStatusMap.getOrDefault(userVisaStatus.toLowerCase(),0)+1);
+            }
+
+        }
+
+        FacetDto facetDTO = new FacetDto();
+        List<FacetFieldDto> facetFieldDtoList = new ArrayList<>();
+
+        if(!locationMap.isEmpty()){
+            FacetFieldDto locationFacetFieldDto = new FacetFieldDto();
+            locationFacetFieldDto.setDisplayName(FacetFieldEnums.LOCATION.name());
+            locationFacetFieldDto.setFilterValues(fetchMapEntries(locationMap));
+            facetFieldDtoList.add(locationFacetFieldDto);
+        }
+        if(!timeZoneMap.isEmpty()){
+            FacetFieldDto timeZoneFacetFieldDTO = new FacetFieldDto();
+            timeZoneFacetFieldDTO.setDisplayName(FacetFieldEnums.TIME_ZONE.name());
+            timeZoneFacetFieldDTO.setFilterValues(fetchMapEntries(timeZoneMap));
+            facetFieldDtoList.add(timeZoneFacetFieldDTO);
+        }
+        if(!underGraduationMap.isEmpty()){
+            FacetFieldDto underGraduationFacetFieldDto = new FacetFieldDto();
+            underGraduationFacetFieldDto.setDisplayName(FacetFieldEnums.UNDER_GRADUATION.name());
+            underGraduationFacetFieldDto.setFilterValues(fetchMapEntries(underGraduationMap));
+            facetFieldDtoList.add(underGraduationFacetFieldDto);
+        }
+        if(!postGraduationMap.isEmpty()){
+            FacetFieldDto postGraduationFacetFieldDto = new FacetFieldDto();
+            postGraduationFacetFieldDto.setDisplayName(FacetFieldEnums.POST_GRADUATION.name());
+            postGraduationFacetFieldDto.setFilterValues(fetchMapEntries(postGraduationMap));
+            facetFieldDtoList.add(postGraduationFacetFieldDto);
+        }
+        if(!visaStatusMap.isEmpty()){
+            FacetFieldDto visaStatusFacetFieldDto = new FacetFieldDto();
+            visaStatusFacetFieldDto.setDisplayName(FacetFieldEnums.VISA_STATUS.name());
+            visaStatusFacetFieldDto.setFilterValues(fetchMapEntries(visaStatusMap));
+            facetFieldDtoList.add(visaStatusFacetFieldDto);
+        }
+
+        facetDTO.setFacetFields(facetFieldDtoList);
+        userDTOsV2.setFacets(facetDTO);
+        return userDTOsV2;
+    }
+
+    private List<FilterValueDto> fetchMapEntries(Map<String, Integer> map) {
+        List<FilterValueDto> filterValueDtoList = new ArrayList<>();
+        for(Map.Entry<String, Integer> entrySet: map.entrySet()){
+            FilterValueDto filterValueDto = new FilterValueDto();
+            filterValueDto.setCount(entrySet.getValue());
+            filterValueDto.setName(entrySet.getKey());
+            filterValueDtoList.add(filterValueDto);
+        }
+        return filterValueDtoList;
     }
 
 
