@@ -3,6 +3,7 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.ClassDto;
 import com.numpyninja.lms.dto.ClassRecordingDTO;
+import com.numpyninja.lms.dto.UserSkillDTO;
 import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.entity.User;
@@ -442,18 +443,12 @@ public class ClassService {
 	}
 
 	//get All Class Recordings
-	public List<ClassRecordingDTO> getClassesRecordings() {
-		final List<Class> classRecordings = classRepository.findAll();
-
-		List<ClassRecordingDTO> classRecordingDTOList = new ArrayList<ClassRecordingDTO>();
-
-		for(Class classRecord: classRecordings){
-			ClassRecordingDTO classRecordingDTO = new ClassRecordingDTO();
-			classRecordingDTO.setCsId(classRecord.getCsId());
-			classRecordingDTO.setClassRecordingPath(classRecord.getClassRecordingPath());
-
-			classRecordingDTOList.add(classRecordingDTO);
+	public List<ClassRecordingDTO> getAllClassRecordings(){
+		final List<Class> classRecordingsList = classRepository.findAll();
+		if(classRecordingsList.isEmpty()){
+			throw new ResourceNotFoundException("Class Recording list is not found");
+		} else {
+			return classMapper.toClassRecordingDtoList(classRecordingsList);
 		}
-		return classRecordingDTOList;
 	}
 }

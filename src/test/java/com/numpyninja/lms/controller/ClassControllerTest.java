@@ -6,6 +6,7 @@ import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.config.WithMockStaff;
 import com.numpyninja.lms.config.WithMockStudent;
 import com.numpyninja.lms.dto.ClassDto;
+import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.services.ClassService;
 import lombok.SneakyThrows;
@@ -42,12 +43,13 @@ class ClassControllerTest extends AbstractTestController {
     @Autowired
     private MockMvc mockMvc;
 
-
     @MockBean
     private ClassService classService;
     @Autowired
     ObjectMapper objectMapper;
     private static List<ClassDto> classDtoList;
+
+    private static List<ClassRecordingDTO> classRecordingDTOList;
 
     public Date setdate(){
         String sDate = "11/02/2022";
@@ -273,7 +275,31 @@ class ClassControllerTest extends AbstractTestController {
                             jsonPath("$.message").value(message))
                     .andDo(print());
         }
+
+        @DisplayName("test - to Get All Class Recordings")
+        @SneakyThrows
+        @Test
+        @WithMockStudent
+        void testGetAllClassRecordings() throws Exception {
+            //given
+            ClassRecordingDTO recording1 = new ClassRecordingDTO(1L, "/Users/akshatakanaje/Downloads/Jira-Github 2.mp4");
+            ClassRecordingDTO recording2 = new ClassRecordingDTO(2L, "/Users/akshatakanaje/Downloads/video1963980455.mp4");
+            List<ClassRecordingDTO> recordings = Arrays.asList(recording1, recording2);
+            given(classService.getAllClassRecordings()).willReturn( recordings);
+
+            //when
+            ResultActions response = mockMvc.perform(get("/classrecordings"));
+
+            //then
+            response.andExpect(status().isOk())
+                    .andDo(print())
+                    .andExpect(jsonPath("$", hasSize(recordings.size())));
+
+            verify(classService, times(1)).getAllClassRecordings();
+        }
     }
+
+
     @Nested
     class CreateOperation {
 

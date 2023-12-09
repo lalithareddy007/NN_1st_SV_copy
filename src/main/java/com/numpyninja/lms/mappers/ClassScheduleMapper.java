@@ -2,13 +2,13 @@ package com.numpyninja.lms.mappers;
 
 import java.util.List;
 
+import com.numpyninja.lms.dto.ClassRecordingDTO;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.numpyninja.lms.dto.ClassDto;
-import com.numpyninja.lms.dto.ClassRecordingDTO;
 import com.numpyninja.lms.entity.Class;
 
 
@@ -26,6 +26,7 @@ public interface ClassScheduleMapper {
 	   	List<ClassDto> toClassScheduleDTOList(List<Class> classSchdEntites);
 		 
 		 List<Class> toClassScheduleEntityList(List<ClassDto> classSchdDTOs);
-		 
-		
+
+		 List<ClassRecordingDTO> toClassRecordingDtoList(List<Class> ClassRecords);
+
 }

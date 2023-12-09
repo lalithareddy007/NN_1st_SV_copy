@@ -26,6 +26,8 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @RestController
@@ -33,6 +35,8 @@ import java.util.List;
 @Slf4j
 @Api(tags="Class Controller", description="Class CRUD Operations")
 public class ClassController {
+
+	private static final Logger logger = LoggerFactory.getLogger(ClassController.class);
 	
 	@Autowired
 	ClassService classServices;
@@ -157,33 +161,20 @@ public class ClassController {
 
 	@GetMapping(path="/classrecordings")
 	@ApiOperation("Get All Recordings")
-	public ResponseEntity<List<ClassRecordingDTO>> getAllRecordings(){
-		return ResponseEntity.ok(classServices.getClassesRecordings());
+	public ResponseEntity<List<ClassRecordingDTO>> getAllClassRecordings(){
+		return ResponseEntity.ok(classServices.getAllClassRecordings());
     }
 
-	@GetMapping(path="/downloadrecording")
-	public ResponseEntity<InputStreamResource> downloadRecording(@PathVariable Long csId) throws FileNotFoundException {
-		File filePath = new File("/Users/akshatakanaje/Downloads/sqlhackthons.mp4");
-
-		InputStreamResource resource = new InputStreamResource(new FileInputStream(filePath));
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filePath.getName());
-
-		return ResponseEntity.ok()
-				.headers(headers)
-				.contentLength(filePath.length())
-				.contentType(MediaType.APPLICATION_OCTET_STREAM)
-				.body(resource);
-	}
-
 	@GetMapping(path="/download/{csId}")
-	public ResponseEntity<Resource> download(@PathVariable Long csId) throws FileNotFoundException {
+	@ApiOperation("Download Class Recordings")
+	public ResponseEntity<Resource> downloadClassRecordings(@PathVariable Long csId) throws FileNotFoundException {
 		ClassRecordingDTO recording = classServices.getClassRecordingByClassId(csId);
 		String path = recording.getClassRecordingPath();
 
 		Path downloadPath = Paths.get(path);
 		File file = downloadPath.toFile();
 		if(!file.exists()){
+			logger.error("Recording not found for class id: ", csId, path);
 			return (ResponseEntity<Resource>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
