@@ -62,6 +62,12 @@ public class UserController {
 		return ResponseEntity.ok(userList);
 	}
 
+	@GetMapping("/v2/users")
+	@ApiOperation("Get all Users with Facets/Filters")
+	public ResponseEntity<UserDTOV2> getAllUsersV2() {
+		return ResponseEntity.ok(userServices.getAllUsersV2());
+	}
+
 	//get user by ID - user, role, program, batch, skill and other details
 	@GetMapping("/users/{id}")
 	@ApiOperation("Get User Information by ID")
