@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.config.WithMockAdmin;
 import com.numpyninja.lms.config.WithMockAdminStaff;
 import com.numpyninja.lms.config.WithMockStaff;
-import com.numpyninja.lms.config.WithMockStaffStudent;
 import com.numpyninja.lms.dto.AttendanceDto;
 import com.numpyninja.lms.entity.Attendance;
 import com.numpyninja.lms.repository.AttendanceRepository;
@@ -74,7 +73,7 @@ class AttendanceControllerTest extends AbstractTestController {
 
     private void setMockAttendanceAndDto() {
 
-        attendanceDtos = new AttendanceDto(7L, 7L, "U03", "Present", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()));
+        attendanceDtos = new AttendanceDto(7L, 7L, "U03", "Present", Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()), java.time.LocalDate.now());
         attendanceList = new ArrayList<AttendanceDto>();
     }
 

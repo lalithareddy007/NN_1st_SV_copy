@@ -1,76 +1,36 @@
 package com.numpyninja.lms.services;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.any;
-import static org.hamcrest.Matchers.equalTo;
-//import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-//import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.longThat;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.mockitoSession;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.numpyninja.lms.dto.AttendanceDto;
+import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.mappers.AttendanceMapper;
+import com.numpyninja.lms.mappers.ClassScheduleMapper;
+import com.numpyninja.lms.repository.AttendanceRepository;
+import com.numpyninja.lms.repository.ClassRepository;
+import com.numpyninja.lms.repository.ProgBatchRepository;
+import com.numpyninja.lms.repository.UserRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.aspectj.lang.annotation.Before;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.hibernate.query.criteria.internal.expression.SearchedCaseExpression.WhenClause;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import com.numpyninja.lms.dto.AssignmentDto;
-import com.numpyninja.lms.dto.AttendanceDto;
-import com.numpyninja.lms.dto.BatchDTO;
-import com.numpyninja.lms.dto.ClassDto;
-import com.numpyninja.lms.dto.SkillMasterDto;
-import com.numpyninja.lms.entity.Assignment;
-import com.numpyninja.lms.entity.Attendance;
-import com.numpyninja.lms.entity.Batch;
-import com.numpyninja.lms.entity.Class;
-import com.numpyninja.lms.entity.Program;
-import com.numpyninja.lms.entity.User;
-import com.numpyninja.lms.exception.ResourceNotFoundException;
-import com.numpyninja.lms.mappers.AssignmentMapper;
-import com.numpyninja.lms.mappers.AttendanceMapper;
-import com.numpyninja.lms.mappers.ClassScheduleMapper;
-import com.numpyninja.lms.repository.AssignmentRepository;
-import com.numpyninja.lms.repository.AttendanceRepository;
-import com.numpyninja.lms.repository.ClassRepository;
-import com.numpyninja.lms.repository.ProgBatchRepository;
-import com.numpyninja.lms.repository.UserRepository;
-
-import lombok.SneakyThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.*;
 
 
 
@@ -137,8 +97,8 @@ class AttendanceServicesTest {
                 "Selenium", user, "Selenium Class", "OK",
                 "c:/ClassNotes",
                 "c:/Recordings", timestamp, timestamp);
-		 mockAttendance = new Attendance(7L, class2, user, "Present", timestamp, timestamp);
-		 mockAttendanceDto = new AttendanceDto (7L,7L,"U03","Present", timestamp, timestamp);
+		 mockAttendance = new Attendance(7L, class2, user, "Present", timestamp, timestamp, java.time.LocalDate.now());
+		 mockAttendanceDto = new AttendanceDto (7L,7L,"U03","Present", timestamp, timestamp, java.time.LocalDate.now());
 		return mockAttendance;		
 	}
 	

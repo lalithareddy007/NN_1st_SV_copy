@@ -1,9 +1,12 @@
 package com.numpyninja.lms.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.longThat;
-import static org.mockito.ArgumentMatchers.nullable;
+import com.numpyninja.lms.entity.Class;
+import com.numpyninja.lms.entity.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -12,20 +15,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import com.numpyninja.lms.entity.Assignment;
-import com.numpyninja.lms.entity.Attendance;
-import com.numpyninja.lms.entity.Batch;
-import com.numpyninja.lms.entity.Class;
-import com.numpyninja.lms.entity.Program;
-import com.numpyninja.lms.entity.User;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -63,7 +54,7 @@ class AttendanceRepositoryTest {
                 "Selenium", user, "Selenium Class", "OK",
                 "c:/ClassNotes",
                 "c:/Recordings", timestamp, timestamp); 
-		Attendance attendance = new Attendance(6L, class1, user, "Present", timestamp, timestamp);
+		Attendance attendance = new Attendance(6L, class1, user, "Present", timestamp, timestamp, java.time.LocalDate.now());
 		return attendance;
 	}
 	

@@ -1,20 +1,14 @@
 package com.numpyninja.lms.entity;
 
-import java.sql.Timestamp;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import java.sql.Timestamp;
+
 @Entity
 @Getter
 @Setter
@@ -46,6 +40,10 @@ public class Attendance {
 	
 	@Column(name="last_mod_time")
 	private Timestamp lastModTime;
+
+	@Column(name="attendence_date")
+	private java.time.LocalDate attendanceDate;
+
 	
 }
 
