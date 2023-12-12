@@ -282,8 +282,8 @@ class ClassControllerTest extends AbstractTestController {
         @WithMockStudent
         void testGetAllClassRecordings() throws Exception {
             //given
-            ClassRecordingDTO recording1 = new ClassRecordingDTO(1L, "/Users/akshatakanaje/Downloads/Jira-Github 2.mp4");
-            ClassRecordingDTO recording2 = new ClassRecordingDTO(2L, "/Users/akshatakanaje/Downloads/video1963980455.mp4");
+            ClassRecordingDTO recording1 = new ClassRecordingDTO(1L, "c:/RecordingPath");
+            ClassRecordingDTO recording2 = new ClassRecordingDTO(2L, "c:/RecordingPath");
             List<ClassRecordingDTO> recordings = Arrays.asList(recording1, recording2);
             given(classService.getAllClassRecordings()).willReturn( recordings);
 
