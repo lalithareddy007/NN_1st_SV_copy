@@ -122,7 +122,7 @@ class UserServicesTest {
 
 
         Date utilDate = new Date();
-        mockUser = new User("U02", "Abdul", "Kalam", " ", 2222222222L, "India", "IST", "www.linkedin.com/Kalam1234",
+        mockUser = new User("U09", "Abdul", "Kalam", " ", 2222222222L, "India", "IST", "www.linkedin.com/Kalam1234",
                 "MCA", "MBA", "Indian scientist", "H4", new Timestamp(utilDate.getTime()),
                 new Timestamp(utilDate.getTime()));
 
@@ -348,20 +348,18 @@ class UserServicesTest {
     @Test
         //@Order(4)
     void testDeleteUser() {
-        UserLogin mockUserLogin = new UserLogin("U02","abdul.kalam@gmail.com","sket","ACTIVE",
+        UserLogin mockUserLogin = new UserLogin("U09","abdul.kalam@gmail.com","sket","ACTIVE",
                         Timestamp.valueOf(LocalDateTime.now()),Timestamp.valueOf(LocalDateTime.now()),mockUser);
         //given
         given(userRepo.existsById(mockUser.getUserId())).willReturn(true);
         given(userLoginRepository.findById(mockUser.getUserId())).willReturn(Optional.of(mockUserLogin));
-        willDoNothing().given(userRepo).deleteById(mockUser.getUserId());
 
         //when
         userService.deleteUser(mockUser.getUserId());
 
         //then
-        verify(userRepo, times(1)).deleteById(mockUser.getUserId());
-        verify(userRepo).existsById(mockUser.getUserId());
-        verify(userRepo).deleteById(mockUser.getUserId());
+        verify(userLoginRepository).findById(mockUser.getUserId());
+        assertEquals("Inactive", mockUserLogin.getLoginStatus());
 
     }
 
