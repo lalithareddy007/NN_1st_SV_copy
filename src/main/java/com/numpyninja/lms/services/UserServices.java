@@ -861,7 +861,7 @@ public class UserServices implements UserDetailsService {
         final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl)
                 .path("/reset-password")
                 .queryParam("accAct", "yes")
-                .queryParam("token", token).toUriString();
+                .queryParam("token", token).queryParam("email",loginEmail).toUriString();
 
         return url;
     }
