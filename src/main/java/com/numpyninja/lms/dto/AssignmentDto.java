@@ -32,7 +32,7 @@ public class AssignmentDto {
 
 	@NotEmpty(message = "Assignment Description is mandatory")
 	@Pattern(regexp=Constants.REGEX_DESC_ALPHA_NUMERIC_SPCL, message= "assignmentDescription " + Constants.MSG_DESC_ALPHA_NUMERIC_SPCL)
-	@Size(min = 4, max = 25, message = "assignmentName must contain minimum of 4 and maximum of 25 characters")
+	@Size(min = 4, max = 25, message = "Assignment Description must contain minimum of 4 and maximum of 25 characters")
 	private String assignmentDescription;
 
 	private String comments;
