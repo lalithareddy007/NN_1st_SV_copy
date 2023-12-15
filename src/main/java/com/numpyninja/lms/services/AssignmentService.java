@@ -5,24 +5,24 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.numpyninja.lms.entity.UserRoleMap;
-import com.numpyninja.lms.repository.UserRepository;
-import com.numpyninja.lms.repository.UserRoleMapRepository;
+import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.util.AssignmentCreatedUpdatedEvent;
+import com.numpyninja.lms.util.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.numpyninja.lms.dto.AssignmentDto;
-import com.numpyninja.lms.entity.Assignment;
-import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentMapper;
-import com.numpyninja.lms.repository.AssignmentRepository;
-import com.numpyninja.lms.repository.ProgBatchRepository;
 import org.springframework.util.StringUtils;
 
 @Service
 public class AssignmentService {
+	@Autowired
+	private ApplicationEventPublisher eventPublisher;
 
 	@Autowired
 	private AssignmentRepository assignmentRepository;
@@ -38,6 +38,9 @@ public class AssignmentService {
 
 	@Autowired
 	private AssignmentMapper assignmentMapper;
+
+	@Autowired
+	NotificationService notificationService;
 
 	//create an assignment 
 	public AssignmentDto createAssignment(AssignmentDto assignmentDto) {
@@ -63,8 +66,15 @@ public class AssignmentService {
 		assignment.setCreationTime(timestamp);
 		assignment.setLastModTime(timestamp);
 		Assignment newAssignment = this.assignmentRepository.save(assignment);
+
+		//When a new assignment is created, an AssignmentCreatedEvent is triggered and published using Spring's ApplicationEventPublisher
+		AssignmentCreatedUpdatedEvent assignmentCreatedEvent = new AssignmentCreatedUpdatedEvent(newAssignment);
+		eventPublisher.publishEvent(assignmentCreatedEvent);
+		notificationService.handleAssignmentCreatedUpdatedEvent(assignmentCreatedEvent);
+
 		return assignmentMapper.toAssignmentDto(newAssignment);
 	}
+
 
 	//update an assignment
 	public AssignmentDto updateAssignment(AssignmentDto assignmentDto, Long assignmentId) {
@@ -121,6 +131,12 @@ public class AssignmentService {
 
 		Assignment updatedAssignment = this.assignmentRepository.save(updateAssignment);
 		AssignmentDto updatedAssignmentDto = assignmentMapper.toAssignmentDto(updatedAssignment);
+
+		//Notify users in batch
+		AssignmentCreatedUpdatedEvent assignmentUpdatedEvent = new AssignmentCreatedUpdatedEvent(updatedAssignment);
+		eventPublisher.publishEvent(assignmentUpdatedEvent);
+		notificationService.handleAssignmentCreatedUpdatedEvent(assignmentUpdatedEvent);
+
 		return updatedAssignmentDto;
 	}
 

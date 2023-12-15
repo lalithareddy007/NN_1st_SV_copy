@@ -4,13 +4,15 @@ import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.AssignmentSubmit;
 import com.numpyninja.lms.entity.Batch;
-import com.numpyninja.lms.entity.Class;
-import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
 import com.numpyninja.lms.repository.*;
+import com.numpyninja.lms.util.AssignmentGradedEvent;
+import com.numpyninja.lms.util.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -23,6 +25,11 @@ import java.util.*;
 
 @Service
 public class AssignmentSubmitService {
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    NotificationService notificationService;
+
 
     public AssignmentSubmitRepository assignmentSubmitRepository;
 
@@ -295,6 +302,10 @@ public class AssignmentSubmitService {
         savedAssignmentSubmit.setGradedDateTime(presentDateTime);
 
         AssignmentSubmit updatedAssignmentSubmit = assignmentSubmitRepository.save(savedAssignmentSubmit);
+
+        AssignmentGradedEvent assignmentGradedEvent = new AssignmentGradedEvent(savedAssignmentSubmit);
+        eventPublisher.publishEvent(assignmentGradedEvent);
+        notificationService.handleAssignmentGradeEvent(assignmentGradedEvent);
 
         AssignmentSubmitDTO gradedSubmissionDTO = assignmentSubmitMapper.toAssignmentSubmitDTO(updatedAssignmentSubmit);
         return gradedSubmissionDTO;
