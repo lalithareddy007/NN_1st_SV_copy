@@ -3,9 +3,7 @@ package com.numpyninja.lms.services;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
-import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.exception.InvalidDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -95,7 +93,14 @@ public class ProgBatchServices {
     
     //Update new Batch                    
     public BatchDTO updateBatch(BatchDTO batchDTO, Integer batchId) {
-    	Batch exisBatch = progBatchRepository.findById(batchId).orElseThrow(()-> new ResourceNotFoundException("Batch", "Id", batchId));
+
+        if(progBatchRepository.existsByBatchNameAndProgramProgramId(batchDTO.getBatchName(),batchDTO.getProgramId())){
+            String message = String.format("Batch with the name=%s and programId=%d already exists",
+                    batchDTO.getBatchName(), batchDTO.getProgramId());
+            throw new DuplicateResourceFoundException(message);
+        }
+
+        Batch exisBatch = progBatchRepository.findById(batchId).orElseThrow(()-> new ResourceNotFoundException("Batch", "Id", batchId));
     	Batch batchDetailToUpdt = batchMapper.toBatch(batchDTO );
     	Long programId = batchDTO.getProgramId();
     	Program program = programRepository.findById( programId ).orElseThrow(()-> new ResourceNotFoundException("Program", "Id", programId));
