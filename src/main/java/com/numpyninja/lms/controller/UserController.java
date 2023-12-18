@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
+import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.*;
 
 import com.numpyninja.lms.entity.Role;
@@ -138,11 +139,18 @@ public class UserController {
 	@PutMapping("/users/roleProgramBatchStatus/{userId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@ApiOperation("Update User Role Program Batch status")
-	public ResponseEntity<String> assignUpdateUserRoleProgramBatchStatus(@PathVariable String userId,
+	public ResponseEntity<ApiResponse> assignUpdateUserRoleProgramBatchStatus(@PathVariable String userId,
 																		 @RequestBody UserRoleProgramBatchDto userRoleProgramBatchDto) {
-		String response = userServices.assignUpdateUserRoleProgramBatchStatus(userRoleProgramBatchDto, userId);
-		return ResponseEntity.status(HttpStatus.OK).body(response);
+		String response= userServices.assignUpdateUserRoleProgramBatchStatus(userRoleProgramBatchDto, userId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse(response, true), HttpStatus.OK);
 	}
+	/***
+	public ResponseEntity<String> assignUpdateUserRoleProgramBatchStatus(@PathVariable String userId,
+			 @RequestBody UserRoleProgramBatchDto userRoleProgramBatchDto) {
+		String response = userServices.assignUpdateUserRoleProgramBatchStatus(userRoleProgramBatchDto, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+	**/
 
 
 	//USER - GET USER BY PROGRAM-Batch
