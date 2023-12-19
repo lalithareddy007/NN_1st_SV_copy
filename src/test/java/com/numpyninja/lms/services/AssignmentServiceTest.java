@@ -15,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.numpyninja.lms.entity.*;
 import com.numpyninja.lms.repository.UserRepository;
 import com.numpyninja.lms.repository.UserRoleMapRepository;
+import com.numpyninja.lms.util.AssignmentCreatedUpdatedEvent;
+import com.numpyninja.lms.util.NotificationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +28,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.any;
 import static org.mockito.BDDMockito.willDoNothing;
-
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -39,9 +39,16 @@ import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.AssignmentMapper;
 import com.numpyninja.lms.repository.AssignmentRepository;
 import com.numpyninja.lms.repository.ProgBatchRepository;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class AssignmentServiceTest {
+	@Mock
+	AssignmentCreatedUpdatedEvent assignmentCreatedUpdatedEvent;
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
+	@Mock
+	NotificationService notificationService;
 
 	@Mock
 	private AssignmentRepository assignmentRepository;
@@ -146,6 +153,10 @@ class AssignmentServiceTest {
 		given(userRepository.existsById(mockAssignmentDto.getGraderId())).willReturn(true);
 		given(assignmentMapper.toAssignment(mockAssignmentDto)).willReturn(mockAssignment);
 		given(assignmentRepository.save(mockAssignment)).willReturn(mockAssignment);
+		AssignmentCreatedUpdatedEvent assignmentCreatedEvent = new AssignmentCreatedUpdatedEvent(mockAssignment);
+		eventPublisher.publishEvent(assignmentCreatedEvent);
+		notificationService.handleAssignmentCreatedUpdatedEvent(assignmentCreatedEvent);
+
 		given(assignmentMapper.toAssignmentDto(mockAssignment)).willReturn(mockAssignmentDto);
 
 		//when
