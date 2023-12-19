@@ -6,6 +6,7 @@ import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.AssignmentDto;
 import com.numpyninja.lms.dto.JwtResponseDto;
 import com.numpyninja.lms.dto.LoginDto;
+import com.numpyninja.lms.security.WebSecurityConfig;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureDataJpa
 @WebMvcTest(AssignmentController.class)
 @ComponentScan(basePackages = "com.numpyninja.lms.*")
+@ContextConfiguration(classes = {WebSecurityConfig.class})
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 public class AssignmentControllerIT {
 
@@ -45,7 +49,9 @@ public class AssignmentControllerIT {
 
     @BeforeEach
     public void setup() throws Exception {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
 
         // fetch a token
         final LoginDto loginDto = new LoginDto("John.Matthew@gmail.com", "John123");
