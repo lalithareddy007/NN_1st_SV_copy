@@ -17,4 +17,5 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
 
 	Optional<Program> findProgramByProgramIdAndProgramStatusEqualsIgnoreCase(Long programId, String programStatus);
 
+    boolean existsByProgramName(String programName);
 }
