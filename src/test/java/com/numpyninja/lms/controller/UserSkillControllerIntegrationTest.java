@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numpyninja.lms.dto.*;
 import com.numpyninja.lms.repository.UserRepository;
 import com.numpyninja.lms.repository.UserSkillRepository;
+import com.numpyninja.lms.security.WebSecurityConfig;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureDataJpa
 @WebMvcTest(UserSkillController.class)
 @ComponentScan(basePackages = "com.numpyninja.lms.*")
+@ContextConfiguration(classes = {WebSecurityConfig.class})
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 public class UserSkillControllerIntegrationTest {
 
@@ -60,7 +64,9 @@ public class UserSkillControllerIntegrationTest {
 
     @BeforeEach
     public void beforeSetup() throws Exception {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
 
         // fetch a token
         final LoginDto loginDto = new LoginDto("John.Matthew@gmail.com", "John123");
