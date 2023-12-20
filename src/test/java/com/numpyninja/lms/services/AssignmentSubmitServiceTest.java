@@ -76,9 +76,9 @@ public class AssignmentSubmitServiceTest {
     @BeforeEach
     private void setMockAssignmentSubmitDTO(){
 
-        Date dueDate = Timestamp.valueOf("2023-02-02 09:30:00");
+        Date dueDate = Timestamp.valueOf("2024-12-02 09:30:00");
 
-        Timestamp timestamp1 = Timestamp.valueOf("2023-01-02 09:30:00");
+        Timestamp timestamp1 = Timestamp.valueOf("2024-12-02 09:30:00");
         Timestamp timestamp2 = Timestamp.valueOf(LocalDateTime.now());
         Timestamp timestamp3 = Timestamp.valueOf(LocalDateTime.now().plusDays(3));
 
@@ -347,13 +347,16 @@ public class AssignmentSubmitServiceTest {
     public void testGradeSubmissions() {
         Long submissionId = 8L;
         String gradedBy = "U03";
+        Long AssignmentId = 1L;
 
         given(mockAssignmentSubmitRepository.findById(submissionId)).willReturn(Optional.of(mockAssignmentSubmit4));
         given(mockAssignmentSubmitRepository.save(mockAssignmentSubmit4)).willReturn(mockAssignmentSubmit4);
         given(assignmentSubmitMapper.toAssignmentSubmitDTO(mockAssignmentSubmit4)).willReturn(mockAssignmentSubmitDTO4);
+        given(mockAssignmentRepository.findById(AssignmentId)).willReturn(Optional.of(mockAssignment));
+
         when(mockUserRepository.existsById(gradedBy)).thenReturn(true);
         when(mockUserRoleMapRepository.existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
-                gradedBy,"R03","Active")).thenReturn(true);
+                gradedBy,"R03","Active")).thenReturn(false);
 
         mockAssignmentSubmit4.setSubComments("second Submission");
         mockAssignmentSubmit4.setGrade(80);
@@ -408,13 +411,12 @@ public class AssignmentSubmitServiceTest {
         when(mockUserRepository.existsById(mockAssignmentSubmit4.getGradedBy())).thenReturn(true);
         lenient().when(mockUserRoleMapRepository.
                 existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(
-                        gradedBy,"R03","Active")).thenReturn(false);
+                        gradedBy,"R03","Active")).thenReturn(true);
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class,
                 ()->mockAssignmentSubmitService.gradeAssignmentSubmission(mockAssignmentSubmitDTO4,submissionId));
 
         assertNotNull(e.getMessage(),message);
         verify(mockAssignmentSubmitRepository, never()).save(any(AssignmentSubmit.class));
         verify(assignmentSubmitMapper,never()).toAssignmentSubmitDTO(any(AssignmentSubmit.class));
-
     }
 }
