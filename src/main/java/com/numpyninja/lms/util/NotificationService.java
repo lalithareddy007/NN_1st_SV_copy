@@ -155,8 +155,7 @@ public class NotificationService {
 	public void handleGCalenderEventCteatedEvent(GCalenderEventCtreatedEvent newGCalendarEventCreatedEvent) {
 		
 		GCalendarEventRequestDTO GCalendarRequestDto = newGCalendarEventCreatedEvent.getNewGCalenderEvent();
-		
-	        // Retrieve usersLoginMail in the batch for this assignment and send notifications
+		    
 		List<EventAttendeesDTO> attendeesList = GCalendarRequestDto.getAttendees();
 		
 		for(EventAttendeesDTO attendee : attendeesList) {
