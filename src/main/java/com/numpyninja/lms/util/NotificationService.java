@@ -1,6 +1,8 @@
 package com.numpyninja.lms.util;
 
 import com.numpyninja.lms.config.EmailConfig;
+import com.numpyninja.lms.dto.EventAttendeesDTO;
+import com.numpyninja.lms.dto.GCalendarEventRequestDTO;
 import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.AssignmentSubmit;
 import com.numpyninja.lms.entity.UserLogin;
@@ -118,6 +120,51 @@ public class NotificationService {
 
 
     }
+    
+    // Method to send email notification about the creation of new event in Google Calendar
+    public void sendEventCreatedOnGCalendarNotification(String userEmail, GCalendarEventRequestDTO GCalendarRequestDto) {
+
+        // Customize your email content
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(userEmail);
+        mailMessage.setSubject("New Event Created on Google Calendar");
+        String emailContent = generateEmailContentForGCalendar(userEmail, GCalendarRequestDto);
+        mailMessage.setText(emailContent);
+
+        try {
+            emailConfig.javaMailSender().send(mailMessage); // Send the email
+            log.info("Notification sent to: " + userEmail);
+            log.info("Event details: " + GCalendarRequestDto);
+        } catch (MailException e) {
+           log.error(" Failed to send notification to:"  + userEmail + ". Reason:  " + e.getMessage());
+        }
+    }
+    private String generateEmailContentForGCalendar(String userEmail, GCalendarEventRequestDTO GCalendarRequestDto) {
+        // Customize the email content with Google calendar Event details
+        return "Dear " + userEmail + ", "
+                + "A new Google Calendar Event named '" + GCalendarRequestDto.getEventDescription() + "' has been created. "
+                + "When : "+ GCalendarRequestDto.getEventStartDateTime()
+                + " Where : "+ GCalendarRequestDto.getLocation()
+                + " Zoom Link : " + GCalendarRequestDto.getAttachments().get(0).getFileUrl()
+                + "  Check your dashboard for more details. "
+                + " Regards, "
+                + "LMS Team";
+    }
+    
+    @EventListener
+	public void handleGCalenderEventCteatedEvent(GCalenderEventCtreatedEvent newGCalendarEventCreatedEvent) {
+		
+		GCalendarEventRequestDTO GCalendarRequestDto = newGCalendarEventCreatedEvent.getNewGCalenderEvent();
+		
+	        // Retrieve usersLoginMail in the batch for this assignment and send notifications
+		List<EventAttendeesDTO> attendeesList = GCalendarRequestDto.getAttendees();
+		
+		for(EventAttendeesDTO attendee : attendeesList) {
+			String attendeeEmail = attendee.getEmail();
+			log.info("UserLoginEmail:" + attendeeEmail);
+			sendEventCreatedOnGCalendarNotification(attendeeEmail , GCalendarRequestDto);
+		}
+	}
 
 
 }
