@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -38,9 +39,17 @@ import com.numpyninja.lms.exception.GCalendarEventNotFoundException;
 import com.numpyninja.lms.exception.GCalendarIOException;
 import com.numpyninja.lms.exception.GCalendarSecurityException;
 import com.numpyninja.lms.mappers.GCalendarEventsMapper;
+import com.numpyninja.lms.util.GCalenderEventCtreatedEvent;
+import com.numpyninja.lms.util.NotificationService;
 
 @Service
 public class GoogleCalendarService {
+	
+	@Autowired
+	private ApplicationEventPublisher eventPublisher;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	@Value("${spring.application.name}")
 	private String APPLICATION_NAME;
@@ -145,6 +154,12 @@ public class GoogleCalendarService {
 			endDate.setDateTime(new DateTime(calendarEventRequestDTO.getEventEndDateTime()));
 			// endDate.setTimeZone(TimeZone.getDefault().toString());
 			event.setEnd(endDate);
+			
+			//When a new Google calendar is created, an GCalenderEventCreatedEvent is triggered and published using Spring's ApplicationEventPublisher
+			GCalenderEventCtreatedEvent newGCalendarEventCreatedEvent = new GCalenderEventCtreatedEvent(calendarEventRequestDTO);
+			eventPublisher.publishEvent(newGCalendarEventCreatedEvent);
+			notificationService.handleGCalenderEventCteatedEvent(newGCalendarEventCreatedEvent);
+			
 
 			Event eventInsertResponse = events.insert(CALENDAR_ID, event).execute();
 			logger.debug(eventInsertResponse.toString());
