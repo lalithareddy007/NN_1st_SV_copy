@@ -63,31 +63,38 @@ public class GoogleCalendarService {
 
 	//Load credentials from file to GoogleCredentials Object
 	private GoogleCredentials getServiceCredentials() throws FileNotFoundException, IOException {
+		logger.debug("Entering getServiceCredentials()");
 		GoogleCredentials credential;
+		logger.debug("Fetching credentials...");
 		try {
 			InputStream credentialsStream = keyService.getCredentialsAsStream();
 			credential = GoogleCredentials
 					.fromStream(credentialsStream)
 					.createScoped(Collections.singletonList(CalendarScopes.CALENDAR));
 			credentialsStream.close();
+			logger.debug("Credentials fetched successfully.");
 		} catch (Exception e) {
 			logger.error("Error: ", e);
 			throw new GCalendarIOException(e.getLocalizedMessage());
 		}
 		// .createDelegated("numpyninja01@gmail.com");
 		credential.refreshIfExpired();
+		logger.debug("Exiting getServiceCredentials()");
 		return credential;
 	}
 	
 	//Initialize google calendar service
 	private Calendar getCalendarService( GoogleCredentials googleCredential) throws FileNotFoundException, IOException, GeneralSecurityException 
 	{
+		logger.debug("Entering getCalendarService()");
+		//Uses HttpCredentialsAdapter to convert GoogleCredentials to an HttpRequestInitializer.
 		HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(googleCredential);
 		HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 		
 		Calendar calendar = new Calendar.Builder(httpTransport, JSON_FACTORY, requestInitializer)
 				.setApplicationName(APPLICATION_NAME).build();
+		logger.debug("Exiting getCalendarService()");
 		return calendar;
 	}
 

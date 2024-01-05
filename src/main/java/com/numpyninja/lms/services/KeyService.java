@@ -18,6 +18,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.numpyninja.lms.exception.GCalendarIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class KeyService {
 	//This is not used all the time but, incase key needs to be re-written to DB, it should be done through this
 	public void storeKey() throws IOException {
 		String inputFile = "service_account/secret";
+		logger.info("Fetching credentials from file: {}", inputFile);
 		BufferedInputStream fis = (BufferedInputStream) ClassLoader.getSystemResourceAsStream(inputFile);
 		byte[] content = fis.readAllBytes();
 		com.numpyninja.lms.entity.Key key = new com.numpyninja.lms.entity.Key();
@@ -81,9 +83,16 @@ public class KeyService {
 	public InputStream getCredentialsAsStream() throws Exception {
 		try {
 			return doCryptoToStream(Cipher.DECRYPT_MODE, getKey());
-		} catch (Exception e) {
-			logger.error("Error:",e);
-			throw new Exception("Failed to get credentils");
+		}
+//		catch (Exception e) {
+//			logger.error("Error:",e);
+//			throw new Exception("Failed to get credentils");
+//		}
+		catch (Exception e) {
+			logger.error("Error occurred while getting credentials:", e);
+			// Log other relevant details like method name, input parameters, etc.
+			logger.info("method name: getCredentialsAsStream");
+			throw new GCalendarIOException("Failed to get credentials: " + e.getMessage());
 		}
 	}
 

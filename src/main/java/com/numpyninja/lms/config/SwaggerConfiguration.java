@@ -3,6 +3,9 @@ package com.numpyninja.lms.config;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,7 @@ import java.util.Collections;
 @EnableSwagger2
 @Configuration
 public class SwaggerConfiguration {
+	private static final Logger logger = LoggerFactory.getLogger(SwaggerConfiguration.class);
 	public static final String AUTHORIZATION_HEADER = "Authorization";
 
 	private ApiKey apiKeys() {
@@ -48,6 +52,7 @@ public class SwaggerConfiguration {
 
 	@Bean
 	public Docket api() {
+		logger.info("Configuring Swagger API documentation");
 		return new Docket(DocumentationType.SWAGGER_2)
 				//.apiInfo(apiInfo())
 				//.securityContexts(Arrays.asList(securityContext()))
@@ -67,6 +72,7 @@ public class SwaggerConfiguration {
 
 	
 	 private ApiInfo apiInfo(){
+		 logger.info("Building API information for Swagger");
 	        return new ApiInfo(
 	                "Learning Management System Phase 2",
 	                "LMS REST API Documentation",
@@ -80,6 +86,7 @@ public class SwaggerConfiguration {
 	    }
 
 	protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+		logger.info("Adding resource handlers for Swagger UI");
 		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
 		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
