@@ -48,6 +48,7 @@ public class KeyService {
 
 		}
 		SecretKey secret = new SecretKeySpec(encodedKey.get().getKey(), "AES");
+		logger.info("secret: "+ secret);
 		return secret;
 	}
 
@@ -82,6 +83,7 @@ public class KeyService {
 	}
 	public InputStream getCredentialsAsStream() throws Exception {
 		try {
+			System.out.println("In getCredentialsAsStream method ");
 			return doCryptoToStream(Cipher.DECRYPT_MODE, getKey());
 		}
 //		catch (Exception e) {
@@ -99,7 +101,7 @@ public class KeyService {
 	// Return the decrypted file as Stream
 		private InputStream doCryptoToStream(int cipherMode, Key key) throws CryptoException {
 			try {
-				
+				logger.info("In doCryptoToStream method ");
 				Cipher cipher = Cipher.getInstance("AES");
 				cipher.init(cipherMode, key);
 
