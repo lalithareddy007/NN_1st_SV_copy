@@ -860,7 +860,7 @@ public class UserServices implements UserDetailsService {
         String token = jwtUtils.generateEmailUrlToken(loginEmail);
         final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl)
                 .path("/reset-password")
-                .queryParam("accAct", "yes")
+                .queryParam("accAct", "yes").queryParam("email", loginEmail)
                 .queryParam("token", token).toUriString();
 
         return url;
@@ -938,9 +938,16 @@ public class UserServices implements UserDetailsService {
         return roleRepository.findAll();
     }
 
+    public List<User> getUserWithActiveStatus( ) {
+        List<UserRoleMap> userLogin1=userRoleMapRepository.findByUserRoleStatus("Active");
+        List<String> userId = userLogin1.stream().map(UserRoleMap::getUserId).collect(Collectors.toList());
+        System.out.println(userId);
+        return userRepository.findByUserId(userId);
+    }
+
 	/*
 	 * public UserDto getAllUsersById(String Id) throws ResourceNotFoundException {
-	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty())
+	 * Optional<User> userById = userRepository.findById(Id); if(userById.isEmpty()
 	 * { throw new ResourceNotFoundException("User Id " + Id +" not found"); } else
 	 * { UserDto userDto = userMapper.userDto(userById.get()); return userDto; } }
 
