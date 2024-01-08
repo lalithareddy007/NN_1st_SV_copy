@@ -860,7 +860,7 @@ public class UserServices implements UserDetailsService {
         String token = jwtUtils.generateEmailUrlToken(loginEmail);
         final String url = UriComponentsBuilder.fromHttpUrl(frontendUrl)
                 .path("/reset-password")
-                .queryParam("accAct", "yes")
+                .queryParam("accAct", "yes").queryParam("email", loginEmail)
                 .queryParam("token", token).toUriString();
 
         return url;
