@@ -41,6 +41,7 @@ public class KeyService {
 	private Logger logger = LoggerFactory.getLogger(KeyService.class);
 
 	private Key getKey() throws Exception {
+		storeKey();
 		Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
 		if (!encodedKey.isPresent()) {
 			throw new Exception("Key is not present");
