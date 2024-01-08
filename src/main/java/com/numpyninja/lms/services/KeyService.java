@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -40,7 +41,7 @@ public class KeyService {
 	
 	private Logger logger = LoggerFactory.getLogger(KeyService.class);
 
-	private Key getKey() throws Exception {
+	/*private Key getKey() throws Exception {
 		storeKey();
 		Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
 		if (!encodedKey.isPresent()) {
@@ -49,6 +50,25 @@ public class KeyService {
 		}
 		SecretKey secret = new SecretKeySpec(encodedKey.get().getKey(), "AES");
 		return secret;
+	}*/
+	private Key getKey() throws Exception {
+		String secretFromEnv = System.getenv("KEY");
+		if (secretFromEnv != null && !secretFromEnv.isEmpty()) {
+			byte[] secretBytes = secretFromEnv.getBytes(StandardCharsets.UTF_8); // Convert to byte array
+			//takes the byte array secretBytes, assumed to contain valid key material for AES encryption,
+			// and creates a SecretKey object ready to be used for AES encryption or decryption operations
+			SecretKey secret = new SecretKeySpec(secretBytes, "AES");//Advanced Encryption Standard
+			logger.info("Using secret from environmental variable.");
+			return secret;
+		} else {
+			Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
+			if (encodedKey.isEmpty()) {
+				throw new Exception("Key is not present in the database.");
+			}
+			SecretKey secret = new SecretKeySpec(encodedKey.get().getKey(), "AES");
+			logger.info("Using secret from the database.");
+			return secret;
+		}
 	}
 
 	//This code should be used for storing the key in the database
