@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -42,14 +43,23 @@ public class KeyService {
 	private Logger logger = LoggerFactory.getLogger(KeyService.class);
 
 	private Key getKey() throws Exception {
-		Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
-		if (!encodedKey.isPresent()) {
-			throw new Exception("Key is not present");
-
+		String secretFromEnv = System.getenv("GOOGLE_CALENDAR_KEY");
+		if (secretFromEnv != null && !secretFromEnv.isEmpty()) {
+			byte[] secretBytes = secretFromEnv.getBytes(StandardCharsets.UTF_8); // Convert to byte array
+			//takes the byte array secretBytes, assumed to contain valid key material for AES encryption,
+			// and creates a SecretKey object ready to be used for AES encryption or decryption operations
+			SecretKey secret = new SecretKeySpec(secretBytes, "AES");//Advanced Encryption Standard
+			logger.info("Using secret from environmental variable.");
+			return secret;
+		} else {
+			Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
+			if (encodedKey.isEmpty()) {
+				throw new Exception("Key is not present in the database.");
+			}
+			SecretKey secret = new SecretKeySpec(encodedKey.get().getKey(), "AES");
+			logger.info("Using secret from the database.");
+			return secret;
 		}
-		SecretKey secret = new SecretKeySpec(encodedKey.get().getKey(), "AES");
-		logger.info("secret: "+ secret);
-		return secret;
 	}
 
 	//This code should be used for storing the key in the database
@@ -82,14 +92,16 @@ public class KeyService {
 		}
 	}
 	public InputStream getCredentialsAsStream() throws Exception {
+			String credentialsFromEnv = System.getenv("GOOGLE_CREDENTIALS");
 		try {
-			System.out.println("In getCredentialsAsStream method ");
-			return doCryptoToStream(Cipher.DECRYPT_MODE, getKey());
+			if (credentialsFromEnv != null && !credentialsFromEnv.isEmpty()) {
+				byte[] credentialBytes = credentialsFromEnv.getBytes(StandardCharsets.UTF_8);
+				return new ByteArrayInputStream(credentialBytes);
+			} else {
+
+				return doCryptoToStream(Cipher.DECRYPT_MODE, getKey());
+			}
 		}
-//		catch (Exception e) {
-//			logger.error("Error:",e);
-//			throw new Exception("Failed to get credentils");
-//		}
 		catch (Exception e) {
 			logger.error("Error occurred while getting credentials:", e);
 			// Log other relevant details like method name, input parameters, etc.
