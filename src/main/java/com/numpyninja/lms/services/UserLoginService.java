@@ -270,8 +270,8 @@ public class UserLoginService {
 	}
 
 	public String createEmailUrlConfirmPwdWithToken(String loginEmail, String token) {
-		final String url = UriComponentsBuilder.fromHttpUrl(getFrontendURL()).path("/reset-password")
-				.queryParam("token", token).queryParam("email",loginEmail).toUriString();
+		final String url = UriComponentsBuilder.fromHttpUrl(getFrontendURL()).path("/reset-password").queryParam("email",loginEmail)
+				.queryParam("token", token).toUriString();
 
 		return url;
 	}
