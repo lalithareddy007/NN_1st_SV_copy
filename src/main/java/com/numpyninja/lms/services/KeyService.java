@@ -61,6 +61,7 @@ public class KeyService {
 			logger.info("Using secret from environmental variable.");
 			return secret;
 		} else {
+			storeKey();
 			Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
 			if (encodedKey.isEmpty()) {
 				throw new Exception("Key is not present in the database.");
