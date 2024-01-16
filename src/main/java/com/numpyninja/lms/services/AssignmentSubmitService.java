@@ -362,6 +362,57 @@ public class AssignmentSubmitService {
         	throw new ResourceNotFoundException("Submissions for Program Id: "+programId+ " Not found");
         }
     }
+
+
+    public double getGradesMeanByBatchId(Integer batchId) {
+    	
+		List<Integer> gradeList = new ArrayList<>();			
+		
+		List<AssignmentSubmit> assignmentSubmits = assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchId);
+        if (assignmentSubmits.isEmpty()) {
+            throw new ResourceNotFoundException("Assignments with grades does not exist for Batch ID : "+batchId);
+        }
+        try {
+			for (AssignmentSubmit asgnmnt :  assignmentSubmits) {			
+				gradeList.add(asgnmnt.getGrade());
+			}	
+			if (gradeList.size()== 1) 
+				return gradeList.get(0);
+			else
+				return gradeList.stream().mapToDouble(Integer::doubleValue).average().orElse(0.0);
+		}catch(Exception e){
+			throw new ResourceNotFoundException("can't find mean of batch: "+batchId);
+		}
+    }
+
+	public double getGradesMedianByBatchId(Integer batchId) {
+		List<Integer> gradeList = new ArrayList<>();
+		
+		List<AssignmentSubmit> assignmentSubmits = assignmentSubmitRepository.findByAssignment_Batch_BatchId(batchId);
+       if (assignmentSubmits.isEmpty()) {
+           throw new ResourceNotFoundException("Assignments with grades does not exist for Batch ID : "+batchId);
+       }	
+       try {
+    	   for (AssignmentSubmit asgnmnt :  assignmentSubmits) {			
+   				gradeList.add(asgnmnt.getGrade());
+   		   }
+    	   if (gradeList.size()== 1) 
+				return gradeList.get(0);
+		   else{			
+				Collections.sort(gradeList);
+				int length = gradeList.size();
+				int middle = length/2;
+				if (length%2 == 1) { 
+			        return gradeList.get(middle);
+			    } else {
+			        return (gradeList.get(middle-1) + gradeList.get(middle)) / 2.0;
+			    }
+		   }
+       }catch (Exception e) {
+    	   throw new ResourceNotFoundException("can't find median of batch: "+batchId);
+       }
+	}
+
      	
 
 }

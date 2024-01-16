@@ -130,4 +130,21 @@ public class AssignmentSubmitController {
         return ResponseEntity.ok(gradesListByProgram);
     }
     
+    @GetMapping("/mean/{batchId}")
+    @ApiOperation("Get mean by batch Id")
+    public ResponseEntity<String> getGradesMeanByBatchId(@PathVariable Integer batchId) {
+       
+    	double gradesMeanByBatch = assignmentSubmitService.getGradesMeanByBatchId(batchId);
+        return ResponseEntity.ok("Mean of the batch "+ batchId +" : " + gradesMeanByBatch);
+    }
+  
+	@GetMapping("/median/{batchId}")
+	@ApiOperation("Get median by batch Id")
+	public ResponseEntity<String> getGradeMeanByBatchId(@PathVariable Integer batchId) {
+	     
+		Double gradesMedianByBatch = assignmentSubmitService.getGradesMedianByBatchId(batchId);
+		return ResponseEntity.ok("Median of the batch "+ batchId +" : " + gradesMedianByBatch);
+	}
+
+    
 }
