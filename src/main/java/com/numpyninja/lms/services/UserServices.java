@@ -693,6 +693,11 @@ public class UserServices implements UserDetailsService {
         Role existingUserRole = roleRepository.findById(roleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Role", "Id", roleId));
 
+        if(existingUserRole.getRoleId().equalsIgnoreCase("R01"))
+        {
+            throw new InvalidDataException("User with Role Admin cannot be assigned to a Program/Batch");
+        }
+
         boolean isPresentUserAndRole = userRoleMapRepository.
                 existsUserRoleMapByUser_UserIdAndRole_RoleIdAndUserRoleStatusEqualsIgnoreCase(userId, roleId,
                         "Active");
