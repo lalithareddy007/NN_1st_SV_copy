@@ -73,8 +73,14 @@ public class ProgBatchServices {
     	Long programId = batchDTO.getProgramId();
     	Batch newBatch = batchMapper.toBatch(batchDTO );
     	Program program = programRepository.findById( programId ).orElseThrow(()-> new ResourceNotFoundException("Program", "Id", programId));
-    	newBatch.setProgram(program);
-    	
+
+        if(program.getProgramStatus().equalsIgnoreCase("Inactive"))
+        {
+            throw new InvalidDataException("Batch cannot be created for a Program with Inactive status");
+        }
+        else {
+            newBatch.setProgram(program);
+        }
     	//check null values
     	boolean batchstatus = batchDTO.getBatchStatus().equalsIgnoreCase("null");
     	if (batchstatus)
