@@ -97,23 +97,23 @@ class ClassServiceTest {
         Program program = new Program((long) 7, "Django", "new Prog", "nonActive", timestamp, timestamp);
         Batch batchInClass = new Batch(3, "SDET 1", "SDET Batch 1", "Active", program, 5, timestamp, timestamp);
 
-        mockClass = new Class((long) 1, batchInClass, 1, classDate,
-                "Selenium", staffInClass, "Selenium Class", "OK",
+        mockClass = new Class((long) 1, batchInClass, 1, classDate,"Active",
+                "Selenium",staffInClass, "Selenium Class", "OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath", timestamp, timestamp);
 
         mockClassDto = new ClassDto((long) 1, 3, 1, classDate,
-                "Selenium", "U02", "Selenium Class", "OK",
+                "Selenium", "Active","U02", "Selenium Class" ,"OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath");
 
         mockClass2 = new Class((long) 2, batchInClass, 2, classDate,
-                "Selenium1", staffInClass, "Selenium Class1", "OK",
+                "Selenium1", "Active",staffInClass, "Selenium Class1", "OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath", timestamp, timestamp);
 
         mockClassDto2= new ClassDto((long) 2, 3, 2, classDate,
-                "Selenium1", "U02", "Selenium Class1", "OK",
+                "Selenium1","Active", "U02", "Selenium Class1", "OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath");
         

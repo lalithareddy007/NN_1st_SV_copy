@@ -25,6 +25,7 @@ private Integer classNo;
 @DateTimeFormat(pattern = "dd/MM/yyyy h:mm a")
 private Date classDate;
 private String classTopic;
+private String classStatus;
 private String classStaffId;
 private String classDescription;
 private String classComments;
