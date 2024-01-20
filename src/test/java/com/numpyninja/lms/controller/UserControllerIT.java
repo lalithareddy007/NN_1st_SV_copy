@@ -542,8 +542,9 @@ public class UserControllerIT {
     @Order(13)
     public void testAssignUpdateUserRoleProgramBatchStatus() throws Exception {
         final UserRoleProgramBatchDto userRoleProgramBatchDto = new UserRoleProgramBatchDto();
+        userId = "U02";
         userRoleProgramBatchDto.setUserId(userId);
-        userRoleProgramBatchDto.setRoleId("R03");
+        userRoleProgramBatchDto.setRoleId("R02");
         userRoleProgramBatchDto.setProgramId(1L);
 
         UserRoleProgramBatchSlimDto userRoleProgramBatchSlimDto = new UserRoleProgramBatchSlimDto();
@@ -553,13 +554,20 @@ public class UserControllerIT {
         userRoleProgramBatchDto.setUserRoleProgramBatches(Arrays.asList(userRoleProgramBatchSlimDto));
 
         String body = obj.writeValueAsString(userRoleProgramBatchDto);
-        final MvcResult mvcResult = mockMvc.perform(put("/lms/users/roleProgramBatchStatus/" + userId)
+        final MvcResult mvcResult = mockMvc.perform(put("/lms/users/roleProgramBatchStatus/{userId}" , userId)
                         .contextPath("/lms")
                         .header("Authorization", "Bearer " + token)
                         .contentType("application/json")
                         .content(body))
                 .andReturn();
-        assertEquals(200, mvcResult.getResponse().getStatus());
+        String responseBody = mvcResult.getResponse().getContentAsString();
+
+        ApiResponse apiResponse = obj.readValue(responseBody, ApiResponse.class);
+        String message = apiResponse.getMessage();
+
+        assertEquals(200,mvcResult.getResponse().getStatus());
+        assertEquals(true,apiResponse.isSuccess());
+        assertEquals("User "+userId+" has been successfully assigned to Program/Batch(es)",message);
     }
 
     @Test
