@@ -10,6 +10,7 @@ import com.numpyninja.lms.config.ApiResponse;
 import com.numpyninja.lms.dto.*;
 
 import com.numpyninja.lms.entity.Role;
+import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleMap;
 import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 
@@ -199,6 +200,12 @@ public class UserController {
 		return ResponseEntity.ok(usersCountByStatus);
 		
 	}
+	@GetMapping("/users/activeUsers")
+	@ApiOperation("Get all Active User ")
+	public List<User> getUserWithActiveStatus() throws ResourceNotFoundException {
+		return userServices.getUserWithActiveStatus();
+	}
+
 
 	@GetMapping("/roles")
 	@ApiOperation("Get All roles")

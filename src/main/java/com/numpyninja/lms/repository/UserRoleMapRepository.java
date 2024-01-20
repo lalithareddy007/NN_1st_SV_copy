@@ -4,6 +4,7 @@ import java.util.List;
 
 //import javax.persistence.EntityManager;
 
+import com.numpyninja.lms.entity.UserLogin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -55,6 +56,9 @@ public interface UserRoleMapRepository  extends JpaRepository <UserRoleMap, Long
 			+ "WHERE u.role.roleId=:roleId "
 			+ "GROUP BY u.userRoleStatus")
 	List<UserCountByStatusDTO> getUsersCountByStatusByRole(String roleId);
+
+	@Query("Select u FROM UserRoleMap u WHERE u.userRoleStatus=:userRoleStatus")
+    List<UserRoleMap> findByUserRoleStatus(@Param(value="userRoleStatus") String userRoleStatus);
 }
 
 

@@ -22,5 +22,6 @@ public interface UserRepository extends JpaRepository< User, String>{
         		" and r.role_name='ROLE_STAFF' and m.user_role_status='Active' and u.user_id = m.user_id", nativeQuery=true)
         
          List<Object> getAllStaffList();
-
+    @Query("SELECT u FROM User u WHERE u.userId IN :userId")
+    List<User> findByUserId(List<String> userId);
 }

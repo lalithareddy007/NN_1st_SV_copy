@@ -63,6 +63,8 @@ public class UserRoleMap {
 	@JsonIgnore
 	@Column( name ="last_mod_time")
 	private Timestamp lastModTime;
-
+	public String getUserId() {
+		return user != null ? user.getUserId() : null;
+	}
 }
 
