@@ -60,7 +60,11 @@ public class Assignment {
 
 	@ManyToOne (fetch=FetchType.LAZY)
     @JoinColumn (name="a_batch_id", nullable=false)  
-    private Batch batch;  
+    private Batch batch;
+
+	@ManyToOne (fetch = FetchType.LAZY)
+	@JoinColumn(name="a_cs_id", nullable=false)
+	private Class aclass;
 
 	@ManyToOne (fetch=FetchType.LAZY)
     @JoinColumn (name="a_created_by", nullable=false)

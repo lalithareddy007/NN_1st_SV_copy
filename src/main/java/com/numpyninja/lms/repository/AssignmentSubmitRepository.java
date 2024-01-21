@@ -1,8 +1,6 @@
 package com.numpyninja.lms.repository;
 
-import com.numpyninja.lms.entity.Assignment;
 import com.numpyninja.lms.entity.AssignmentSubmit;
-import com.numpyninja.lms.entity.Batch;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,4 +37,5 @@ public interface AssignmentSubmitRepository extends JpaRepository<AssignmentSubm
     List<AssignmentSubmit> getGradesByProgramId(Long programId);
 
 
+    List<AssignmentSubmit> findByAssignment_Aclass_CsId(Long csId);
 }

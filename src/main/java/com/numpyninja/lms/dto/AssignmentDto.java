@@ -61,6 +61,9 @@ public class AssignmentDto {
 	@NotNull(message = "Batch ID is mandatory")
 	private Integer batchId;
 
+	@NotNull(message = "Class ID is mandatory")
+	private Long  csId;
+
 	@NotEmpty(message = "Created By is mandatory")
 	private String createdBy;
 

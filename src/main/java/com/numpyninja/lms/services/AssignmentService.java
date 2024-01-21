@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.numpyninja.lms.entity.*;
+import com.numpyninja.lms.entity.Class;
 import com.numpyninja.lms.repository.*;
 import com.numpyninja.lms.util.AssignmentCreatedUpdatedEvent;
 import com.numpyninja.lms.util.NotificationService;
@@ -37,6 +38,9 @@ public class AssignmentService {
 	private UserRoleMapRepository userRoleMapRepository;
 
 	@Autowired
+	private ClassRepository classRepository;
+
+	@Autowired
 	private AssignmentMapper assignmentMapper;
 
 	@Autowired
@@ -60,11 +64,16 @@ public class AssignmentService {
 		if (!userRepository.existsById(assignmentDto.getGraderId()))
 			throw new ResourceNotFoundException("User", "ID", assignmentDto.getGraderId());
 
+		Long classId = assignmentDto.getCsId();
+		Class aClass= classRepository.findById(classId)
+				.orElseThrow(() -> new ResourceNotFoundException("Class", "Id", classId));
+
 		Assignment assignment = assignmentMapper.toAssignment(assignmentDto);
 		LocalDateTime now = LocalDateTime.now();
 		Timestamp timestamp = Timestamp.valueOf(now);
 		assignment.setCreationTime(timestamp);
 		assignment.setLastModTime(timestamp);
+		assignment.setAclass(aClass);
 		Assignment newAssignment = this.assignmentRepository.save(assignment);
 
 		//When a new assignment is created, an AssignmentCreatedEvent is triggered and published using Spring's ApplicationEventPublisher

@@ -22,6 +22,7 @@ import javax.validation.Validator;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AssignmentSubmitService {
@@ -413,6 +414,18 @@ public class AssignmentSubmitService {
        }
 	}
 
-     	
 
+    public double getGradeMeanByClassId(Long csId) {
+
+        List<AssignmentSubmit> assignmentSubmits = assignmentSubmitRepository.findByAssignment_Aclass_CsId(csId);
+        if(assignmentSubmits.isEmpty()){
+            throw new ResourceNotFoundException("Assignments with grades does not exist for class Id: "+ csId);
+        }
+
+        List<Integer> classGradesList = assignmentSubmits.stream()
+                .map(AssignmentSubmit::getGrade)
+                .collect(Collectors.toList());
+
+        return classGradesList.size() == 1 ? classGradesList.get(0) : classGradesList.stream().mapToDouble(Integer::doubleValue).average().orElse(0.0);
+    }
 }

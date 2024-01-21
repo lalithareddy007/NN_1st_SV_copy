@@ -20,6 +20,7 @@ public interface AssignmentMapper {
 	@Mapping(source="assignment.batch.batchId", target="batchId")
 	@Mapping(source="assignment.user.userId", target="createdBy")
 	@Mapping(source="assignment.user1.userId", target="graderId")
+	@Mapping(source="assignment.aclass.csId", target="csId")
     AssignmentDto toAssignmentDto(Assignment assignment); 
     
 	@InheritInverseConfiguration
