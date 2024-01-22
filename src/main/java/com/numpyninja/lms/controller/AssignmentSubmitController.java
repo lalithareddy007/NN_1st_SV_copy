@@ -153,4 +153,11 @@ public class AssignmentSubmitController {
         return ResponseEntity.ok("Mean of the class "+ csId +" : " + classGradesMean);
     }
 
+    @GetMapping("/class/median/{csId}")
+    @ApiOperation("Get class mean by class Id")
+    public ResponseEntity<String> getGradeMedianByClassId(@PathVariable Long csId){
+        double classGradesMedian = assignmentSubmitService.getGradesMedianByClassId(csId);
+        return ResponseEntity.ok("Median of the class "+ csId +" : " + classGradesMedian);
+    }
+
 }

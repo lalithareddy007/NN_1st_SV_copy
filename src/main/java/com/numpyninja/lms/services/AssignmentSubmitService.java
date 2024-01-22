@@ -426,6 +426,43 @@ public class AssignmentSubmitService {
                 .map(AssignmentSubmit::getGrade)
                 .collect(Collectors.toList());
 
-        return classGradesList.size() == 1 ? classGradesList.get(0) : classGradesList.stream().mapToDouble(Integer::doubleValue).average().orElse(0.0);
+        if(classGradesList.isEmpty()) {
+            throw new ResourceNotFoundException("No grades found for class Id: " + csId);
+        }
+
+        return classGradesList.size() == 1 ? classGradesList.get(0) : classGradesList
+                .stream()
+                .mapToDouble(Integer::doubleValue)
+                .average()
+                .orElseThrow(() -> new ResourceNotFoundException("Can't find mean of class: " + csId));
+    }
+
+
+    public double getGradesMedianByClassId(Long csId) {
+
+        List<AssignmentSubmit> assignmentSubmits = assignmentSubmitRepository.findByAssignment_Aclass_CsId(csId);
+        if(assignmentSubmits.isEmpty()){
+            throw new ResourceNotFoundException("Assignments with grades does not exist for class Id: "+ csId);
+        }
+
+        List<Integer> classGradesList = assignmentSubmits.stream()
+                .map(AssignmentSubmit::getGrade)
+                .collect(Collectors.toList());
+
+        if(classGradesList.isEmpty()) {
+            throw new ResourceNotFoundException("No grades found for class Id: " + csId);
+        }
+
+        if(classGradesList.size() == 1) {
+            return  classGradesList.get(0);
+        } else {
+            Collections.sort(classGradesList);
+            int length = classGradesList.size();
+            int middle = length / 2;
+
+           return Optional.of(length % 2 == 1 ?  classGradesList.get(middle) :
+                    (classGradesList.get(middle-1) + classGradesList.get(middle)) / 2.0)
+                            .orElseThrow(() -> new ResourceNotFoundException("Can't find median of class: " + csId));
+        }
     }
 }
