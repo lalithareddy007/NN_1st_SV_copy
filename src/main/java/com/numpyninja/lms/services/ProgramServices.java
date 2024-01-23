@@ -3,6 +3,7 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.ProgramDTO;
 import com.numpyninja.lms.dto.ProgramWithUsersDTO;
+import com.numpyninja.lms.entity.Batch;
 import com.numpyninja.lms.entity.Program;
 import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
@@ -11,6 +12,7 @@ import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.ProgramMapper;
 import com.numpyninja.lms.mappers.UserMapper;
+import com.numpyninja.lms.repository.ProgBatchRepository;
 import com.numpyninja.lms.repository.ProgramRepository;
 import com.numpyninja.lms.repository.UserRoleProgramBatchMapRepository;
 
@@ -34,6 +36,9 @@ import java.util.stream.Collectors;
 public class ProgramServices {
 	@Autowired
 	private ProgramRepository programRepository;
+
+	@Autowired
+	private ProgBatchRepository progBatchRepository;
 
 	@Autowired
 	private ProgramMapper programMapper;
@@ -137,6 +142,7 @@ public class ProgramServices {
 		else {
 
 			Program updateLMSProgramEntity= programRepository.findById(programId).get();
+
 			updateLMSProgramEntity.setProgramName(program.getProgramName());
 			updateLMSProgramEntity.setProgramDescription(program.getProgramDescription());
 			updateLMSProgramEntity.setProgramStatus(program.getProgramStatus());
@@ -145,6 +151,18 @@ public class ProgramServices {
 			updateLMSProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 
 			savedProgramEntity = programRepository.save(updateLMSProgramEntity);
+			// If program status is Inactive, then batches with this program name is made inactive
+			List<Batch> batch = progBatchRepository.findByProgramProgramId(programId);
+			Optional<Program> updatedProgram = programRepository.findById(programId);
+			if(updatedProgram.get().getProgramStatus().equalsIgnoreCase("Inactive"))
+			{
+				for(Batch updateBatchStatus : batch)
+				{
+					updateBatchStatus.setBatchStatus("Inactive");
+					progBatchRepository.save(updateBatchStatus);
+				}
+			}
+
 			savedProgramDTO =programMapper.INSTANCE.toProgramDTO(savedProgramEntity);
 			return savedProgramDTO;
 		}
@@ -165,7 +183,8 @@ public class ProgramServices {
 			List<Program>result= programRepository.findByProgramName(programName);
 			if(result.size()<=0) {
 				System.out.println("in update program, no program name list is found");
-				throw new ResourceNotFoundException("no list with such program name"+programName);
+				throw new ResourceNotFoundException("no list with such program name "+programName);
+
 			}else {
 				for(Program rec:result) {
 
@@ -175,7 +194,7 @@ public class ProgramServices {
 					}
 
 				}
-				//updateProgramEntity.setProgram_id(program.getProgram_id());
+				//updateProgramEntity.setProgramId(program.getProgramId());
 				updateProgramEntity.setProgramName(program.getProgramName());
 				updateProgramEntity.setProgramDescription(program.getProgramDescription());
 				updateProgramEntity.setProgramStatus(program.getProgramStatus());
@@ -183,6 +202,19 @@ public class ProgramServices {
 				updateProgramEntity.setLastModTime(new Timestamp( new Date().getTime()));
 				//updateProgramEntity= programMapper.INSTANCE.toProgramEntity(program);
 				programRepository.save(updateProgramEntity);
+
+
+				// If program status is Inactive, then batches with this program name is made inactive
+				List<Batch> batch = progBatchRepository.findByProgramProgramId(updateProgramEntity.getProgramId());
+				Optional<Program> updatedProgram = programRepository.findById(updateProgramEntity.getProgramId());
+				if(updatedProgram.get().getProgramStatus().equalsIgnoreCase("Inactive"))
+				{
+					for(Batch updateBatchStatus : batch)
+					{
+						updateBatchStatus.setBatchStatus("Inactive");
+						progBatchRepository.save(updateBatchStatus);
+					}
+				}
 
 				return programMapper.INSTANCE.toProgramDTO(updateProgramEntity);
 			}
