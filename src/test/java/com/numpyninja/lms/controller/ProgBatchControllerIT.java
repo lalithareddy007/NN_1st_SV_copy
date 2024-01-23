@@ -205,12 +205,12 @@ public class ProgBatchControllerIT {
     public void testCreateBatch() throws Exception{
  	   
     	 BatchDTO dummyBatchDTO =new BatchDTO();
-    	 dummyBatchDTO.setBatchName("Test Java Batch01");
-    	 dummyBatchDTO.setBatchDescription("TestJava Desc");
+    	 dummyBatchDTO.setBatchName("Test DataScience Batch02");
+    	 dummyBatchDTO.setBatchDescription("TestDatascience Desc");
     	 dummyBatchDTO.setBatchNoOfClasses(5);
     	 dummyBatchDTO.setBatchStatus("Active");
-    	 dummyBatchDTO.setProgramId(15L);
-    	 dummyBatchDTO.setProgramName("Java");
+    	 dummyBatchDTO.setProgramId(2L);
+    	 dummyBatchDTO.setProgramName("DataScience");
     	
     	 String requestJson =obj.writeValueAsString(dummyBatchDTO);
     	 

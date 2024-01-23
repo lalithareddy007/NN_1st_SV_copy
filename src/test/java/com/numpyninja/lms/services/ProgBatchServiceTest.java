@@ -56,23 +56,20 @@ public class ProgBatchServiceTest {
 	
     @BeforeAll
     public static void setData() {
-        long programId1 = 1;
-        long programId2 = 2;
-        String prg1Desc = "SDET";
-        String prg2Desc = "Datascience";
- 
-    	batchDTO1 = new BatchDTO(1,"01","SDET BATCH 01","In Active",  6, programId1, prg1Desc );
-    	batchDTO2 = new BatchDTO(2,"02","SDET BATCH 02","Active", 4, programId1, prg1Desc );
-    	batchDTO3 = new BatchDTO(3,"01","DataScience 01","Active", 6, programId2, prg2Desc );
+
+		program1 = new Program(1L,"SDET","SDET Program","Active",Timestamp.valueOf("2022-10-04 22:16:02.713"), Timestamp.valueOf("2022-02-04 22:16:02.713"));
+		program2 = new Program(2L,"DataScience","DS Program","Active",Timestamp.valueOf("2022-10-04 22:16:02.713"), Timestamp.valueOf("2022-02-04 22:16:02.713"));
+
+    	batchDTO1 = new BatchDTO(1,"01","SDET BATCH 01","Active",  6, 1L, "SDET" );
+    	batchDTO2 = new BatchDTO(2,"01","DatScience 01","Active", 4, 2L, "Data Science");
+    	batchDTO3 = new BatchDTO(3,"02","SDET BATCH 03","Active", 6, 1L, "SDET");
     	listOfDTOs.add(batchDTO1);
     	listOfDTOs.add(batchDTO2);
     	listOfDTOs.add(batchDTO3); 
-    	
-    	program1 = new Program(); program1.setProgramId((long)1); 
-     	program2 = new Program(); program2.setProgramId((long)2);
+
      	batch1 = new Batch(1,"01","SDET BATCH 01","Active", program1, 6, Timestamp.valueOf("2022-10-04 22:16:02.713"), Timestamp.valueOf("2022-02-04 22:16:02.713") );
-     	batch2 = new Batch(2,"02","SDET BATCH 02","Active", program1, 4, Timestamp.valueOf("2022-10-04 22:16:02.713"), Timestamp.valueOf("2021-10-04 22:16:02.713") );
-     	batch3 = new Batch( 3, "01","DataScience 01", "Active", program2,6,Timestamp.valueOf("2022-10-04 22:16:02.713"), Timestamp.valueOf("2021-10-04 22:16:02.713") );
+     	batch2 = new Batch(2,"01","DataScience 01","Active", program2, 4, Timestamp.valueOf("2022-10-04 22:16:02.713"), Timestamp.valueOf("2021-10-04 22:16:02.713") );
+     	batch3 = new Batch( 3, "02","SDET 03", "Active", program1,6,Timestamp.valueOf("2022-10-04 22:16:02.713"), Timestamp.valueOf("2021-10-04 22:16:02.713") );
      	listOfBatches.add(batch1); 
      	listOfBatches.add(batch2);
      	listOfBatches.add(batch3);
@@ -167,8 +164,8 @@ public class ProgBatchServiceTest {
 	@Order(5)
 	public void givenBatchDTO_WhenSave_ThenReturnSavedBatchDTO() throws Exception {
 		// given
-		Long programId = (long)2; 
-		given(programRepository.findById(programId)).willReturn( Optional.of(program2) );
+		Long programId = 1L;
+		given(programRepository.findById(programId)).willReturn( Optional.of(program1));
 		given (  batchMapper.toBatch( batchDTO3 )).willReturn(batch3);
 		given( batchRepository.save( batch3)).willReturn(batch3);
 		given (  batchMapper.toBatchDTO( batch3 )).willReturn(batchDTO3);
@@ -187,8 +184,8 @@ public class ProgBatchServiceTest {
 	@Order(6)                         
 	public void givenExistingBatch_WhenSave_ThenThrowsException() throws Exception {
 		// given
-		Long programId = (long)2; 
-		given(programRepository.findById(programId)).willReturn( Optional.of(program2) );
+		Long programId = (long)1;
+		given(programRepository.findById(programId)).willReturn( Optional.of(program1) );
 		given (  batchMapper.toBatch( batchDTO3 )).willReturn(batch3);
 		given (batchRepository.findByBatchNameAndProgram_ProgramId(batch3.getBatchName(), programId)).willReturn(batch3);
 		
