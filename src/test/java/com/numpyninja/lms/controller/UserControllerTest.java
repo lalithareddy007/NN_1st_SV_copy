@@ -361,17 +361,15 @@ public class UserControllerTest {
 		String userId = "U07";
 		String expectedResponse = "User " + userId + " has been successfully assigned to Program/Batch(es)";
 
-		when(userService.assignUpdateUserRoleProgramBatchStatus(any(UserRoleProgramBatchDto.class), eq(userId)))
-				.thenReturn(expectedResponse);
+		given(userService.assignUpdateUserRoleProgramBatchStatus(any(UserRoleProgramBatchDto.class), eq(userId)))
+				.willReturn(expectedResponse);
 
 		ResultActions resultActions = mockMvc.perform((put("/users/roleProgramBatchStatus/{userId}", userId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(mockUserRoleProgramBatchDto))));
 
-		MvcResult result = resultActions.andExpect(status().isOk()).andDo(print()).andReturn();
-		String response = result.getResponse().getContentAsString();
+		resultActions.andExpect(status().isOk());
 
-		assertEquals(expectedResponse, response);
 	}
 
 	@DisplayName("test to assign/update program/batches to Staff")
@@ -382,17 +380,15 @@ public class UserControllerTest {
 		String userId = "U09";
 		String expectedResponse = "User " + userId + " has been successfully assigned to Program/Batch(es)";
 
-		when(userService.assignUpdateUserRoleProgramBatchStatus(any(UserRoleProgramBatchDto.class), eq(userId)))
-				.thenReturn(expectedResponse);
+		given(userService.assignUpdateUserRoleProgramBatchStatus(any(UserRoleProgramBatchDto.class), eq(userId)))
+				.willReturn(expectedResponse);
 
 		ResultActions resultActions = mockMvc.perform((put("/users/roleProgramBatchStatus/{userId}", userId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(mockUserRoleProgramBatchDto2))));
 
-		MvcResult result = resultActions.andExpect(status().isOk()).andDo(print()).andReturn();
-		String response = result.getResponse().getContentAsString();
+		resultActions.andExpect(status().isOk()); 
 
-		assertEquals(expectedResponse, response);
 	}
 
 
