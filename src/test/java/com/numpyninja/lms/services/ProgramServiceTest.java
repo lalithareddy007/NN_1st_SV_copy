@@ -5,6 +5,7 @@ import com.numpyninja.lms.entity.Program;
 import com.numpyninja.lms.exception.DuplicateResourceFoundException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
 import com.numpyninja.lms.mappers.ProgramMapper;
+import com.numpyninja.lms.repository.ProgBatchRepository;
 import com.numpyninja.lms.repository.ProgramRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,6 +36,8 @@ public class ProgramServiceTest {
     private ProgramServices programServices;
     @Mock
     private ProgramRepository programRepository;
+    @Mock
+    private ProgBatchRepository progBatchRepository;
     @Mock
     private ProgramMapper programMapper;
     private static ProgramDTO programDto1;
@@ -130,6 +133,8 @@ public class ProgramServiceTest {
         when(programRepository.existsById(programId)).thenReturn(true);
         when(programRepository.findById(programId)).thenReturn(Optional.of(program1));
         when(programRepository.save(program1)).thenReturn(savedProgram);
+
+
         //when
         ProgramDTO programDTO = programServices.updateProgramById(programId,updatedProgramDto);
         //then
@@ -158,12 +163,15 @@ public class ProgramServiceTest {
         //given
         String programName="SQL";
         String programDescription1="Beginners Program";
-        ProgramDTO updatedProgramDto = programDto1;
+        ProgramDTO updatedProgramDto = programDto2;
         updatedProgramDto.setProgramDescription(programDescription1);
         Program savedProgram =program2;
         savedProgram.setProgramDescription(programDescription1);
         when(programRepository.findByProgramName(programName)).thenReturn(programList);
         when(programRepository.save(program2)).thenReturn(savedProgram);
+        when(programRepository.findById(program2.getProgramId())).thenReturn(Optional.of(program2));
+
+
         //when
         ProgramDTO programDTO = programServices.updateProgramByName(programName,updatedProgramDto);
         //then

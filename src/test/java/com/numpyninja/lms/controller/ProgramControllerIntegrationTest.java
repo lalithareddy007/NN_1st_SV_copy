@@ -131,7 +131,7 @@ public class ProgramControllerIntegrationTest {
         long programId=programRepository.findAll().get(0).getProgramId();
         ProgramDTO dummyProgramDto=new ProgramDTO();
         dummyProgramDto.setProgramDescription("Advance");
-        dummyProgramDto.setProgramName("Postgres");
+        dummyProgramDto.setProgramName("PostgreSQL");
         dummyProgramDto.setProgramId(250L);
         dummyProgramDto.setProgramStatus("Active");
         dummyProgramDto.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
@@ -142,6 +142,7 @@ public class ProgramControllerIntegrationTest {
                 .andReturn();
         String responseBody = mvcResult.getResponse().getContentAsString();
         ProgramDTO programDTO=obj.readValue(responseBody, ProgramDTO.class);
+        assertEquals(200,mvcResult.getResponse().getStatus());
         assertEquals(dummyProgramDto.getProgramDescription(),programDTO.getProgramDescription());
 
     }
@@ -152,7 +153,7 @@ public class ProgramControllerIntegrationTest {
         String programName="Postgres";
         ProgramDTO dummyProgramDto=new ProgramDTO();
         dummyProgramDto.setProgramDescription("Advance");
-        dummyProgramDto.setProgramName("Postgres");
+        dummyProgramDto.setProgramName("PostgreSQL");
         dummyProgramDto.setProgramId(250L);
         dummyProgramDto.setProgramStatus("Active");
         dummyProgramDto.setLastModTime(Timestamp.valueOf(LocalDateTime.now()));
@@ -163,6 +164,7 @@ public class ProgramControllerIntegrationTest {
                 .andReturn();
         String responseBody = mvcResult.getResponse().getContentAsString();
         ProgramDTO programDTO=obj.readValue(responseBody, ProgramDTO.class);
+        assertEquals(200,mvcResult.getResponse().getStatus());
         assertEquals(dummyProgramDto.getProgramDescription(),programDTO.getProgramDescription());
 
     }
