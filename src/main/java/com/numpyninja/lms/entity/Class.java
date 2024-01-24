@@ -45,7 +45,8 @@ public class Class {
     
     @Column(name="class_topic")
     private String classTopic;
-    
+    @Column(name="class_status")
+    private String classStatus;
     //@Column(name="class_staff_id")
     //private String classStaffId;
     //present one working 

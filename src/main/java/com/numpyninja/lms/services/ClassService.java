@@ -362,8 +362,10 @@ public class ClassService {
 			Boolean value= classRepository.existsById(classId);
 			if(value)
 			{
-				classRepository.deleteById(classId);
-				return value;
+				Class classEntity = classRepository.findById(classId).get();
+				classEntity.setClassStatus("Inactive");
+				classRepository.save(classEntity);
+				return true;
 			}
 			else
 			{
