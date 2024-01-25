@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttendanceDto {
-	@com.fasterxml.jackson.annotation.JsonIgnore
+	//@com.fasterxml.jackson.annotation.JsonIgnore
 	private Long attId;
 	private Long csId;
 	private String studentId;

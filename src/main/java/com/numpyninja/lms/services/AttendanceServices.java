@@ -127,7 +127,7 @@ public class AttendanceServices {
 private boolean validAttendanceDate(LocalDate classDate){
 		LocalDate dateBefore7days = LocalDate.now().minusDays(7);
         return classDate.isBefore(java.time.LocalDate.now()) &&
-				classDate.isAfter(dateBefore7days);
+				classDate.isAfter(dateBefore7days)|| classDate.equals(LocalDate.now());
     }
 
 	// Update new Attendance under class
