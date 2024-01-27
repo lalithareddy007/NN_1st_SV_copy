@@ -13,12 +13,12 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class Key {
+public class Encrypted_Key {
 	@Id
 	@Column
 	private Integer id;
 
 	@Column
 	@Type(type = "org.hibernate.type.BinaryType")
-	private byte[] key;
+	private byte[] EncryptedKey;
 }

@@ -42,12 +42,13 @@ public class KeyService {
 	private Logger logger = LoggerFactory.getLogger(KeyService.class);
 
 	private Key getKey() throws Exception {
-		Optional<com.numpyninja.lms.entity.Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
+		storeKey();
+		Optional<com.numpyninja.lms.entity.Encrypted_Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
 		if (!encodedKey.isPresent()) {
 			throw new Exception("Key is not present");
 
 		}
-		SecretKey secret = new SecretKeySpec(encodedKey.get().getKey(), "AES");
+		SecretKey secret = new SecretKeySpec(encodedKey.get().getEncryptedKey(), "AES");
 		return secret;
 	}
 
@@ -57,8 +58,8 @@ public class KeyService {
 		String inputFile = "service_account/secret";
 		BufferedInputStream fis = (BufferedInputStream) ClassLoader.getSystemResourceAsStream(inputFile);
 		byte[] content = fis.readAllBytes();
-		com.numpyninja.lms.entity.Key key = new com.numpyninja.lms.entity.Key();
-		key.setKey(content);
+		com.numpyninja.lms.entity.Encrypted_Key key = new com.numpyninja.lms.entity.Encrypted_Key();
+		key.setEncryptedKey(content);
 		key.setId(1);
 		keyRepo.save(key);
 	}
