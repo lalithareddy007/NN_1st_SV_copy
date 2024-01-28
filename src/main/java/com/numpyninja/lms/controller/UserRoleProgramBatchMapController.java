@@ -30,7 +30,7 @@ public class UserRoleProgramBatchMapController {
 
     @GetMapping("")
     @ApiOperation("Get Assigned Program/Batch(es) of All Users")
-    //@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UserRoleProgramBatchMapDto>> getAll() {
         return ResponseEntity.ok(userRoleProgramBatchMapService.getAllUserRoleProgramBatchMaps());
     }
@@ -38,11 +38,25 @@ public class UserRoleProgramBatchMapController {
 
     @GetMapping("/{userId}")
     @ApiOperation("Get Assigned Program/Batch of a User By User Id")
-    //@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UserRoleProgramBatchMapDto>> getById(@PathVariable(value="userId") String userId) throws InvalidDataException
     {
         return ResponseEntity.ok(userRoleProgramBatchMapService.getByUserId(userId));
     }
+
+
+
+    @DeleteMapping("/deleteAll/{userId}")
+    @ApiOperation("Delete All Programs/Batches assigned to the User By UserId")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse> deleteAllProgramBatchesAssignedToAUser(@PathVariable(value = "userId") String userId) throws ResourceNotFoundException
+    {
+        userRoleProgramBatchMapService.deleteAllByUserId(userId);
+        return new ResponseEntity<ApiResponse>(new ApiResponse("Deleted All Programs/Batches assigned to User ID",true),HttpStatus.OK);
+
+    }
+
+
 
 
 //    @DeleteMapping("/{userId}/{roleId}/{programId}/{batchId}")
@@ -60,25 +74,17 @@ public class UserRoleProgramBatchMapController {
 
 
 
-    @DeleteMapping("/{userId}")
-    @ApiOperation("Delete Program/Batch assigned to a User By Id")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> deleteProgramBatchAssignedById(@PathVariable(value = "userId") String userId)
-    {
-        //List<UserRoleProgramBatchMapDto> userRoleProgramBatchMapDtos = userRoleProgramBatchMapService.getByUserId(userId);
-         userRoleProgramBatchMapService.deleteById(userId);
-        return new ResponseEntity<ApiResponse>(new ApiResponse("Deleted the program/batch assigned to the User Id", true),HttpStatus.OK);
-    }
+//    @DeleteMapping("/{userId}")
+//    @ApiOperation("Delete Program/Batch assigned to a User By Id")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    public ResponseEntity<ApiResponse> deleteProgramBatchAssignedById(@PathVariable(value = "userId") String userId)
+//    {
+//        //List<UserRoleProgramBatchMapDto> userRoleProgramBatchMapDtos = userRoleProgramBatchMapService.getByUserId(userId);
+//         userRoleProgramBatchMapService.deleteById(userId);
+//        return new ResponseEntity<ApiResponse>(new ApiResponse("Deleted the program/batch assigned to the User Id", true),HttpStatus.OK);
+//    }
 
 
 
-    @DeleteMapping("/deleteAll/{userId}")
-    @ApiOperation("Delete All Programs/Batches assigned to the User By UserId")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ApiResponse> deleteAllProgramBatchesAssignedToAUser(@PathVariable(value = "userId") String userId) throws ResourceNotFoundException
-    {
-        userRoleProgramBatchMapService.deleteAllByUserId(userId);
-        return new ResponseEntity<ApiResponse>(new ApiResponse("Deleted All Programs/Batches assigned to User ID",true),HttpStatus.OK);
 
-    }
 }

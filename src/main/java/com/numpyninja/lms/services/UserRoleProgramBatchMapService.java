@@ -68,6 +68,28 @@ public class UserRoleProgramBatchMapService {
     }
 
 
+
+    public void deleteAllByUserId(String userId)
+    {
+        List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository.findByUser_UserId(userId);
+        if(userRoleProgramBatchMaps.isEmpty())
+        {
+            throw new ResourceNotFoundException("UserRoleProgramBatchMap","id",userId);
+        }
+        for(UserRoleProgramBatchMap userRoleProgramBatchMap : userRoleProgramBatchMaps)
+        {
+            if(userRoleProgramBatchMap.getUserRoleProgramBatchStatus().equalsIgnoreCase("Active"))
+            {
+                userRoleProgramBatchMap.setUserRoleProgramBatchStatus("Inactive");
+                userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
+            }
+        }
+        //userRoleProgramBatchMapRepository.deleteAll(userRoleProgramBatchMap);
+
+    }
+
+
+
     //delete/Unassign the assigned Program/Batch for a user by user id
 //    public void deleteById(String userId, String roleId, Long programId, Integer batchId)
 //    {
@@ -99,30 +121,22 @@ public class UserRoleProgramBatchMapService {
 //       {
 //           throw new ResourceNotFoundException("UserRoleProgramBatchMap","id",userId);
 //       }
+//       String roleId = userRoleProgramBatchMaps.get(0).getRole().getRoleId();
+//       Long programId = userRoleProgramBatchMaps.get(0).getProgram().getProgramId();
+//       Integer batchId = userRoleProgramBatchMaps.get(0).getBatch().getBatchId();
+//
+//       Long userRoleProgramBatchId = userRoleProgramBatchMapRepository.findByUser_UserId(userId).get(0).getUserRoleProgramBatchId();
+//
+//       Optional<UserRoleProgramBatchMap> userRoleProgramBatchMap = userRoleProgramBatchMapRepository.findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId(userId,roleId,programId,batchId);
+//       if(userRoleProgramBatchMap.get().getUserRoleProgramBatchStatus().equalsIgnoreCase("Active"))
+//       {
+//           userRoleProgramBatchMap.get().setUserRoleProgramBatchStatus("Inactive");
+//           userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap.get());
+//       }
+//    }
 
 
-    //}
 
-
-
-    public void deleteAllByUserId(String userId)
-    {
-       List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository.findByUser_UserId(userId);
-       if(userRoleProgramBatchMaps.isEmpty())
-       {
-           throw new ResourceNotFoundException("UserRoleProgramBatchMap","id",userId);
-       }
-       for(UserRoleProgramBatchMap userRoleProgramBatchMap : userRoleProgramBatchMaps)
-       {
-           if(userRoleProgramBatchMap.getUserRoleProgramBatchStatus().equalsIgnoreCase("Active"))
-           {
-               userRoleProgramBatchMap.setUserRoleProgramBatchStatus("Inactive");
-               userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap);
-           }
-       }
-       //userRoleProgramBatchMapRepository.deleteAll(userRoleProgramBatchMap);
-
-    }
 
 
 
