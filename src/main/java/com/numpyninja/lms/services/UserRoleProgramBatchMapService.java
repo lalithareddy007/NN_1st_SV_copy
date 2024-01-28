@@ -2,6 +2,7 @@ package com.numpyninja.lms.services;
 
 import com.numpyninja.lms.dto.UserRoleProgramBatchDto;
 import com.numpyninja.lms.dto.UserRoleProgramBatchMapDto;
+import com.numpyninja.lms.entity.User;
 import com.numpyninja.lms.entity.UserRoleProgramBatchMap;
 import com.numpyninja.lms.exception.InvalidDataException;
 import com.numpyninja.lms.exception.ResourceNotFoundException;
@@ -95,13 +96,25 @@ public class UserRoleProgramBatchMapService {
 //    public void deleteById(String userId) {
 //
 //       List<UserRoleProgramBatchMap> userRoleProgramBatchMaps = userRoleProgramBatchMapRepository.findByUser_UserId(userId);
-//       if(userRoleProgramBatchMaps.isEmpty())
+//
+//        if(userRoleProgramBatchMaps.isEmpty())
+//        {
+//            throw new ResourceNotFoundException("UserRoleProgramBatchMap","id",userId);
+//        }
+//        String roleId = userRoleProgramBatchMaps.get(0).getRole().getRoleId();
+//       Long programId = userRoleProgramBatchMaps.get(0).getProgram().getProgramId();
+//       Integer batchId = userRoleProgramBatchMaps.get(0).getBatch().getBatchId();
+//
+//       Long userRoleProgramBatchId = userRoleProgramBatchMapRepository.findByUser_UserId(userId).get(0).getUserRoleProgramBatchId();
+//
+//       Optional<UserRoleProgramBatchMap> userRoleProgramBatchMap = userRoleProgramBatchMapRepository.findByUser_UserIdAndRoleRoleIdAndProgram_ProgramIdAndBatch_BatchId(userId,roleId,programId,batchId);
+//       if(userRoleProgramBatchMap.get().getUserRoleProgramBatchStatus().equalsIgnoreCase("Active"))
 //       {
-//           throw new ResourceNotFoundException("UserRoleProgramBatchMap","id",userId);
+//           userRoleProgramBatchMap.get().setUserRoleProgramBatchStatus("Inactive");
+//           userRoleProgramBatchMapRepository.save(userRoleProgramBatchMap.get());
 //       }
-
-
-    //}
+//
+//    }
 
 
 
