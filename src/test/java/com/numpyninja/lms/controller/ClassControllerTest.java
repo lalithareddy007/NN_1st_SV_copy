@@ -73,15 +73,15 @@ class ClassControllerTest extends AbstractTestController {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        ClassDto classDto1 = new ClassDto(1L, 1, 1, classDate, "Selenium1",
+        ClassDto classDto1 = new ClassDto(1L, 1, 1, classDate, "Selenium1","Active",
                 "UO2", "Selenium1 Class", "OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath");
-        ClassDto classDto2 = new ClassDto(1L, 1, 1, classDate, "Selenium2",
+        ClassDto classDto2 = new ClassDto(1L, 1, 1, classDate, "Selenium2","Active",
                 "UO3", "Selenium2 Class", "OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath");
-        ClassDto classDto3 = new ClassDto(1L, 1, 1, classDate, "Selenium3",
+        ClassDto classDto3 = new ClassDto(1L, 1, 1, classDate, "Selenium3","Active",
                 "UO2", "Selenium3 Class", "OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath");
@@ -350,7 +350,7 @@ class ClassControllerTest extends AbstractTestController {
         @WithMockAdmin
         void testUpdateClassByClassId() {
             Date date = setdate();
-            ClassDto updateClassDTO = new ClassDto(1L, 1, 1, date, "Selenium-01",
+            ClassDto updateClassDTO = new ClassDto(1L, 1, 1, date, "Selenium-01","Active",
                     "UO2", "Selenium1 Introduction Class", "OK",
                     "c:/ClassNotes",
                     "c:/RecordingPath");
@@ -375,7 +375,7 @@ class ClassControllerTest extends AbstractTestController {
         @WithMockStudent
         void testUpdateClassScheduleByIdForbidden() {
             Date date = setdate();
-            ClassDto updateClassDTO = new ClassDto(1L, 1, 1, date, "Selenium-01",
+            ClassDto updateClassDTO = new ClassDto(1L, 1, 1, date, "Selenium-01","Active",
                     "UO2", "Selenium1 Introduction Class", "OK",
                     "c:/ClassNotes",
                     "c:/RecordingPath");
@@ -399,7 +399,7 @@ class ClassControllerTest extends AbstractTestController {
             Long classId = 7L;
             String message = "Class with class id  not found";
             Date date = setdate();
-            ClassDto updateClassDTO = new ClassDto(1L, 1, 1, date, "Selenium-01",
+            ClassDto updateClassDTO = new ClassDto(1L, 1, 1, date, "Selenium-01","Active",
                     "UO2", "Selenium1 Introduction Class", "OK",
                     "c:/ClassNotes",
                     "c:/RecordingPath");
