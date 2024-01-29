@@ -40,17 +40,36 @@ public class KeyService {
 	private String credentialPath ;
 	
 	private Logger logger = LoggerFactory.getLogger(KeyService.class);
-
 	private Key getKey() throws Exception {
-		storeKey();
-		Optional<com.numpyninja.lms.entity.Encrypted_Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
-		if (!encodedKey.isPresent()) {
-			throw new Exception("Key is not present");
-
+		String secretFromEnv = System.getenv("KEY");
+		if (secretFromEnv != null && !secretFromEnv.isEmpty()) {
+			byte[] secretBytes = secretFromEnv.getBytes(StandardCharsets.UTF_8); // Convert to byte array
+			//takes the byte array secretBytes, assumed to contain valid key material for AES encryption,
+			// and creates a SecretKey object ready to be used for AES encryption or decryption operations
+			SecretKey secret = new SecretKeySpec(secretBytes, "AES");//Advanced Encryption Standard
+			logger.info("Using secret from environmental variable.");
+			return secret;
+		} else {
+			Optional<com.numpyninja.lms.entity.Encrypted_Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
+			if (encodedKey.isEmpty()) {
+				throw new Exception("Key is not present in the database.");
+			}
+			SecretKey secret = new SecretKeySpec(encodedKey.get().getEncryptedKey(), "AES");
+			logger.info("Using secret from the database.");
+			return secret;
 		}
-		SecretKey secret = new SecretKeySpec(encodedKey.get().getEncryptedKey(), "AES");
-		return secret;
 	}
+
+//	private Key getKey() throws Exception {
+//		storeKey();
+//		Optional<com.numpyninja.lms.entity.Encrypted_Key> encodedKey = keyRepo.findById(Integer.valueOf(1));
+//		if (!encodedKey.isPresent()) {
+//			throw new Exception("Key is not present");
+//
+//		}
+//		SecretKey secret = new SecretKeySpec(encodedKey.get().getEncryptedKey(), "AES");
+//		return secret;
+//	}
 
 	//This code should be used for storing the key in the database
 	//This is not used all the time but, incase key needs to be re-written to DB, it should be done through this
