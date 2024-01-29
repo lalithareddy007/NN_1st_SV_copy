@@ -336,6 +336,9 @@ public class ClassService {
 
 		if(StringUtils.hasLength(modifiedClassDTO.getClassTopic()))
 			savedClass.setClassTopic(modifiedClassDTO.getClassTopic());
+
+		if(StringUtils.hasLength(modifiedClassDTO.getClassStatus()))
+			savedClass.setClassStatus(modifiedClassDTO.getClassStatus());
 		
 
 		if(modifiedClassDTO.getClassNo().getClass() == Integer.class)
