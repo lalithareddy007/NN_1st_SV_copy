@@ -19,10 +19,11 @@ class UserRoleMapRepositoryTest {
 	@Test
 	@DisplayName("To test the method find user role map by given user ID")
 	void testFindUserRoleMapsByUserUserId() {
+		//given
 		var userId = userRoleMapRepo.findAll().get(0).getUser().getUserId();
-
+		//when
 		var userRole = userRoleMapRepo.findUserRoleMapsByUserUserId(userId);
-		
+		//then
 		assertThat(userRole).isNotNull();
 		assertThat(userRole.get(0).getUser().getUserId()).isEqualTo(userId);
 	}
