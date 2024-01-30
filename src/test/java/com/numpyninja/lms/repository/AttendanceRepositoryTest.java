@@ -51,9 +51,9 @@ class AttendanceRepositoryTest {
 		User user = new User("U02", "Steve", "Jobs", "", (long) 1234567890, "CA", "PST", "@stevejobs",
 				"", "", "", "Citizen", timestamp, timestamp);
 		Class class1 = new Class ((long) 7, batch, 4, dueDate,
-                "Selenium", user, "Selenium Class", "OK",
+                "Selenium","Active", user, "Selenium Class", "OK",
                 "c:/ClassNotes",
-                "c:/Recordings", timestamp, timestamp); 
+                "c:/Recordings", timestamp, timestamp);
 		Attendance attendance = new Attendance(6L, class1, user, "Present", timestamp, timestamp, java.time.LocalDate.now());
 		return attendance;
 	}
@@ -69,7 +69,7 @@ class AttendanceRepositoryTest {
 		 Program program = new Program((long) 7, "Django", "new Prog", "nonActive", timestamp, timestamp);
 		Batch batchInClass = new Batch(1, "SDET 1", "SDET Batch 1", "Active", program, 5, timestamp, timestamp);
 		Class class2 =  new Class((long) 7, batchInClass, 1, classDate,
-                "Selenium", user, "Selenium Class", "OK",
+                "Selenium", "Active",user, "Selenium Class", "OK",
                 "c:/ClassNotes",
                 "c:/RecordingPath", timestamp, timestamp);
         return class2;
