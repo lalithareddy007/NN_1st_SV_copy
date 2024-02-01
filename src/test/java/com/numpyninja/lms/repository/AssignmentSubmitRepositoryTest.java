@@ -1,9 +1,6 @@
 package com.numpyninja.lms.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,16 +8,10 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import com.numpyninja.lms.dto.AssignmentSubmitDTO;
 import com.numpyninja.lms.entity.*;
-import com.numpyninja.lms.exception.ResourceNotFoundException;
-import com.numpyninja.lms.mappers.AssignmentSubmitMapper;
-import com.numpyninja.lms.services.AssignmentSubmitService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -67,12 +58,12 @@ public class AssignmentSubmitRepositoryTest {
 				1234567809L, "CA", "PST", "@elonmusk", "",
 				"", "", "Citizen", timestamp, timestamp);
 
-		Assignment assignment = new Assignment(1L, "Test Assignment",
+		Assignment assignment = new Assignment(20L, "Test Assignment",
 				"Junit test", "practice", dueDate, "Filepath1",
 				"Filepath2", "Filepath3", "Filepath4",
 				"Filepath5", batch, user, user1, timestamp, timestamp);
 
-		Assignment assignment1 = new Assignment(1L, "Test Assignment",
+		Assignment assignment1 = new Assignment(20L, "Test Assignment",
 				"Junit test", "practice", dueDate, "Filepath1",
 				"Filepath2", "Filepath3", "Filepath4",
 				"Filepath5", batch, user1, user1, timestamp, timestamp);
@@ -97,9 +88,6 @@ public class AssignmentSubmitRepositoryTest {
 
 		//given
 		assignmentSubmitRepo.save(mockAssignmentSubmit);
-
-		System.out.println("USER" + mockAssignmentSubmit.getUser().getUserId());
-		//System.out.println("List"+assignmentSubmitList);
 
 		//when
 		List<AssignmentSubmit> assignmentSubmitList = assignmentSubmitRepo.findByUser_userId(mockAssignmentSubmit.getUser().getUserId());
@@ -156,9 +144,8 @@ public class AssignmentSubmitRepositoryTest {
 	@Test
 	@DisplayName("Test for reSubmit Assignment")
 	public void testResubmitAssignment() {
-		Long submissionId = 1L;
+		Long submissionId = assignmentSubmitRepo.findAll().get(0).getSubmissionId();
 
-		// Save the mockAssignmentSubmit object in the repository
 		assignmentSubmitRepo.save(mockAssignmentSubmit);
 
 
